@@ -92,7 +92,7 @@ You will see a menu like this one..
 etc..  
 
  
-## Can I install it perminently 
+## Can I install it permanently 
 
 * it may already be installed.. 
 * optionaly on the Master run these commands
