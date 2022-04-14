@@ -96,12 +96,17 @@ etc..
 
 * it may already be installed.. 
 * optionaly on the Master run these commands
-* cp dino.py /usr/bin/local
-* cp get_context.py /usr/bin/local 
+* cp dino.py /usr/local/sbin/ 
+* cp get_context.py /usr/local/sbin/ 
+* chmod a+x /usr/local/sbin/dino.py 
+* chmod a+x /usr/local/sbin/get_context.py 
 
 ## How can I add new steps
 
 * edit the code and commit to master    
 * email simon.green and ask if he can add it for you 
+
+
+
 
 
