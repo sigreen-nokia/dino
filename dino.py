@@ -387,7 +387,7 @@ def submenu212():
 def whatsatrainer():
      print("""
               A trainer is code designed to teach how to write and execute day to day tasks and automations
-              Trainer code is not fancy, as its intended to be readble. 
+              Trainer code is not fancy, as its intended to be readable. 
               It tells the user how it did the task, so they can do it themselfes 
               The code is intended to be shared, improved and reused. No rules
               Its written on top of other peoples code, thanks Ato, thanks Chris 

@@ -10,7 +10,7 @@
 
 
 * dino.py is a trainer intended to teach customer engineers how to write and execute day to day tasks and automations
-* A trainers code is not fancy, as its intended to be readble.
+* A trainers code is not fancy, as its intended to be readable.
 * It tells the user how it did the task, so they can do it themselfes
 * The code is intended to be shared, improved and reused.
 * Its written on top of other peoples code and hints, thanks Ato, thanks Chris thanks everyone
