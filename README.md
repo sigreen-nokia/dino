@@ -49,14 +49,14 @@ You will see a menu like this one..
 	Deepfield Cluster Health
 	-------------------------------------------------
 
-            1.salt-ping all nodes                      			#tests basic connectivity Master to each worker
-            2.soup status on all nodes      		       		#checks the status of the Deepfield processes
-            3.check disk space 						#show disk space available per partition for all nodes    
-            4.memory hogs 						#show the top processes consuming memory for all nodes 
-            5.cpu hogs 							#show the top processes consuming cpu for all nodes 
-            6.show me the cpu details for each node 			#cpu details
-            7.show me the cpu model for each node 			#cpu model
-            8.get the cpu clock speeds for each node 			#wondering why one node is busy.. perhaps you have a fan out and the clock was stepped
+            1.salt-ping all nodes                          #tests basic connectivity Master to each worker
+            2.soup status on all nodes                     #checks the status of the Deepfield processes
+            3.check disk space                             #show disk space available per partition for all nodes    
+            4.memory hogs                                  #show the top processes consuming memory for all nodes 
+            5.cpu hogs                                     #show the top processes consuming cpu for all nodes 
+            6.show me the cpu details for each node        #cpu details
+            7.show me the cpu model for each node          #cpu model
+            8.get the cpu clock speeds for each node       #wondering why one node is busy.. perhaps you have a fan out and the clock was stepped
             9.Return
 
 
