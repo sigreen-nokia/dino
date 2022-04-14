@@ -35,7 +35,7 @@ You will see a menu like this one..
             6.mysql (empty)
             7.postgres (empty)
             8.impala (empty)
-            9.kafka (empoty)
+            9.kafka (empty)
             10.redis (empty)
             11.tracing (empty)
             12.networking and bonding
