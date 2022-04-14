@@ -42,9 +42,6 @@ You will see a menu like this one..
             13.bgp (empty)
             14.Exit
 
-....and can click through the menu's in order to execute tasks   
-
-
 	-------------------------------------------------
 	Deepfield Cluster Health
 	-------------------------------------------------
@@ -89,7 +86,30 @@ You will see a menu like this one..
             12.test connectivity to Deepfield metrics 
             13.Return
 
-etc..  
+....and can click through the menu's in order to execute tasks
+
+    Enter your choice: 9
+    Command is:sudo salt \* cmd.run "ntpq -p"
+    worker01:
+             remote           refid      st t when poll reach   delay   offset  jitter
+        ==============================================================================
+        *10.22.192.240   10.22.8.132      3 u  273 1024  377    0.819    0.019   2.226
+        +10.22.192.241   10.22.8.132      3 u  123 1024  377    0.628    0.088   2.042
+         LOCAL(0)        .LOCL.          14 l  36d   64    0    0.000    0.000   0.000
+        +master.site. 12.34.567.241    4 u  353 1024  377    0.080   -3.167   8.322
+    master:
+             remote           refid      st t when poll reach   delay   offset  jitter
+        ==============================================================================
+        *10.22.192.240   10.22.8.132      3 u    -   64  377    0.464    4.742   1.452
+        +10.22.192.241   10.22.8.132      3 u    1   64  377    0.567    3.045   1.431
+         LOCAL(0)        .LOCL.          10 l  36d   64    0    0.000    0.000   0.000
+    worker02:
+             remote           refid      st t when poll reach   delay   offset  jitter
+        ==============================================================================
+        *10.22.192.240   10.22.8.132      3 u  569 1024  377    1.083  -11.344  15.715
+        +10.22.192.241   10.22.8.132      3 u  110 1024  377    1.126   -6.815  12.341
+         LOCAL(0)        .LOCL.          14 l  36d   64    0    0.000    0.000   0.000
+        +master.ite. 12.34.567.241    4 u  589 1024  377    0.586  -20.116  14.507
 
  
 ## Can I install it permanently 
