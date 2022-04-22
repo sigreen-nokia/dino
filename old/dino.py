@@ -12,9 +12,6 @@ from subprocess import check_output as run
 #statics
 logDir = '/pipedream/log/'
 uiLogName = 'ui.log'
-# path to place the dino working files directory
-# WorkingDir = '/tmp'
-WorkingDir = '/pipedream/log/'
 # log of all queries
 queriesFile = './queries_from_logs.txt'
 # results files with query-counts and sorted query-counts 
@@ -290,39 +287,29 @@ def submenu25():
     print("\t-------------------------------------------------")
     while True:
         print("""
-            1.Show the most frequently ran customer queries in context traffic 
-            2.Show the most frequently ran customer queries in contexts backbone
-            3.Show the most frequently ran customer queries in contexts big_cube 
-            4.Show the most frequently ran customer queries in context subscriber
-            5.Show the most frequently ran customer queries in context video_stream
-            6.Show the most frequently ran customer queries in context flowdump
-            7.Cleanup the dino-* directories used to store the queries
-            8.Return""")
+            1.Show the most frequently ran customer queries in contexts traffic,backbone,big_cube 
+            2.Show the most frequently ran customer queries in context subscriber
+            3.Show the most frequently ran customer queries in context video_stream
+            4.Show the most frequently ran customer queries in context flowdump
+            5.Cleanup the /tmp/dino-* directories used to store the queries
+            6.Return""")
         print("\n")
-        #to get avialable cubes https://localhost:22222/cube/list
         ch=int(input("Enter your choice: "))
-        # you can list more than one context, coma seperated
         if(ch == 1):
-            mycontext = ['traffic'] 
+            mycontext = ['traffic', 'backbone', 'big_cube'] 
             getMostUsedQueries()
         elif ch == 2:
-            mycontext = ['backbone'] 
-            getMostUsedQueries()
-        elif ch == 3:
-            mycontext = ['big_cube'] 
-            getMostUsedQueries()
-        elif ch == 4:
             mycontext = ['subscriber'] 
             getMostUsedQueries()
-        elif ch == 5:
+        elif ch == 3:
             mycontext = ['video_stream'] 
             getMostUsedQueries()
-        elif ch == 6:
+        elif ch == 4:
             mycontext = ['flowdump'] 
             getMostUsedQueries()
-        elif ch == 7:
-            os.system("rm -rf " + WorkingDir + "dino-*")
-        elif ch == 8:
+        elif ch == 5:
+            os.system("rm -rf /tmp/dino-*")
+        elif ch == 6:
             topmenu()
         else:
             print("Invalid entry")
@@ -586,14 +573,14 @@ def analyzeQueries(queriesDF):
         print(df[["context", "dimensions", "boundaries", "uuid", "name", "count"]].sort_values(['count'], ascending=False).head(queryThreshold))
     print("*************************************************************")
     print("\n\nDetailed query results can be found in the following files \n")
-    print("	" + WorkingDir + "dino-" + str(os.getpid()) + "/querysummary_sorted_on_count.csv contains the queries sorted on number of hits")
-    print("	"  + WorkingDir + "dino-" + str(os.getpid()) + "/queries_from_logs.txt contains the log entries for all querys found")
+    print("	/tmp/dino-" + str(os.getpid()) + "/querysummary_sorted_on_count.csv contains the queries sorted on number of hits")
+    print("	/tmp/dino-" + str(os.getpid()) + "/queries_from_logs.txt contains the log entries for all querys found")
     print("\n\nSome of the files can get quite large, so if you do not planning to use them you might consider cleanig up with \n")
-    print("rm -rf " + WorkingDir + "dino-" + str(os.getpid()))
+    print("rm -rf /tmp/dino-" + str(os.getpid()))
 
 
 def makeTempDir():
-    tmpDirPath = ( WorkingDir + 'dino-' + str(os.getpid()))  
+    tmpDirPath = ('/tmp/dino-' + str(os.getpid()))  
     log.info('Creating dir ' + str(tmpDirPath))
     os.mkdir(str(tmpDirPath))
     os.chdir(tmpDirPath)
