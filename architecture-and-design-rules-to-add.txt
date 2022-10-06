@@ -1,0 +1,50 @@
+1)
+
+Emily Vaughn-Kukura
+:mount_fuji: Jul 15th at 6:51 PM
+Digging in on the deployment, I found that every dnsflow node has 7 instances of dnsflowd running (and there are 33 nodes), so we have 231 dnsflowds, which means 231 consumers of the df-dnsflow-raw topic. However, there are only 152 total partitions of that topic:
+support@charter-prod2-master:~$ kafka-topics --bootstrap-server localhost:9092 --describe --topic df-dnsflow-raw | tail -5
+	Topic: df-dnsflow-raw	Partition: 147	Leader: 7267881	Replicas: 7267881,644006662	Isr: 7267881,644006662
+	Topic: df-dnsflow-raw	Partition: 148	Leader: 13918645	Replicas: 13918645,678085621	Isr: 678085621,13918645
+	Topic: df-dnsflow-raw	Partition: 149	Leader: 23558369	Replicas: 23558369,681017937	Isr: 23558369,681017937
+	Topic: df-dnsflow-raw	Partition: 150	Leader: 30947268	Replicas: 30947268,683294962	Isr: 30947268,683294962
+	Topic: df-dnsflow-raw	Partition: 151	Leader: 33011909	Replicas: 33011909,683850257	Isr: 33011909,683850257
+support@charter-prod2-master:~$ 
+consumers cant 'share' a single partition, so this results in the remaining 231-152=79 dnsflow instances to just be sitting idle, each using ~7GB of resident memory - for example on worker92 where all instances are idle:
+upport@charter-prod2-worker92:~$ ps aux | grep dnsflow | grep -v "grep" | awk '{$5=int(100 * $5/1024/1024)/100"GB";}{$6=int(100 * $6/1024/1024)/100"GB";}{ print;}'
+dfdaemon 2659 24.5 0.7 91.78GB 7.33GB ? Sl 17:44 0:37 /usr/local/sbin/dnsflowd -n 06
+dfdaemon 5627 4.6 0.7 91.79GB 7.33GB ? Sl 16:13 4:19 /usr/local/sbin/dnsflowd -n 04
+dfdaemon 41830 4.6 0.7 91.79GB 7.33GB ? Sl 16:46 2:48 /usr/local/sbin/dnsflowd -n 01
+dfdaemon 50146 8.1 0.7 91.78GB 7.33GB ? Sl 17:36 0:53 /usr/local/sbin/dnsflowd -n 00
+dfdaemon 62289 4.6 0.7 91.79GB 7.33GB ? Sl 16:53 2:31 /usr/local/sbin/dnsflowd -n 03
+dfdaemon 87775 77.8 0.7 91.71GB 7.32GB ? Sl 17:46 0:31 /usr/local/sbin/dnsflowd -n 05
+dfdaemon 124188 5.1 0.7 91.78GB 7.33GB ? Sl 17:12 1:47 /usr/local/sbin/dnsflowd -n 02
+support@charter-prod2-worker92:~$ 
+2 replies
+
+
+Emily Vaughn-Kukura
+:mount_fuji:  3 days ago
+This isn't breaking anything but its wasteful and could confuse people, so I think we should reduce the number of dnsflowd instances cluster-wide to 152. We can do this by setting 4 or 5 dnsflow's per instance in slice. We already are going to need to do a rolling restart of dnsflow: when we apply the patch for the dnsflow segfaults on monday (https://nokiadeepfield.slack.com/archives/C02E96UQ1NK/p1657655584931939), so we can do this config change at the same time.
+
+
+Emily Vaughn-Kukura
+:mount_fuji:  3 days ago
+FYI 
+@Tenchov, Kaloyan (Nokia - US/Ann Arbor)
+ 
+@Zhang, Jeff 2. (Nokia - US/Ann Arbor)
+ 
+@Zuellig, Joshua (Nokia - US/Ann Arbor)
+
+2) see BT ticket.. 
+
+
+
+
+
+
+
+
+
+

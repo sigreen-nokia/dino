@@ -89,8 +89,7 @@ def topmenu():
     #hdfs dfs -ls /pipedream/cache/dimensions/
     #mtr --no-dns --report --report-cycles 60 worker01
     #nodes with dnsflow sudo salt -G roles:dnsflow cmd.run 'supervisorctl status | grep dns'
-    #genome genome.py check url /etc/hosts port
-    #data view management, see my bt ps ticket and steps in the git.  
+
     while True:
         print("""
             1.Whats a trainer ? 
