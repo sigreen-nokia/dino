@@ -8,7 +8,9 @@ import get_context
 import pandas as pd
 import deepy.log as log
 from subprocess import check_output as run
-
+from datetime import date
+#date 
+today = str(date.today())
 #statics
 logDir = '/pipedream/log/'
 uiLogName = 'ui.log'
@@ -42,29 +44,23 @@ boundary_regex = re.compile(r"\((boundary\.[\w.-]*),.*\)")
 def topmenu():
 
     os.system("clear")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
     print("\tDino - Deepfield customer engineer trainer")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\t-------------------------------------------------")
 
     #incomming!!
-    #routers.pt --list | | tr -s ' ' (list all routers)
+    #routers.py --list | | tr -s ' ' (list all routers)
     #all daemon processes at 100% normd collectord dnsflowd 
-    #hdfs 
-    #hdfs dfsadmin -report
     #birdc
     #sudo birdc show protocols 
     #sudo birdc show route protocol session_217_41_168_0 | wc -l 
-    #swap
-    #whats using my swap space
     #for file in /proc/*/status ; do awk '/VmSwap|Name/{printf $2 " " $3}END{ print ""}' $file; done | sort -k 2 -n -r 
-    #how much swap do I have 
-    #grep -i swap /proc/meminfo
     #mysql (<5.2)
     #mysql -u root -e "show databases";
     #mysql -u root -e "use defender_bt-tactical; show tables;"
@@ -73,9 +69,6 @@ def topmenu():
     #impala-shell
     #redis-cli keys "*license.json" | xargs redis-cli del
     #flow tracing
-    #Check if we are receiving flow by router
-    #flow.py --show-realtime
-    #flow.py --show-realtime | grep worker02 | wc -l  
     #normd
     #pdvi.py traffic.json
     #bgp bgp.py --search 213.187.233.0/24
@@ -86,7 +79,6 @@ def topmenu():
     #ptdump
     #python community.py 
     #dims.py dump suspicious | more
-    #hdfs dfs -ls /pipedream/cache/dimensions/
     #mtr --no-dns --report --report-cycles 60 worker01
     #nodes with dnsflow sudo salt -G roles:dnsflow cmd.run 'supervisorctl status | grep dns'
     #genome genome.py check url /etc/hosts port
@@ -106,7 +98,9 @@ def topmenu():
             11.tracing (empty)
             12.networking and bonding
             13.bgp (empty)
-            14.Exit""")
+            14.MOP
+            15.HDFS
+            16.Exit""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -138,6 +132,10 @@ def topmenu():
         elif ch == 13:
             foldername=input("Enter the foldername: ")
         elif ch == 14:
+            submenu214() 
+        elif ch == 15:
+            submenu215() 
+        elif ch == 16:
             print("Exiting application")
             exit()
         else:
@@ -148,14 +146,14 @@ def topmenu():
 
 def submenu22():
     os.system("clear")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
     print("\tDeepfield Example Queries")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\t-------------------------------------------------")
     while True:
         print("""
@@ -181,14 +179,14 @@ def submenu22():
 
 def submenu23():
     os.system("clear")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
     print("\tDeepfield Cluster Health")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\t-------------------------------------------------")
     while True:
         print("""
@@ -204,7 +202,10 @@ def submenu23():
             10.show me the cpu details for each node 			#cpu details
             11.show me the cpu model for each node 			#cpu model
             12.get the cpu clock speeds for each node 			#wondering why one node is busy.. perhaps you have a fan out and the clock was stepped
-            13.Return""")
+            13.Whats taking up all my SWAP space
+            14.How much SWAP space do I have
+            15.flow                                                     #show router flow per DCU
+            16.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -256,6 +257,18 @@ def submenu23():
             print("Command is:" + mycmd )
             os.system(mycmd)
         elif ch == 13:
+            mycmd = ("for file in /proc/*/status ; do awk '/VmSwap|Name/{printf $2 \" \" $3}END{ print \"\"}' $file; done | sort -k 2 -n -r")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif ch == 14:
+            mycmd = ("grep -i swap /proc/meminfo")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif ch == 15:
+            mycmd = ("flow.py --show-realtime")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif ch == 16:
             topmenu()
         else:
             print("Invalid entry")
@@ -265,36 +278,41 @@ def submenu23():
 
 def submenu24():
     os.system("clear")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
     print("\tDeepfield Cluster Configuration")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\t-------------------------------------------------")
     while True:
         print("""
             1.salt roles configured on each node 			#shows the configured services on each node 
             2.who has the dnsflow salt role     			#which dcu's
             3.who has the collector salt role     			#which dcu's
-            4.Return""")
+            4.List all configured routers
+            5.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
             mycmd = "sudo salt \* grains.get roles"
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 2):
+        elif(ch == 2):
             mycmd = "sudo salt -G roles:dnsflow test.ping"
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 3):
+        elif(ch == 3):
             mycmd = "sudo salt -G roles:collector test.ping"
             print("Command is:" + mycmd )
             os.system(mycmd)
-        elif ch == 4:
+        elif(ch == 4):
+            mycmd = "routers.py --list | tr -s ' '"
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif ch == 5:
             topmenu()
         else:
             print("Invalid entry")
@@ -306,14 +324,14 @@ def submenu25():
     os.system("clear")
     #set the context as a global
     global mycontext 
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
     print("\tDeepfield Queries the customer is using most frequently (view optimization)")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\t-------------------------------------------------")
     while True:
         print("""
@@ -359,14 +377,14 @@ def submenu25():
 
 def submenu212():
     os.system("clear")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
     print("\tDeepfield Networking")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\t-------------------------------------------------")
     while True:
         print("""
@@ -389,48 +407,48 @@ def submenu212():
             mycmd = "sudo salt \* cmd.run \"ip addr show\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 2):
+        elif(ch == 2):
             mycmd = "sudo salt \* cmd.run \"netstat -rn\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 3):
+        elif(ch == 3):
             mycmd = "sudo salt \* cmd.run \"cat /proc/net/bonding/bond0 | grep up\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 4):
+        elif(ch == 4):
             mycmd = "sudo salt \* cmd.run \"cat /proc/net/bonding/bond0\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 5):
+        elif(ch == 5):
             mycmd = "sudo salt \* cmd.run \"netstat -i\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 6):
+        elif(ch == 6):
             mycmd = "sudo salt \* cmd.run \"netstat -s\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 7):
+        elif(ch == 7):
             mycmd = "sudo salt \* cmd.run \"sudo netstat -tulpn | grep LISTEN\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 8):
+        elif(ch == 8):
             myport=input("Enter your port: ")
             mycmd = "sudo salt \* cmd.run \"sudo lsof -i:" + myport + "\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 9):
+        elif(ch == 9):
             mycmd = "sudo salt \* cmd.run \"ntpq -p\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 10):
+        elif(ch == 10):
             mycmd = "sudo salt \* cmd.run \"date\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 11):
+        elif(ch == 11):
             mycmd = "sudo salt \* cmd.run \"nc -zv genome.deepfield.net 443\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 12):
+        elif(ch == 12):
             mycmd = "sudo salt \* cmd.run \"nc -zv monitoring.deepfield.net 443\""
             print("Command is:" + mycmd )
             os.system(mycmd)
@@ -442,17 +460,109 @@ def submenu212():
         os.system("clear")
         submenu212()
 
+def submenu214():
+    os.system("clear")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\n\t-------------------------------------------------")
+    # sets the text colour to green
+    os.system("tput setaf 2")
+    print("\tDeepfield MOPS and Backups")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\t-------------------------------------------------")
+    while True:
+        print("""
+            1.create a MOP directory on all DCUs based on todays date
+            2.backup the network configuration static and dynamic into the MOP directory, on all DCUs
+            3.backup the slice.json into the MOP directory, on all DCUs
+            4.backup the soup status into the MOP directory, on Master for all DCUs
+            5.delete todays mop directory, on all DCUs
+            6.Return""")
+        print("\n")
+        ch=int(input("Enter your choice: "))
+        if(ch == 1):
+            mycmd = ("sudo salt \* cmd.run \"mkdir -p /home/support/mop/mop-" + today + "\"")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 2):
+            mycmd = ("sudo salt \* cmd.run \"cp /etc/network/interfaces /home/support/mop/mop-" + today + "/interfaces.bkup\"")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+            mycmd = ("sudo salt \* cmd.run \"ifconfig | tee /home/support/mop/mop-" + today + "/ifconfig.bkup\"")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+            mycmd = ("sudo salt \* cmd.run \"ip addr show | tee /home/support/mop/mop-" + today + "/ipaddr.bkup\"")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+            mycmd = ("sudo salt \* cmd.run \"netstat -rn | tee /home/support/mop/mop-" + today + "/netstat.bkup\"")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 3):
+            mycmd = ("sudo salt \* cmd.run \"cp /pipedream/cache/config/slice.json /home/support/mop/mop-" + today + "/slice.json.bkup\"")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 4):
+            mycmd = ("sudo salt \* cmd.run \"sudo supervisorctl status | tee /home/support/mop/mop-" + today + "/soup.status.bkup\"")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 5):
+            mycmd = ("sudo salt \* cmd.run \"rm -rf /home/support/mop/mop-" + today + "\"")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 6):
+            topmenu()
+        else:
+            print("Invalid entry")
+        input("Press enter to continue")
+        os.system("clear")
+        submenu214()
+
+def submenu215():
+    os.system("clear")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\n\t-------------------------------------------------")
+    # sets the text colour to green
+    os.system("tput setaf 2")
+    print("\tHDFS")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\t-------------------------------------------------")
+    while True:
+        print("""
+            1.HDFS Status Report
+            2.List all HDFS Dimensions, sorted by size
+            3.Return""")
+        print("\n")
+        ch=int(input("Enter your choice: "))
+        if(ch == 1):
+            mycmd = ("hdfs dfsadmin -report")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 2):
+            mycmd = ("hdfs dfs -ls /pipedream/cache/dimensions/ | sort -n -k+5")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 3):
+            topmenu()
+        else:
+            print("Invalid entry")
+        input("Press enter to continue")
+        os.system("clear")
+        submenu215()
+
 
 def submenu29():
     os.system("clear")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
     print("\tDeepfield Kafka")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\t-------------------------------------------------")
     while True:
         print("""
@@ -468,19 +578,19 @@ def submenu29():
             mycmd = "kafka-consumer-groups --bootstrap-server localhost:9092 --list"
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 2):
+        elif(ch == 2):
             mycmd = "kafka-consumer-groups --bootstrap-server localhost:9092 --describe --group df-dnsflowd"
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 3):
+        elif(ch == 3):
             mycmd = "kafka-topics --bootstrap-server localhost:9092 --describe --topic df-dnsflow-raw"
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 4):
+        elif(ch == 4):
             mycmd = "kafka-consumer-groups --bootstrap-server localhost:9092 --describe --group df-classifyd"
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 5):
+        elif(ch == 5):
             mycmd = "kafka-topics --bootstrap-server localhost:9092 --describe --topic df-flow"
             print("Command is:" + mycmd )
             os.system(mycmd)
@@ -496,14 +606,14 @@ def submenu29():
 
 def submenuexample():
     os.system("clear")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
     print("\tDeepfield Example")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\t-------------------------------------------------")
     while True:
         print("""
@@ -516,7 +626,7 @@ def submenuexample():
             mycmd = "sudo salt \* cmd.run \"ip addr show\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 2):
+        elif(ch == 2):
             mycmd = "sudo salt \* cmd.run \"netstat -rn\""
             print("Command is:" + mycmd )
             os.system(mycmd)

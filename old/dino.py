@@ -12,6 +12,9 @@ from subprocess import check_output as run
 #statics
 logDir = '/pipedream/log/'
 uiLogName = 'ui.log'
+# path to place the dino working files directory
+# WorkingDir = '/tmp'
+WorkingDir = '/pipedream/log/'
 # log of all queries
 queriesFile = './queries_from_logs.txt'
 # results files with query-counts and sorted query-counts 
@@ -50,6 +53,14 @@ def topmenu():
     print("\t-------------------------------------------------")
 
     #incomming!!
+    #mops: create a mop dir. backup network config static and dynamic. backup slice. 
+    #routers.pt --list | | tr -s ' ' (list all routers)
+    #all daemon processes at 100% normd collectord dnsflowd 
+    #hdfs 
+    #hdfs dfsadmin -report
+    #birdc
+    #sudo birdc show protocols 
+    #sudo birdc show route protocol session_217_41_168_0 | wc -l 
     #swap
     #whats using my swap space
     #for file in /proc/*/status ; do awk '/VmSwap|Name/{printf $2 " " $3}END{ print ""}' $file; done | sort -k 2 -n -r 
@@ -61,7 +72,6 @@ def topmenu():
     #mysql -u root -e "use defender_bt-tactical; describe Interfaces;"
     #postgres  (5.2+)
     #impala-shell
-    #kafka
     #redis-cli keys "*license.json" | xargs redis-cli del
     #flow tracing
     #Check if we are receiving flow by router
@@ -80,7 +90,8 @@ def topmenu():
     #hdfs dfs -ls /pipedream/cache/dimensions/
     #mtr --no-dns --report --report-cycles 60 worker01
     #nodes with dnsflow sudo salt -G roles:dnsflow cmd.run 'supervisorctl status | grep dns'
-
+    #genome genome.py check url /etc/hosts port
+    #data view management, see my bt ps ticket and steps in the git.  
     while True:
         print("""
             1.Whats a trainer ? 
@@ -91,7 +102,7 @@ def topmenu():
             6.mysql (empty)
             7.postgres (empty)
             8.impala (empty)
-            9.kafka (empty)
+            9.kafka
             10.redis (empty)
             11.tracing (empty)
             12.networking and bonding
@@ -116,7 +127,7 @@ def topmenu():
         elif ch == 8:
             os.system("systemctl status httpd")
         elif ch == 9:
-            os.system("systemctl status docker")
+            submenu29() 
         elif ch == 10:
             new_user=input("Enter the name of new user: ")
             os.system("sudo useradd {}".format(new_user))
@@ -186,11 +197,15 @@ def submenu23():
             2.soup status on all nodes      		       		#checks the status of the Deepfield processes
             3.check disk space 						#show disk space available per partition for all nodes    
             4.memory hogs 						#show the top processes consuming memory for all nodes 
-            5.cpu hogs 							#show the top processes consuming cpu for all nodes 
-            6.show me the cpu details for each node 			#cpu details
-            7.show me the cpu model for each node 			#cpu model
-            8.get the cpu clock speeds for each node 			#wondering why one node is busy.. perhaps you have a fan out and the clock was stepped
-            9.Return""")
+            5.check the performance of dnsflowd on each worker 	        #100% indicated it is time to scale up
+            6.check the performance of classifyd on each worker 	#100% indicated it is time to scale up
+            7.check the performance of collectord on each worker 	#100% indicated it is time to scale up
+            8.check the performance of normd on each worker 	        #100% indicated it is time to scale up
+            9.cpu hogs 							#show the top processes consuming cpu for all nodes 
+            10.show me the cpu details for each node 			#cpu details
+            11.show me the cpu model for each node 			#cpu model
+            12.get the cpu clock speeds for each node 			#wondering why one node is busy.. perhaps you have a fan out and the clock was stepped
+            13.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -206,26 +221,42 @@ def submenu23():
             print("Command is:" + mycmd )
             os.system(mycmd)
         elif ch == 4:
-            mycmd = "sudo salt \* cmd.run \"ps -eo %mem,%cpu,pid,ppid,cmd --sort=-%mem | cut -c -140 | head\""
+            mycmd = "sudo salt \* cmd.run \"ps -eo %mem,%cpu,pid,ppid,cmd --sort=-%mem | cut -c -140 | head -n 20 \""
             print("Command is:" + mycmd )
             os.system(mycmd)
         elif ch == 5:
-            mycmd = "sudo salt \* cmd.run \"ps -eo %mem,%cpu,pid,ppid,cmd --sort=-%cpu | cut -c -140 | head\""
+            mycmd = "sudo salt \* cmd.run \"ps -eo %mem,%cpu,pid,ppid,cmd --sort=-%mem | cut -c -140 | grep dnsflow | grep -v grep \""
             print("Command is:" + mycmd )
             os.system(mycmd)
         elif ch == 6:
-            mycmd = "sudo salt \* cmd.run \"lscpu\""
+            mycmd = "sudo salt \* cmd.run \"ps -eo %mem,%cpu,pid,ppid,cmd --sort=-%mem | cut -c -140 | grep classifyd | grep -v grep \""
             print("Command is:" + mycmd )
             os.system(mycmd)
         elif ch == 7:
-            mycmd = "sudo salt \* cmd.run \"lshw | grep -i intel | grep -i cpu\""
+            mycmd = "sudo salt \* cmd.run \"ps -eo %mem,%cpu,pid,ppid,cmd --sort=-%mem | cut -c -140 | grep collectord | grep -v grep \""
             print("Command is:" + mycmd )
             os.system(mycmd)
         elif ch == 8:
-            mycmd = "sudo salt \* cmd.run \"cat /proc/cpuinfo | grep MHz\""
+            mycmd = "sudo salt \* cmd.run \"ps -eo %mem,%cpu,pid,ppid,cmd --sort=-%mem | cut -c -140 | grep normd | grep -v grep \""
             print("Command is:" + mycmd )
             os.system(mycmd)
         elif ch == 9:
+            mycmd = "sudo salt \* cmd.run \"ps -eo %mem,%cpu,pid,ppid,cmd --sort=-%cpu | cut -c -140 | head\""
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif ch == 10:
+            mycmd = "sudo salt \* cmd.run \"lscpu\""
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif ch == 11:
+            mycmd = "sudo salt \* cmd.run \"lshw | grep -i intel | grep -i cpu\""
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif ch == 12:
+            mycmd = "sudo salt \* cmd.run \"cat /proc/cpuinfo | grep MHz\""
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif ch == 13:
             topmenu()
         else:
             print("Invalid entry")
@@ -287,29 +318,39 @@ def submenu25():
     print("\t-------------------------------------------------")
     while True:
         print("""
-            1.Show the most frequently ran customer queries in contexts traffic,backbone,big_cube 
-            2.Show the most frequently ran customer queries in context subscriber
-            3.Show the most frequently ran customer queries in context video_stream
-            4.Show the most frequently ran customer queries in context flowdump
-            5.Cleanup the /tmp/dino-* directories used to store the queries
-            6.Return""")
+            1.Show the most frequently ran customer queries in context traffic 
+            2.Show the most frequently ran customer queries in contexts backbone
+            3.Show the most frequently ran customer queries in contexts big_cube 
+            4.Show the most frequently ran customer queries in context subscriber
+            5.Show the most frequently ran customer queries in context video_stream
+            6.Show the most frequently ran customer queries in context flowdump
+            7.Cleanup the dino-* directories used to store the queries
+            8.Return""")
         print("\n")
+        #to get avialable cubes https://localhost:22222/cube/list
         ch=int(input("Enter your choice: "))
+        # you can list more than one context, coma seperated
         if(ch == 1):
-            mycontext = ['traffic', 'backbone', 'big_cube'] 
+            mycontext = ['traffic'] 
             getMostUsedQueries()
         elif ch == 2:
-            mycontext = ['subscriber'] 
+            mycontext = ['backbone'] 
             getMostUsedQueries()
         elif ch == 3:
-            mycontext = ['video_stream'] 
+            mycontext = ['big_cube'] 
             getMostUsedQueries()
         elif ch == 4:
-            mycontext = ['flowdump'] 
+            mycontext = ['subscriber'] 
             getMostUsedQueries()
         elif ch == 5:
-            os.system("rm -rf /tmp/dino-*")
+            mycontext = ['video_stream'] 
+            getMostUsedQueries()
         elif ch == 6:
+            mycontext = ['flowdump'] 
+            getMostUsedQueries()
+        elif ch == 7:
+            os.system("rm -rf " + WorkingDir + "dino-*")
+        elif ch == 8:
             topmenu()
         else:
             print("Invalid entry")
@@ -401,6 +442,94 @@ def submenu212():
         input("Press enter to continue")
         os.system("clear")
         submenu212()
+
+
+def submenu29():
+    os.system("clear")
+    # sets the text color to white
+    os.system("tput setaf 7")
+    print("\n\t-------------------------------------------------")
+    # sets the text colour to green
+    os.system("tput setaf 2")
+    print("\tDeepfield Kafka")
+    # sets the text color to white
+    os.system("tput setaf 7")
+    print("\t-------------------------------------------------")
+    while True:
+        print("""
+            1.list the available kafka consumer groups
+            2.show the kafka df-dnsflowd consumer groups
+            3.show the kafka df-dnsflow-raw topic and partitions 
+            4.show the kafka df-classifyd consumer groups 
+            5.show the kafka df-flow topic and partitions 
+            6.Return""")
+        print("\n")
+        ch=int(input("Enter your choice: "))
+        if(ch == 1):
+            mycmd = "kafka-consumer-groups --bootstrap-server localhost:9092 --list"
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        if(ch == 2):
+            mycmd = "kafka-consumer-groups --bootstrap-server localhost:9092 --describe --group df-dnsflowd"
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        if(ch == 3):
+            mycmd = "kafka-topics --bootstrap-server localhost:9092 --describe --topic df-dnsflow-raw"
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        if(ch == 4):
+            mycmd = "kafka-consumer-groups --bootstrap-server localhost:9092 --describe --group df-classifyd"
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        if(ch == 5):
+            mycmd = "kafka-topics --bootstrap-server localhost:9092 --describe --topic df-flow"
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif ch == 6:
+            topmenu()
+        else:
+            print("Invalid entry")
+        input("Press enter to continue")
+        os.system("clear")
+        submenu29()
+
+
+
+def submenuexample():
+    os.system("clear")
+    # sets the text color to white
+    os.system("tput setaf 7")
+    print("\n\t-------------------------------------------------")
+    # sets the text colour to green
+    os.system("tput setaf 2")
+    print("\tDeepfield Example")
+    # sets the text color to white
+    os.system("tput setaf 7")
+    print("\t-------------------------------------------------")
+    while True:
+        print("""
+            1.show the example1 on each node 
+            2.show the example2 on each node 
+            13.Return""")
+        print("\n")
+        ch=int(input("Enter your choice: "))
+        if(ch == 1):
+            mycmd = "sudo salt \* cmd.run \"ip addr show\""
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        if(ch == 2):
+            mycmd = "sudo salt \* cmd.run \"netstat -rn\""
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif ch == 3:
+            topmenu()
+        else:
+            print("Invalid entry")
+        input("Press enter to continue")
+        os.system("clear")
+        submenuexample()
+
+
 
 
 
@@ -573,14 +702,14 @@ def analyzeQueries(queriesDF):
         print(df[["context", "dimensions", "boundaries", "uuid", "name", "count"]].sort_values(['count'], ascending=False).head(queryThreshold))
     print("*************************************************************")
     print("\n\nDetailed query results can be found in the following files \n")
-    print("	/tmp/dino-" + str(os.getpid()) + "/querysummary_sorted_on_count.csv contains the queries sorted on number of hits")
-    print("	/tmp/dino-" + str(os.getpid()) + "/queries_from_logs.txt contains the log entries for all querys found")
+    print("	" + WorkingDir + "dino-" + str(os.getpid()) + "/querysummary_sorted_on_count.csv contains the queries sorted on number of hits")
+    print("	"  + WorkingDir + "dino-" + str(os.getpid()) + "/queries_from_logs.txt contains the log entries for all querys found")
     print("\n\nSome of the files can get quite large, so if you do not planning to use them you might consider cleanig up with \n")
-    print("rm -rf /tmp/dino-" + str(os.getpid()))
+    print("rm -rf " + WorkingDir + "dino-" + str(os.getpid()))
 
 
 def makeTempDir():
-    tmpDirPath = ('/tmp/dino-' + str(os.getpid()))  
+    tmpDirPath = ( WorkingDir + 'dino-' + str(os.getpid()))  
     log.info('Creating dir ' + str(tmpDirPath))
     os.mkdir(str(tmpDirPath))
     os.chdir(tmpDirPath)
