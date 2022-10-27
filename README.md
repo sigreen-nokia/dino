@@ -24,7 +24,7 @@
 You will see a menu like this one..   
 
 	-------------------------------------------------
-	dino - Deepfield customer engineer trainer
+	Dino - Deepfield customer engineer trainer
 	-------------------------------------------------
 
             1.Whats a trainer ? 
@@ -35,27 +35,35 @@ You will see a menu like this one..
             6.mysql (empty)
             7.postgres (empty)
             8.impala (empty)
-            9.kafka (empty)
+            9.kafka
             10.redis (empty)
             11.tracing (empty)
             12.networking and bonding
             13.bgp (empty)
-            14.Exit
+            14.MOP
+            15.HDFS
+            16.Exit
 
 	-------------------------------------------------
 	Deepfield Cluster Health
 	-------------------------------------------------
 
-            1.salt-ping all nodes                          #tests basic connectivity Master to each worker
-            2.soup status on all nodes                     #checks the status of the Deepfield processes
-            3.check disk space                             #show disk space available per partition for all nodes    
-            4.memory hogs                                  #show the top processes consuming memory for all nodes 
-            5.cpu hogs                                     #show the top processes consuming cpu for all nodes 
-            6.show me the cpu details for each node        #cpu details
-            7.show me the cpu model for each node          #cpu model
-            8.get the cpu clock speeds for each node       #wondering why one node is busy.. perhaps you have a fan out and the clock was stepped
-            9.Return
-
+            1.salt-ping all nodes                      			#tests basic connectivity Master to each worker
+            2.soup status on all nodes      		       		#checks the status of the Deepfield processes
+            3.check disk space 						#show disk space available per partition for all nodes    
+            4.memory hogs 						#show the top processes consuming memory for all nodes 
+            5.check the performance of dnsflowd on each worker 	        #100% indicated it is time to scale up
+            6.check the performance of classifyd on each worker 	#100% indicated it is time to scale up
+            7.check the performance of collectord on each worker 	#100% indicated it is time to scale up
+            8.check the performance of normd on each worker 	        #100% indicated it is time to scale up
+            9.cpu hogs 							#show the top processes consuming cpu for all nodes 
+            10.show me the cpu details for each node 			#cpu details
+            11.show me the cpu model for each node 			#cpu model
+            12.get the cpu clock speeds for each node 			#wondering why one node is busy.. perhaps you have a fan out and the clock was stepped
+            13.Whats taking up all my SWAP space
+            14.How much SWAP space do I have
+            15.flow                                                     #show router flow per DCU
+            16.Return
 
 	-------------------------------------------------
 	Deepfield Queries the customer is using most frequently (view optimization)
@@ -86,7 +94,7 @@ You will see a menu like this one..
             12.test connectivity to Deepfield metrics 
             13.Return
 
-....and can click through the menu's in order to execute tasks
+....and can click through the menu's in order to execute tasks, and see how to do it
 
     Enter your choice: 9
     Command is:sudo salt \* cmd.run "ntpq -p"
@@ -123,10 +131,9 @@ You will see a menu like this one..
 
 ## How can I add new steps
 
-* edit the code and commit to master    
+* edit the code yourself and commit to master    
+* or 
 * email simon.green and ask if he can add it for you 
-
-
 
 
 
