@@ -644,6 +644,12 @@ def submenuexample():
 
 def whatsatrainer():
      print("""
+               /@\            \|/   
+              `-\ \  ______  - 0 -   
+                 \ \/ ` /  \  /|\ _   
+                  \_i / \  |\____//   
+                    | |==| |=----/   
+              ----------------------  
               A trainer is code designed to teach how to write and execute day to day tasks and automations
               Trainer code is not fancy, as its intended to be readable. 
               It tells the user how it did the task, so they can do it themselfes 
