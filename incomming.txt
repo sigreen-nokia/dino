@@ -1,0 +1,70 @@
+queries
+=======
+defender policies
+https://continent8-rc.deepfield.net:44301/defender/config/policies/14
+ddos
+https://continent8-rc.deepfield.net:44301/cube/traffic.datatable?slice=timestamp(2022-10-21T17-00-00:2022-10-21T22-30-00)&dimensions=addr.dst,ddos,timestamp&measures=avg.bps,avg.pps&apply=sort(timestamp,asc)&apply=top(auto,n:100)&bs=((boundary.peering.input,true))&s=category(ddos)&s=addr.dst(94.190.149.0/24)
+#ntp attack and explorer query
+https://library.deepfield.net/attack/4410
+https://defend.exponential-e.com/explore-beta/timegraph/traffic?slice=timestamp(2022-11-29T01-00-00:2022-11-29T02-30-00)&dimensions=timestamp,Non_DDoS_services.dst,detection&measures=max.bps&slice:or=(addr.dst(31.221.116.217))&slice:or=(protocol(17))&slice:or=(port.src(0,123))&apply=timestep(10s,10s)&apply=sort(timestamp,asc)&apply=top(auto,n:100)&apply=smooth(60s)&bs=((boundary.peering.input,true))
+#To get a sample of all seen dnsflow domains: 
+https://charter-subi.deepfield.net/cube/dnsfqdn.csv?s=timestamp(-60min:)&d=dnsfqdn
+
+defender
+========
+cat /pipedream/cache/config/dnf/dnf_mitigation_rules_5_0.json | json_pp
+cat /pipedream/cache/config/dnf/dnf_mitigation_rules_5_1.json | json_pp
+cat /pipedream/cache/config/dnf/dnf_mitigation_rules_5_3.json | json_pp
+cat /pipedream/cache/config/dnf/dnf_mitigation_rules_5_4.json | json_pp
+#version stable beta lagacy via api 
+curl -k 'https://127.0.0.1/api/secure_genome/version/detection?api_key=5t0xuVHgegvEkN'
+# detection rules from genome
+curl --insecure 'https://localhost/dimension/371/positions/download?&attributes=(*)&api_key=5bD2Aale9knBz3' | tee dimesion_detection_possitions.json
+#From the docs
+#Detection Mechanism Description
+#beta
+#The most recent version with bleeding-edge signatures. Intended for risk-tolerant customers.
+#stable
+#Tested and verified version. Intended for customers who require a well-tested and validated version.
+#legacy
+#This is the rule set that matches the 5.3 suspicious rules, and the default Secure Genome version when upgrading from 5.3 to 5.4. Users can then verify the upgrade and move to a more recent version of Secure Genome detection when they are ready.
+#file_upload
+#This is a manually uploaded file with a static version of detection rules.
+ 
+
+
+
+other
+=====
+    #incomming!!
+    #routers.py --list | | tr -s ' ' (list all routers)
+    #all daemon processes at 100% normd collectord dnsflowd
+    #birdc
+    #sudo birdc show protocols
+    #sudo birdc show route protocol session_217_41_168_0 | wc -l
+    #for file in /proc/*/status ; do awk '/VmSwap|Name/{printf $2 " " $3}END{ print ""}' $file; done | sort -k 2 -n -r
+    #mysql (<5.2)
+    #mysql -u root -e "show databases";
+    #mysql -u root -e "use defender_bt-tactical; show tables;"
+    #mysql -u root -e "use defender_bt-tactical; describe Interfaces;"
+    #postgres  (5.2+)
+    #impala-shell
+    #redis-cli keys "*license.json" | xargs redis-cli del
+    #flow tracing
+    #normd
+    #pdvi.py traffic.json
+    #bgp bgp.py --search 213.187.233.0/24
+    #routemap.py -v show -a 213.187.233.0/24
+    #dims.py dump interfaces -p 15630
+    #flow.py --show-realtime | grep MLT1
+    #diagnostics.py --skip-config --build-only -v
+    #ptdump
+    #python community.py
+    #dims.py dump suspicious | more
+    #mtr --no-dns --report --report-cycles 60 worker01
+    #nodes with dnsflow sudo salt -G roles:dnsflow cmd.run 'supervisorctl status | grep dns'
+    #genome genome.py check url /etc/hosts port
+    #data view management, see my bt ps ticket and steps in the git.
+    #queries on suspitiouse (pre 5.4) and detection traffic (5.4)
+    # /explore-beta/timegraph/traffic?slice=timestamp(-24hours:now)&dimensions=timestamp,detection,ddos&measures=avg.bps&slice:or=(protectiongroup.dst(65687))&apply=sort(timestamp,asc)&apply=top(auto,n:100)&bs=((boundary.peering.input,true))
+

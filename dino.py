@@ -2,11 +2,14 @@
 import os
 import re
 import subprocess
+import socket
 import deepy.cfg
 import deepy.deepui
 import get_context
 import pandas as pd
+import requests 
 import deepy.log as log
+import json 
 from subprocess import check_output as run
 from datetime import date
 #date 
@@ -39,7 +42,8 @@ apikey_regex = re.compile(r"api_key=([\w,.-]*)&?")
 boundaryslice_regex = re.compile(r"bs=\(([\w,-.()]*)\)&?")
 # pattern to extract each boundary from the boundary slice
 boundary_regex = re.compile(r"\((boundary\.[\w.-]*),.*\)")
-
+# api_key
+api_key = 'None' 
 
 def topmenu():
 
@@ -54,35 +58,6 @@ def topmenu():
     os.system("tput setaf 6")
     print("\t-------------------------------------------------")
 
-    #incomming!!
-    #routers.py --list | | tr -s ' ' (list all routers)
-    #all daemon processes at 100% normd collectord dnsflowd 
-    #birdc
-    #sudo birdc show protocols 
-    #sudo birdc show route protocol session_217_41_168_0 | wc -l 
-    #for file in /proc/*/status ; do awk '/VmSwap|Name/{printf $2 " " $3}END{ print ""}' $file; done | sort -k 2 -n -r 
-    #mysql (<5.2)
-    #mysql -u root -e "show databases";
-    #mysql -u root -e "use defender_bt-tactical; show tables;"
-    #mysql -u root -e "use defender_bt-tactical; describe Interfaces;"
-    #postgres  (5.2+)
-    #impala-shell
-    #redis-cli keys "*license.json" | xargs redis-cli del
-    #flow tracing
-    #normd
-    #pdvi.py traffic.json
-    #bgp bgp.py --search 213.187.233.0/24
-    #routemap.py -v show -a 213.187.233.0/24
-    #dims.py dump interfaces -p 15630
-    #flow.py --show-realtime | grep MLT1
-    #diagnostics.py --skip-config --build-only -v
-    #ptdump
-    #python community.py 
-    #dims.py dump suspicious | more
-    #mtr --no-dns --report --report-cycles 60 worker01
-    #nodes with dnsflow sudo salt -G roles:dnsflow cmd.run 'supervisorctl status | grep dns'
-    #genome genome.py check url /etc/hosts port
-    #data view management, see my bt ps ticket and steps in the git.  
     while True:
         print("""
             1.Whats a trainer ? 
@@ -100,7 +75,8 @@ def topmenu():
             13.bgp (empty)
             14.MOP
             15.HDFS
-            16.Exit""")
+            16.Devices API
+            17.Exit""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -136,6 +112,8 @@ def topmenu():
         elif ch == 15:
             submenu215() 
         elif ch == 16:
+            submenu216() 
+        elif ch == 17:
             print("Exiting application")
             exit()
         else:
@@ -553,6 +531,193 @@ def submenu215():
         submenu215()
 
 
+def submenu216():
+    os.system("clear")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\n\t-------------------------------------------------")
+    # sets the text colour to green
+    os.system("tput setaf 2")
+    print("\tDevices API")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\t-------------------------------------------------")
+    while True:
+        print("""
+            1.Get the Device API Topology Schema
+            2.Get the Device API utilisation Schema
+            3.Get a list of routers via the devices API
+            4.Get a list of routers using the routers dimension
+            5.Get a list of all interfaces via the interface dimension (this is a big list, perhaps the next one is better)
+            6.Get a list of interfaces for a given router via the interface dimension
+            7.Build a router model from an existing router, to POST to the Devices Topology API (Useful for interface/router changes) 
+            8.Debugging hints
+            9.Return""")
+        print("\n")
+        #grab the first API key from the support users list of keys
+        supportKeys = deepy.deepui.get_root_api_keys()
+        firstSupportKey = supportKeys[0]
+        #check its really set, if not ask for a manualy entered key
+        if not firstSupportKey:
+            print ("I did not manage to extract your support user API key, so could you past it here")
+            firstSupportKey=input("Enter your API key: ")
+        else: 
+            #print("The support user API key is " , firstSupportKey)
+            print("")
+        ch=int(input("Enter your choice: "))
+        if(ch == 1):
+            print("To see the Device API Topology Schema, point your browser here ")
+            print("https://" + re.sub("^[a-z]+\.", "", socket.gethostname())+ "/docs/api/devices/topology")
+        elif(ch == 2):
+            print("To see the Device API Utilisation Schema, point your browser here ")
+            print("https://" + re.sub("^[a-z]+\.", "", socket.gethostname())+ "/docs/api/devices/utilization")
+        elif(ch == 3):
+            print("Method GET is as of 5.4 not supported, so this command will fail. Only POST is supported")
+            print("curl --insecure -X GET 'https:/localhost/api/devices/topology?api_key=" + firstSupportKey + "'")
+            print("I've provided an alternative more complex method in the next option")
+        elif(ch == 4):
+            print("Get a list of routers and attributes using the routers dimension")
+            mycmd = ("curl --insecure -X GET 'https://localhost/dimension/router/positions?&attributes=(*)&api_key=" + firstSupportKey + "'")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 5):
+            print("Get a list of all interfaces via the interface dimension")
+            mycmd = ("curl --insecure -X GET 'https://localhost/dimension/interfaces/positions?&attributes=(*)&api_key=" + firstSupportKey + "'")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 6):
+            print("Get a list of interfaces for a given router via the interface dimension")
+            #url = 'https://localhost/dimension/router/positions?api_key=' + firstSupportKey
+            url = 'https://localhost/dimension/router/positions?attributes=*&api_key=' + firstSupportKey
+            routerlist = requests.get(url, verify=False).json()
+            #for debug the two lines below prints the json
+            json_formatted_routerlist = json.dumps(routerlist, indent=2)
+            #print ("\nDebug routerlist: " , json_formatted_routerlist)
+            #build the text menu
+            user_input = ''
+            input_message = "Select a router:\n"
+            index = 0
+            for key in routerlist:
+                index += 1
+                routername = routerlist[key]['name']
+                input_message += f'{index}) {routername}\n'
+            input_message += 'You selected router: '
+            #prompt for the router by number x) 
+            user_input = input(input_message)
+            #now find the selected router name and possition for the selected number
+            index = 0
+            for key in routerlist:
+                index += 1
+                if index == int(user_input):
+                    routername = routerlist[key]['name']
+                    routerpossition = routerlist[key]['position_id']
+            print ("You selected Router name:", routername)
+            print ("That Router has possition:", routerpossition)
+            print ("The following command will get the router interfaces")
+            mycmd = ("curl --insecure -X GET 'https://localhost/dimension/interfaces/positions?filter=(interface:router_pos_id,=," + str(routerpossition) + ")&attributes=(*)&api_key=" + firstSupportKey + "'")
+            print("Command is:" + mycmd )
+            input("Press any key and I'll run the command...")
+            os.system(mycmd)
+        elif(ch == 7):
+            print("Build a router model from an existing router, ready to POST to the Devices Topology API (Useful for interface/router changes)")
+            print("This one works around the missing GET in devices API")
+            print("Building up the router model from several places")
+            print("I'll also show you the curl to use")
+            #start by listing all routers and askign the user to pick one 
+            url = 'https://localhost/dimension/router/positions?attributes=*&api_key=' + firstSupportKey
+            routerlist = requests.get(url, verify=False).json()
+            #for debug the two lines below prints the json containing all of the router info
+            #json_formatted_routerlist = json.dumps(routerlist, indent=2)
+            #print ("\nDebug routerlist: " , json_formatted_routerlist)
+            #build the text menu
+            user_input = ''
+            input_message = "Select a router:\n"
+            index = 0
+            for key in routerlist:
+                index += 1
+                routername = routerlist[key]['name']
+                input_message += f'{index}) {routername}\n'
+            input_message += 'You selected router: '
+            #prompt for the router by number x) 
+            user_input = input(input_message)
+            #
+            #ok so we know the router. LEts gather up all of the information we need for the model 
+            #
+            #find the router name and the possition
+            index = 0
+            for key in routerlist:
+                index += 1
+                if index == int(user_input):
+                    routername = routerlist[key]['name']
+                    routerpossition = routerlist[key]['position_id']
+                    routerflowip = routerlist[key]['router']['flow_ip']
+            #
+            #get the router interfaces
+            url = 'https://localhost/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + firstSupportKey
+            routerinterfaces = requests.get(url, verify=False).json()
+            #for debug the line below prints the json containing all of the router interfaces
+            #print ("\nDebug url: " + url)
+            #json_formatted_routerinterfaces = json.dumps(routerinterfaces, indent=2)
+            #print ("\nDebug routerinterfaces: ", json_formatted_routerinterfaces)
+            #
+            #we have router name, routername
+            #we have the router possition, routerpossition
+            #we have the router interfaces routerinterfaces json_formatted_routerinterfaces
+            #we have the router flow ip routerflowip 
+            #
+            #so we have all of the details required for the model. lets build the json
+            topologyjson = "{\n"
+            topologyjson += f'  "devices": [\n'
+            topologyjson += f'    {{\n'
+            topologyjson += f'      "name": "{routername}",\n'
+            topologyjson += f'      "flow_ip": "{routerflowip}",\n'
+            topologyjson += f'      "interfaces": [\n'
+            #we have to reformat the interfaces for the devices topology model
+            #index = 0
+            #for key in routerinterfaces["devices"]:
+            #    print(routerinterfaces["devices"])
+            for key in routerinterfaces:
+                 index += 1
+                 ifIndex = routerinterfaces[key]['interface']['ifIndex']
+                 ifName = routerinterfaces[key]['interface']['ifName']
+                 topologyjson += f'      {{\n'
+                 topologyjson += f'          "ifIndex": {ifIndex},\n'
+                 topologyjson += f'          "ifName": "{ifName}"\n'
+                 topologyjson += f'      }},\n'
+            #replace the last }, with a }
+            topologyjson = (replace_last(topologyjson, '},', '}'))
+            topologyjson += f'      ]\n'
+            topologyjson += f'    }}\n'
+            topologyjson += f'    ]\n'
+            topologyjson += f'}}\n'
+
+            #print ("Debug: topology_json\n", topologyjson)
+            file = open("topologyConfigFile.json", "w")
+            file.write(topologyjson)
+            file.close
+            #now show the command to provision the router model
+            mycmd = ("curl --insecure -X POST -d '@topologyConfigFile.json' https://localhost/api/devices/topology?api_key=" + firstSupportKey)
+            print("I have created a file for you topologyConfigFile.json with the routers topology model")
+            print("Check the file over carefully")
+            print("The device API POST is an update")
+            print("so in general you will only want to include new or changed interfaces and parameters, not all parameters")
+            print("Once you are happy copy paste the command below to provision/change the router or interface")
+            print("\nCommand is:" + mycmd )
+        elif(ch == 8):
+            print ("To Debug check syslog: sudo less /var/log/syslog")
+            print ("Example Output below")
+            print ("")
+            print ("Dec 15 19:48:39 master home.py[95936][INFO]: 200 POST /api/devices/topology?api_key=************ (127.0.0.1) 1284.48ms")
+            print ("Dec 15 19:48:39 master home.py[95936][INFO]: Request to /api/devices/topology?api_key=************ completed in 1.284 seconds. 0 bytes were transferred.")
+            print ("Dec 15 19:48:39 master home.py[95936][INFO]: /api/devices/topology?api_key=************ took 1 seconds to load for User 4acd26f26fa54fbbe02394be699dcd41bc9b1990 Status: 200")
+        elif(ch == 9):
+            topmenu()
+        else:
+            print("Invalid entry")
+        input("\nPress enter to continue")
+        os.system("clear")
+        submenu216()
+
 def submenu29():
     os.system("clear")
     # sets the text color to magenta
@@ -828,6 +993,9 @@ def makeTempDir():
     log.info('Creating dir ' + str(tmpDirPath))
     os.mkdir(str(tmpDirPath))
     os.chdir(tmpDirPath)
+
+def replace_last(string, old, new):
+    return new.join(string.rsplit(old, 1))
 
 # Main program  
 topmenu() 
