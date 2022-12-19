@@ -75,7 +75,7 @@ def topmenu():
             13.bgp (empty)
             14.MOP
             15.HDFS
-            16.Devices API
+            16.Devices API, Routers and Interfaces
             17.Exit""")
         print("\n")
         ch=int(input("Enter your choice: "))
@@ -574,17 +574,19 @@ def submenu216():
         elif(ch == 3):
             print("Method GET is as of 5.4 not supported, so this command will fail. Only POST is supported")
             print("curl --insecure -X GET 'https:/localhost/api/devices/topology?api_key=" + firstSupportKey + "'")
-            print("I've provided an alternative more complex method in the next option")
+            print("I've provided an alternative more complex methods in the following options")
         elif(ch == 4):
             print("Get a list of routers and attributes using the routers dimension")
-            mycmd = ("curl --insecure -X GET 'https://localhost/dimension/router/positions?&attributes=(*)&api_key=" + firstSupportKey + "'")
+            mycmd = ("curl --insecure -X GET 'https://localhost/dimension/router/positions?&attributes=(*)&api_key=" + firstSupportKey + "' | tee routerlist.json")
             print("Command is:" + mycmd )
             os.system(mycmd)
+            print("\n\nI've written the output to file routerlist.json for you")
         elif(ch == 5):
             print("Get a list of all interfaces via the interface dimension")
-            mycmd = ("curl --insecure -X GET 'https://localhost/dimension/interfaces/positions?&attributes=(*)&api_key=" + firstSupportKey + "'")
+            mycmd = ("curl --insecure -X GET 'https://localhost/dimension/interfaces/positions?&attributes=(*)&api_key=" + firstSupportKey + "' | tee interfacelist.json")
             print("Command is:" + mycmd )
             os.system(mycmd)
+            print("\n\nI've written the output to file interfacelist.json for you")
         elif(ch == 6):
             print("Get a list of interfaces for a given router via the interface dimension")
             #url = 'https://localhost/dimension/router/positions?api_key=' + firstSupportKey
@@ -614,10 +616,11 @@ def submenu216():
             print ("You selected Router name:", routername)
             print ("That Router has possition:", routerpossition)
             print ("The following command will get the router interfaces")
-            mycmd = ("curl --insecure -X GET 'https://localhost/dimension/interfaces/positions?filter=(interface:router_pos_id,=," + str(routerpossition) + ")&attributes=(*)&api_key=" + firstSupportKey + "'")
+            mycmd = ("curl --insecure -X GET 'https://localhost/dimension/interfaces/positions?filter=(interface:router_pos_id,=," + str(routerpossition) + ")&attributes=(*)&api_key=" + firstSupportKey + "' | tee myrouterinterfacelist.json")
             print("Command is:" + mycmd )
             input("Press any key and I'll run the command...")
             os.system(mycmd)
+            print("\n\nI've written the output to file myrouterinterfacelist.json for you")
         elif(ch == 7):
             print("Build a router model from an existing router, ready to POST to the Devices Topology API (Useful for interface/router changes)")
             print("This one works around the missing GET in devices API")
