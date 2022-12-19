@@ -551,7 +551,7 @@ def submenu216():
             5.Get a list of all interfaces via the interface dimension (this is a big list, perhaps the next one is better)
             6.Get a list of interfaces for a given router via the interface dimension
             7.Build a router model from an existing router, to POST to the Devices Topology API (Useful for interface/router changes) 
-            8.Set a routers interface to active true/false (receiving flow)
+            8.Set a routers interface to active true/false (not ready yet)
             9.Debugging hints
             10.Return""")
         print("\n")
@@ -716,9 +716,100 @@ def submenu216():
         elif(ch == 8):
             print ("Set a routers interface to active true/false (receiving flow)")
             #first get a router from the list
-
-
-
+            #start by listing all routers and askign the user to pick one 
+            url = 'https://localhost/dimension/router/positions?attributes=*&api_key=' + firstSupportKey
+            routerlist = requests.get(url, verify=False).json()
+            #for debug the two lines below prints the json containing all of the router info
+            #json_formatted_routerlist = json.dumps(routerlist, indent=2)
+            #print ("\nDebug routerlist: " , json_formatted_routerlist)
+            #build the text menu for the routers
+            user_input = ''
+            input_message = "Select a router:\n"
+            index = 0
+            for key in routerlist:
+                index += 1
+                routername = routerlist[key]['name']
+                input_message += f'{index}) {routername}\n'
+            input_message += 'You selected router: '
+            #prompt for the router by number x) 
+            user_input = input(input_message)
+            #
+            #find the router name and the possition
+            index = 0
+            for key in routerlist:
+                index += 1
+                if index == int(user_input):
+                    routername = routerlist[key]['name']
+                    routerpossition = routerlist[key]['position_id']
+                    routerflowip = routerlist[key]['router']['flow_ip']
+            # now have the user select the router interface they want to enable/disable from a list
+            url = 'https://localhost/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + firstSupportKey
+            routerinterfacelist = requests.get(url, verify=False).json()
+            #for debug the two lines below prints the json containing all of the router info
+            json_formatted_routerinterfacelist = json.dumps(routerinterfacelist, indent=2)
+            print ("\nDebug routerinterfacelist: " , json_formatted_routerinterfacelist)
+            #build the text menu for the router interfaces
+            user_input = ''
+            input_message = "Select an interface from that router:\n"
+            index = 0
+            for key in routerinterfacelist:
+                index += 1
+                interfacename = routerinterfacelist[key]['name']
+                input_message += f'{index}) {interfacename}\n'
+            input_message += 'You selected router interface: '
+            #prompt for the router interface by number x) 
+            user_input = input(input_message)
+            #find the interface possition and name 
+            index = 0
+            for key in routerinterfacelist:
+                index += 1
+                if index == int(user_input):
+                    #get the name of the selected interface
+                    interfacenameselected = routerinterfacelist[key]['name']
+                    #get the possition of the selected interface
+                    interfacepossitionselected = routerinterfacelist[key]['id']
+                    #get the json for the selected interface
+                    routerinterfaceselectedjson = routerinterfacelist[key]
+                    print ("Debug: interfacenameselected=", interfacenameselected)
+                    print ("Debug: interfacepossitionselected=", interfacepossitionselected)
+                    print ("Debug: routerinterfaceselectedjson=", routerinterfaceselectedjson)
+            print ("\nlooking for parameter \"active\" within router " + routername + " and interface " + interfacenameselected)
+            if "active" in routerinterfaceselectedjson:
+                print("Ok the active flag is present already")
+                interfaceactiveflag = routerinterfaceselectedjson["active"]
+                print("and is set to: ", interfaceactiveflag)
+            else:
+                print("active doesn't exist in the selected interface JSON so we will add it once you select a value")
+            print("\nHow do you want me to set active true or false (any other entry will make no changes)")
+            user_input = input("Input true or false:")
+            if user_input == 'true':
+                print ("true")
+                if "active" in routerinterfaceselectedjson:
+                    print ("active is present and currently set to ", routerinterfaceselectedjson["active"])
+                    print ("As instructed I will change active to \"active\": true,")
+                else:
+                    print ("active doesn't exist in the selected interface JSON")
+                    print ("I will add the new parameter \"active\": true,")
+            elif user_input == 'false':
+                print ("false")
+                if "active" in routerinterfaceselectedjson:
+                    print ("active is present and currently set to ", routerinterfaceselectedjson["active"])
+                    print ("As instructed I will change active to \"active\": false,")
+                else:
+                    print ("active doesn't exist in the selected interface JSON")
+                    print ("I will add the new parameter \"active\": false,")
+            else:
+                print ("doing nothing as only true|false are valid entries for the active flag")
+            url = 'https://localhost/dimension/interfaces/position/' + str(interfacepossitionselected) + '?api_key=' + firstSupportKey
+            print ("The JSON I'm about to PUT is as follows") 
+            json_formatted_routerinterfaceselectedjson= json.dumps(routerinterfaceselectedjson, indent=2)
+            print ("\n" , json_formatted_routerinterfaceselectedjson)
+            print ("Debug: url=", url)
+            user_input = input("\nenter Y to make the change. Any other key to do nothing:")
+            if user_input == 'Y':
+                #not ready yet, the api is failing. Tried several combinations. 
+                #setrouterinterfaceflag = requests.put(url, verify=False, data=routerinterfaceselectedjson)
+                #print ("The url PUT response was :", setrouterinterfaceflag)
         elif(ch == 9):
             print ("To Debug check syslog: sudo less /var/log/syslog")
             print ("Example Output below")
