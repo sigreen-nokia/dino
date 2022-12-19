@@ -42,7 +42,8 @@ You will see a menu like this one..
             13.bgp (empty)
             14.MOP
             15.HDFS
-            16.Exit
+            16.Devices API, Routers and Interfaces
+            17.Exit
 
 	-------------------------------------------------
 	Deepfield Cluster Health
@@ -93,6 +94,22 @@ You will see a menu like this one..
             11.test connectivity to Deepfield genome
             12.test connectivity to Deepfield metrics 
             13.Return
+
+	-------------------------------------------------
+	Devices API
+	-------------------------------------------------
+
+            1.Get the Device API Topology Schema
+            2.Get the Device API utilisation Schema
+            3.Get a list of routers via the devices API
+            4.Get a list of routers using the routers dimension
+            5.Get a list of all interfaces via the interface dimension (this is a big list, perhaps the next one is better)
+            6.Get a list of interfaces for a given router via the interface dimension
+            7.Build a router model from an existing router, to POST to the Devices Topology API (Useful for interface/router changes) 
+            8.Set a routers interface to active true/false (receiving flow)
+            9.Debugging hints
+            10.Return
+
 
 ....and can click through the menu's in order to execute tasks, and see how to do it
 

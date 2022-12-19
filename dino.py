@@ -551,8 +551,9 @@ def submenu216():
             5.Get a list of all interfaces via the interface dimension (this is a big list, perhaps the next one is better)
             6.Get a list of interfaces for a given router via the interface dimension
             7.Build a router model from an existing router, to POST to the Devices Topology API (Useful for interface/router changes) 
-            8.Debugging hints
-            9.Return""")
+            8.Set a routers interface to active true/false (receiving flow)
+            9.Debugging hints
+            10.Return""")
         print("\n")
         #grab the first API key from the support users list of keys
         supportKeys = deepy.deepui.get_root_api_keys()
@@ -703,17 +704,31 @@ def submenu216():
             print("I have created a file for you topologyConfigFile.json with the routers topology model")
             print("Check the file over carefully")
             print("The device API POST is an update")
-            print("so in general you will only want to include new or changed interfaces and parameters, not all parameters")
+            print("The devices api does not add routers, so add the in the ui first")
+            print("The devices api adds and updates interfaces")
+            print("You can include all interfaces (with the risk that you change them) or just the new ones")
+            print("for devices api to work snmp must be disabled 'unticked' on the router. Otherwise 200OK and nothing")
+            print("for devices api to work the router must have a name and a description. Otherwise 200OK and nothing")
+            print("I have not found a way to delete interfaces using device api")
+            print("Interfaces come up with this missing in the interfaces dimension devices active: false the next option fixes that")
             print("Once you are happy copy paste the command below to provision/change the router or interface")
             print("\nCommand is:" + mycmd )
         elif(ch == 8):
+            print ("Set a routers interface to active true/false (receiving flow)")
+            #first get a router from the list
+
+
+
+        elif(ch == 9):
             print ("To Debug check syslog: sudo less /var/log/syslog")
             print ("Example Output below")
+            print ("but 200 OK just means the json was ok. If it fails to add its silent")
+            print ("")
             print ("")
             print ("Dec 15 19:48:39 master home.py[95936][INFO]: 200 POST /api/devices/topology?api_key=************ (127.0.0.1) 1284.48ms")
             print ("Dec 15 19:48:39 master home.py[95936][INFO]: Request to /api/devices/topology?api_key=************ completed in 1.284 seconds. 0 bytes were transferred.")
             print ("Dec 15 19:48:39 master home.py[95936][INFO]: /api/devices/topology?api_key=************ took 1 seconds to load for User 4acd26f26fa54fbbe02394be699dcd41bc9b1990 Status: 200")
-        elif(ch == 9):
+        elif(ch == 10):
             topmenu()
         else:
             print("Invalid entry")
