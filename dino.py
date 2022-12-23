@@ -550,8 +550,8 @@ def submenu216():
             4.Get a list of routers using the routers dimension
             5.Get a list of all interfaces via the interface dimension (this is a big list, perhaps the next one is better)
             6.Get a list of interfaces for a given router via the interface dimension
-            7.Build a router model from an existing router, to POST to the Devices Topology API (Useful for interface/router changes) 
-            8.Set a routers interface to active true/false (not ready yet)
+            7.Build a router model from an existing router, so you can add/remove interfaces using the devices api 
+            8.Set a specified routers interface to active true/false
             9.Debugging hints
             10.Return""")
         print("\n")
@@ -623,10 +623,11 @@ def submenu216():
             os.system(mycmd)
             print("\n\nI've written the output to file myrouterinterfacelist.json for you")
         elif(ch == 7):
-            print("Build a router model from an existing router, ready to POST to the Devices Topology API (Useful for interface/router changes)")
+            print("Build a router model from an existing router")
+            print("show the POST to the Devices Topology API to recreate it") 
+            print ("If you then add/delete interfaces to the topology.json file they will change in the router")
             print("This one works around the missing GET in devices API")
-            print("Building up the router model from several places")
-            print("I'll also show you the curl to use")
+            print("I am Building up the router model from several places")
             #start by listing all routers and askign the user to pick one 
             url = 'https://localhost/dimension/router/positions?attributes=*&api_key=' + firstSupportKey
             routerlist = requests.get(url, verify=False).json()
@@ -645,7 +646,7 @@ def submenu216():
             #prompt for the router by number x) 
             user_input = input(input_message)
             #
-            #ok so we know the router. LEts gather up all of the information we need for the model 
+            #ok so we know the router. Lets gather up all of the information we need for the model 
             #
             #find the router name and the possition
             index = 0
@@ -747,7 +748,7 @@ def submenu216():
             routerinterfacelist = requests.get(url, verify=False).json()
             #for debug the two lines below prints the json containing all of the router info
             json_formatted_routerinterfacelist = json.dumps(routerinterfacelist, indent=2)
-            print ("\nDebug routerinterfacelist: " , json_formatted_routerinterfacelist)
+            #print ("\nDebug routerinterfacelist: " , json_formatted_routerinterfacelist)
             #build the text menu for the router interfaces
             user_input = ''
             input_message = "Select an interface from that router:\n"
@@ -770,46 +771,36 @@ def submenu216():
                     interfacepossitionselected = routerinterfacelist[key]['id']
                     #get the json for the selected interface
                     routerinterfaceselectedjson = routerinterfacelist[key]
-                    print ("Debug: interfacenameselected=", interfacenameselected)
-                    print ("Debug: interfacepossitionselected=", interfacepossitionselected)
-                    print ("Debug: routerinterfaceselectedjson=", routerinterfaceselectedjson)
-            print ("\nlooking for parameter \"active\" within router " + routername + " and interface " + interfacenameselected)
-            if "active" in routerinterfaceselectedjson:
-                print("Ok the active flag is present already")
-                interfaceactiveflag = routerinterfaceselectedjson["active"]
-                print("and is set to: ", interfaceactiveflag)
-            else:
-                print("active doesn't exist in the selected interface JSON so we will add it once you select a value")
-            print("\nHow do you want me to set active true or false (any other entry will make no changes)")
-            user_input = input("Input true or false:")
+                    #print ("Debug: interfacenameselected=", interfacenameselected)
+                    #print ("Debug: interfacepossitionselected=", interfacepossitionselected)
+                    #print ("Debug: routerinterfaceselectedjson=", routerinterfaceselectedjson)
+            print ("\nThe interfaces dimension api is buggy (5.4), doesn't allow us to set or add active")
+            print ("So we are going to have to do this directly in postgress (5.4+)")
+            print ("You selected router ", routername)
+            print ("You selected interface ", interfacenameselected)
+            print ("The interfaces current setting for active is\n-------")
+            mycmd = ("sudo -u postgres psql -d \"defender_zen-saha\" -c 'select active from \"Interfaces\" where id=" + str(interfacepossitionselected) + " order by id;'")
+            os.system(mycmd)
+            print("\nI used this Command: " + mycmd )
+            print("\nHow do you want me to set active)")
+            user_input = input("Input true or false any other key makes no change:")
             if user_input == 'true':
-                print ("true")
-                if "active" in routerinterfaceselectedjson:
-                    print ("active is present and currently set to ", routerinterfaceselectedjson["active"])
-                    print ("As instructed I will change active to \"active\": true,")
-                else:
-                    print ("active doesn't exist in the selected interface JSON")
-                    print ("I will add the new parameter \"active\": true,")
+                print ("setting to active=true. I used this comand")
+                mycmd = ("sudo -u postgres psql -d \"defender_zen-saha\" -c 'update \"Interfaces\" set active='true' where id=" + str(interfacepossitionselected) + ";'")
+                print("\nRunning Command: " + mycmd )
+                os.system(mycmd)
+                print("\nDone")
             elif user_input == 'false':
-                print ("false")
-                if "active" in routerinterfaceselectedjson:
-                    print ("active is present and currently set to ", routerinterfaceselectedjson["active"])
-                    print ("As instructed I will change active to \"active\": false,")
-                else:
-                    print ("active doesn't exist in the selected interface JSON")
-                    print ("I will add the new parameter \"active\": false,")
+                print ("setting to active=false. I used this comand")
+                mycmd = ("sudo -u postgres psql -d \"defender_zen-saha\" -c 'update \"Interfaces\" set active='false' where id=" + str(interfacepossitionselected) + ";'")
+                print("\nRunning Command: " + mycmd )
+                os.system(mycmd)
+                print("\nDone")
             else:
-                print ("doing nothing as only true|false are valid entries for the active flag")
-            url = 'https://localhost/dimension/interfaces/position/' + str(interfacepossitionselected) + '?api_key=' + firstSupportKey
-            print ("The JSON I'm about to PUT is as follows") 
-            json_formatted_routerinterfaceselectedjson= json.dumps(routerinterfaceselectedjson, indent=2)
-            print ("\n" , json_formatted_routerinterfaceselectedjson)
-            print ("Debug: url=", url)
-            user_input = input("\nenter Y to make the change. Any other key to do nothing:")
-            if user_input == 'Y':
-                #not ready yet, the api is failing. Tried several combinations. 
-                #setrouterinterfaceflag = requests.put(url, verify=False, data=routerinterfaceselectedjson)
-                #print ("The url PUT response was :", setrouterinterfaceflag)
+                print ("doing nothing")
+            print ("The interfaces current setting for active is now\n-------")
+            mycmd = ("sudo -u postgres psql -d \"defender_zen-saha\" -c 'select active from \"Interfaces\" where id=" + str(interfacepossitionselected) + " order by id;'")
+            os.system(mycmd)
         elif(ch == 9):
             print ("To Debug check syslog: sudo less /var/log/syslog")
             print ("Example Output below")
