@@ -1,4 +1,4 @@
-# importing the modules
+# importing the module
 import os
 import re
 import subprocess
@@ -76,8 +76,7 @@ def topmenu():
             14.MOP
             15.HDFS
             16.Devices API, Routers and Interfaces
-            17.Data Views
-            18.Exit""")
+            17.Exit""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -115,8 +114,6 @@ def topmenu():
         elif ch == 16:
             submenu216() 
         elif ch == 17:
-            submenu217() 
-        elif ch == 18:
             print("Exiting application")
             exit()
         else:
@@ -555,9 +552,8 @@ def submenu216():
             6.Get a list of interfaces for a given router via the interface dimension
             7.Build a router model from an existing router, so you can add/remove interfaces using the devices api 
             8.Set a specified routers interface to active true/false
-            9.Overwrite a specified routers interface name, intended for config rules (works but then gets reset to router name + ifname )
-            10.Debugging hints
-            11.Return""")
+            9.Debugging hints
+            10.Return""")
         print("\n")
         #grab the first API key from the support users list of keys
         supportKeys = deepy.deepui.get_root_api_keys()
@@ -783,113 +779,29 @@ def submenu216():
             print ("You selected router ", routername)
             print ("You selected interface ", interfacenameselected)
             print ("The interfaces current setting for active is\n-------")
-            mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active from \"Interfaces\" where id=" + str(interfacepossitionselected) + " order by id;'")
+            mycmd = ("sudo -u postgres psql -d \"defender_zen-saha\" -c 'select active from \"Interfaces\" where id=" + str(interfacepossitionselected) + " order by id;'")
             os.system(mycmd)
             print("\nI used this Command: " + mycmd )
             print("\nHow do you want me to set active)")
             user_input = input("Input true or false any other key makes no change:")
             if user_input == 'true':
                 print ("setting to active=true. I used this comand")
-                mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'update \"Interfaces\" set active='true' where id=" + str(interfacepossitionselected) + ";'")
+                mycmd = ("sudo -u postgres psql -d \"defender_zen-saha\" -c 'update \"Interfaces\" set active='true' where id=" + str(interfacepossitionselected) + ";'")
                 print("\nRunning Command: " + mycmd )
                 os.system(mycmd)
                 print("\nDone")
             elif user_input == 'false':
                 print ("setting to active=false. I used this comand")
-                mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'update \"Interfaces\" set active='false' where id=" + str(interfacepossitionselected) + ";'")
+                mycmd = ("sudo -u postgres psql -d \"defender_zen-saha\" -c 'update \"Interfaces\" set active='false' where id=" + str(interfacepossitionselected) + ";'")
                 print("\nRunning Command: " + mycmd )
                 os.system(mycmd)
                 print("\nDone")
             else:
                 print ("doing nothing")
             print ("The interfaces current setting for active is now\n-------")
-            mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active from \"Interfaces\" where id=" + str(interfacepossitionselected) + " order by id;'")
+            mycmd = ("sudo -u postgres psql -d \"defender_zen-saha\" -c 'select active from \"Interfaces\" where id=" + str(interfacepossitionselected) + " order by id;'")
             os.system(mycmd)
         elif(ch == 9):
-            print ("Overwrite a specified routers interface name, intended for config rules (works but then gets reset to router name + ifname )")
-            print ("this works, name and display_name change. However on the next update they are set back to the router name + ifname by the system")
-            #first get a router from the list
-            #start by listing all routers and askign the user to pick one 
-            url = 'https://localhost/dimension/router/positions?attributes=*&api_key=' + firstSupportKey
-            routerlist = requests.get(url, verify=False).json()
-            #for debug the two lines below prints the json containing all of the router info
-            #json_formatted_routerlist = json.dumps(routerlist, indent=2)
-            #print ("\nDebug routerlist: " , json_formatted_routerlist)
-            #build the text menu for the routers
-            user_input = ''
-            input_message = "Select a router:\n"
-            index = 0
-            for key in routerlist:
-                index += 1
-                routername = routerlist[key]['name']
-                input_message += f'{index}) {routername}\n'
-            input_message += 'You selected router: '
-            #prompt for the router by number x) 
-            user_input = input(input_message)
-            #
-            #find the router name and the possition
-            index = 0
-            for key in routerlist:
-                index += 1
-                if index == int(user_input):
-                    routername = routerlist[key]['name']
-                    routerpossition = routerlist[key]['position_id']
-                    routerflowip = routerlist[key]['router']['flow_ip']
-            # now have the user select the router interface they want to enable/disable from a list
-            url = 'https://localhost/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + firstSupportKey
-            routerinterfacelist = requests.get(url, verify=False).json()
-            #for debug the two lines below prints the json containing all of the router info
-            json_formatted_routerinterfacelist = json.dumps(routerinterfacelist, indent=2)
-            #print ("\nDebug routerinterfacelist: " , json_formatted_routerinterfacelist)
-            #build the text menu for the router interfaces
-            user_input = ''
-            input_message = "Select an interface from that router:\n"
-            index = 0
-            for key in routerinterfacelist:
-                index += 1
-                interfacename = routerinterfacelist[key]['name']
-                input_message += f'{index}) {interfacename}\n'
-            input_message += 'You selected router interface: '
-            #prompt for the router interface by number x) 
-            user_input = input(input_message)
-            #find the interface possition and name 
-            index = 0
-            for key in routerinterfacelist:
-                index += 1
-                if index == int(user_input):
-                    #get the name of the selected interface
-                    interfacenameselected = routerinterfacelist[key]['name']
-                    #get the possition of the selected interface
-                    interfacepossitionselected = routerinterfacelist[key]['id']
-                    #get the json for the selected interface
-                    routerinterfaceselectedjson = routerinterfacelist[key]
-                    #print ("Debug: interfacenameselected=", interfacenameselected)
-                    #print ("Debug: interfacepossitionselected=", interfacepossitionselected)
-                    #print ("Debug: routerinterfaceselectedjson=", routerinterfaceselectedjson)
-            print ("\nThe interfaces dimension api is buggy (5.4), doesn't allow us to set an interface name")
-            print ("\nhowever its the name we need for config rules, as the name is infact the description")
-            print ("So we are going to have to do this directly in postgress (5.4+)")
-            print ("You selected router ", routername)
-            print ("You selected interface ", interfacenameselected)
-            print ("The interfaces current setting for name is\n-------")
-            mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select name from \"Interfaces\" where id=" + str(interfacepossitionselected) + " order by id;'")
-            os.system(mycmd)
-            print("\nI used this Command: " + mycmd )
-            print("\nHow do you want me to this interfaces name")
-            user_input = input("Input a text string or hit enter to do nothing at all:")
-            #if user_input != '':
-            if(len(user_input) != 0):
-                print ("setting the name, I used this comand")
-                mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c \"update \\\"Interfaces\\\" set name='" + user_input + "' where id=" + str(interfacepossitionselected) + ";\"")
-                print("\nRunning Command: " + mycmd )
-                os.system(mycmd)
-                print("\nDone")
-            else:
-                print ("doing nothing")
-            print ("The interfaces current setting for name is now\n-------")
-            mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select name from \"Interfaces\" where id=" + str(interfacepossitionselected) + " order by id;'")
-            os.system(mycmd)
-        elif(ch == 10):
             print ("To Debug check syslog: sudo less /var/log/syslog")
             print ("Example Output below")
             print ("but 200 OK just means the json was ok. If it fails to add its silent")
@@ -898,216 +810,13 @@ def submenu216():
             print ("Dec 15 19:48:39 master home.py[95936][INFO]: 200 POST /api/devices/topology?api_key=************ (127.0.0.1) 1284.48ms")
             print ("Dec 15 19:48:39 master home.py[95936][INFO]: Request to /api/devices/topology?api_key=************ completed in 1.284 seconds. 0 bytes were transferred.")
             print ("Dec 15 19:48:39 master home.py[95936][INFO]: /api/devices/topology?api_key=************ took 1 seconds to load for User 4acd26f26fa54fbbe02394be699dcd41bc9b1990 Status: 200")
-        elif(ch == 11):
+        elif(ch == 10):
             topmenu()
         else:
             print("Invalid entry")
         input("\nPress enter to continue")
         os.system("clear")
         submenu216()
-
-def submenu217():
-    os.system("clear")
-    # sets the text color to magenta
-    os.system("tput setaf 6")
-    print("\n\t-------------------------------------------------")
-    # sets the text colour to green
-    os.system("tput setaf 2")
-    print("\tData Views")
-    # sets the text color to magenta
-    os.system("tput setaf 6")
-    print("\t-------------------------------------------------")
-    while True:
-        print("""
-            1.Get the Dataview API Topology Schema
-            2.For an example traffic query, show me how to find the data view that was used
-            3.Get a list of all dataviews via the API, write to a file (this is a big list, perhaps the next one is better)
-            4.Dump a specific data view, selected from a menu of all configured data views 
-            5.Show me how to create a new data view (in progress)
-            6.Show me how to patch(modify) an existing data view (in progress)
-            7.Show me how to PUT(replace) an existing data view (in progress)
-            8.Return""")
-        print("\n")
-        #grab the first API key from the support users list of keys
-        supportKeys = deepy.deepui.get_root_api_keys()
-        firstSupportKey = supportKeys[0]
-        #check its really set, if not ask for a manualy entered key
-        if not firstSupportKey:
-            print ("I did not manage to extract your support user API key, so could you past it here")
-            firstSupportKey=input("Enter your API key: ")
-        else: 
-            #print("The support user API key is " , firstSupportKey)
-            print("")
-        ch=int(input("Enter your choice: "))
-        if(ch == 1):
-            print("To see the data view API Schema, point your browser here ")
-            mycmd = ("curl --insecure --silent -X OPTIONS 'https://localhost/api/data_views/?api_key=" + firstSupportKey + "' | json_pp | tee dataviewschema.json")
-            os.system(mycmd)
-            print("Command was:" + mycmd )
-            print("\n\nI've written the schema output to file dataviewschema.json for you")
-        elif(ch == 2):
-            print("-------------------------")
-            print("For an example traffic query, show me how to find the data view that was used")
-            print("-------------------------")
-            print("Lets take the following simple query,\n   15 minutes of traffic\n   dimensions=timestamp&sites\n   top 100\n   output format csv")
-            mycmd = ("curl -k -X GET 'https://localhost/cube/traffic.csv?slice=timestamp(-15minutes:now)&dimensions=timestamp,sites&measures=sum.total.bytes&api_key=" + firstSupportKey + "&a=top(auto,n:100)'")
-            print("Command is:" + mycmd )
-            input("Press any key and I'll run the command...")
-            os.system(mycmd)
-            print("-------------------------")
-            print("In order to find the data view the system used we just need to modify our query to json and grep for view_name")
-            mycmd = ("curl -k --silent -X GET 'https://localhost/cube/traffic.json?slice=timestamp(-15minutes:now)&dimensions=timestamp,sites&measures=sum.total.bytes&api_key=" + firstSupportKey + "&a=top(auto,n:100)' | json_pp | grep view_name")
-            print("Command is:" + mycmd )
-            input("Press any key and I'll run the command...")
-            os.system(mycmd)
-            print("----all done-------")
-        elif(ch == 3):
-            print ("Get a list of all dataviews via the data view API, write to a file (this is a big list, perhaps the next one is better)")
-            mycmd = ("curl -k --silent -X GET 'https://localhost/api/data_views/?api_key=" + firstSupportKey + "' | json_pp | tee dataviewsdump.json") 
-            print("Command is:" + mycmd )
-            input("Press any key and I'll run the command...")
-            os.system(mycmd)
-            print("I've send the output to file dataviewsdump.json")
-        elif(ch == 4):
-            print("Dump a specific data view, selected from a menu of all configured data views")
-            #url = 'https://localhost/dimension/router/positions?api_key=' + firstSupportKey
-            url = 'https://localhost/api/data_views/?attributes=*&api_key=' + firstSupportKey
-            dataviewlist = requests.get(url, verify=False).json()
-            #for debug the two lines below prints the json
-            json_formatted_dataviewlist = json.dumps(dataviewlist, indent=2)
-            #print ("\nDebug dataviewlist: " , json_formatted_dataviewlist)
-            #build the text menu
-            user_input = ''
-            input_message = "Select a data view:\n"
-            index = 0
-            for key in dataviewlist['data']:
-                index += 1
-                #print ("DEBUG: key:", key)
-                dataviewname = key['name']
-                dataviewuuid = key['uuid']
-                #print ("DEBUG: dataviewname:", dataviewname)
-                #print ("DEBUG: dataviewuuid:", dataviewuuid)
-                input_message += f'{index}) {dataviewname}\n'
-            input_message += 'You selected data view: '
-            #prompt for the data view by number x) 
-            user_input = input(input_message)
-            #now find the selected dataview name and uuid for the selected number
-            index = 0
-            for key in dataviewlist['data']:
-                index += 1
-                if index == int(user_input):
-                    dataviewname = key['name']
-                    dataviewuuid = key['uuid']
-            print ("You selected data view name:", dataviewname)
-            print ("Grabbing the dataview details for you")
-            mycmd = ("curl -k --silent -X GET 'https://localhost/api/data_views/" + dataviewuuid + "?api_key=" + firstSupportKey + "' | json_pp | tee mydataview.json") 
-            print("Command is:" + mycmd )
-            input("Press any key and I'll run the command...")
-            os.system(mycmd)
-            print("\n\nI've written the output to file mydataview.json for you")
-        elif(ch == 5):
-            print("Show me how to create a new data view")
-            print("show the POST to the Devices Topology API to recreate it") 
-            print ("If you then add/delete interfaces to the topology.json file they will change in the router")
-            print("This one works around the missing GET in devices API")
-            print("I am Building up the router model from several places")
-            #start by listing all routers and askign the user to pick one 
-            url = 'https://localhost/dimension/router/positions?attributes=*&api_key=' + firstSupportKey
-            routerlist = requests.get(url, verify=False).json()
-            #for debug the two lines below prints the json containing all of the router info
-            #json_formatted_routerlist = json.dumps(routerlist, indent=2)
-            #print ("\nDebug routerlist: " , json_formatted_routerlist)
-            #build the text menu
-            user_input = ''
-            input_message = "Select a router:\n"
-            index = 0
-            for key in routerlist:
-                index += 1
-                routername = routerlist[key]['name']
-                input_message += f'{index}) {routername}\n'
-            input_message += 'You selected router: '
-            #prompt for the router by number x) 
-            user_input = input(input_message)
-            #
-            #ok so we know the router. Lets gather up all of the information we need for the model 
-            #
-            #find the router name and the possition
-            index = 0
-            for key in routerlist:
-                index += 1
-                if index == int(user_input):
-                    routername = routerlist[key]['name']
-                    routerpossition = routerlist[key]['position_id']
-                    routerflowip = routerlist[key]['router']['flow_ip']
-            #
-            #get the router interfaces
-            url = 'https://localhost/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + firstSupportKey
-            routerinterfaces = requests.get(url, verify=False).json()
-            #for debug the line below prints the json containing all of the router interfaces
-            #print ("\nDebug url: " + url)
-            #json_formatted_routerinterfaces = json.dumps(routerinterfaces, indent=2)
-            #print ("\nDebug routerinterfaces: ", json_formatted_routerinterfaces)
-            #
-            #we have router name, routername
-            #we have the router possition, routerpossition
-            #we have the router interfaces routerinterfaces json_formatted_routerinterfaces
-            #we have the router flow ip routerflowip 
-            #
-            #so we have all of the details required for the model. lets build the json
-            topologyjson = "{\n"
-            topologyjson += f'  "devices": [\n'
-            topologyjson += f'    {{\n'
-            topologyjson += f'      "name": "{routername}",\n'
-            topologyjson += f'      "flow_ip": "{routerflowip}",\n'
-            topologyjson += f'      "interfaces": [\n'
-            #we have to reformat the interfaces for the devices topology model
-            #index = 0
-            #for key in routerinterfaces["devices"]:
-            #    print(routerinterfaces["devices"])
-            for key in routerinterfaces:
-                 index += 1
-                 ifIndex = routerinterfaces[key]['interface']['ifIndex']
-                 ifName = routerinterfaces[key]['interface']['ifName']
-                 topologyjson += f'      {{\n'
-                 topologyjson += f'          "ifIndex": {ifIndex},\n'
-                 topologyjson += f'          "ifName": "{ifName}"\n'
-                 topologyjson += f'      }},\n'
-            #replace the last }, with a }
-            topologyjson = (replace_last(topologyjson, '},', '}'))
-            topologyjson += f'      ]\n'
-            topologyjson += f'    }}\n'
-            topologyjson += f'    ]\n'
-            topologyjson += f'}}\n'
-
-            #print ("Debug: topology_json\n", topologyjson)
-            file = open("topologyConfigFile.json", "w")
-            file.write(topologyjson)
-            file.close
-            #now show the command to provision the router model
-            mycmd = ("curl --insecure -X POST -d '@topologyConfigFile.json' https://localhost/api/devices/topology?api_key=" + firstSupportKey)
-            print("I have created a file for you topologyConfigFile.json with the routers topology model")
-            print("Check the file over carefully")
-            print("The device API POST is an update")
-            print("The devices api does not add routers, so add the in the ui first")
-            print("The devices api adds and updates interfaces")
-            print("You can include all interfaces (with the risk that you change them) or just the new ones")
-            print("for devices api to work snmp must be disabled 'unticked' on the router. Otherwise 200OK and nothing")
-            print("for devices api to work the router must have a name and a description. Otherwise 200OK and nothing")
-            print("I have not found a way to delete interfaces using device api")
-            print("Interfaces come up with this missing in the interfaces dimension devices active: false the next option fixes that")
-            print("Once you are happy copy paste the command below to provision/change the router or interface")
-            print("\nCommand is:" + mycmd )
-        elif(ch == 6):
-            print("Show me how to patch(modify) an existing data view")
-        elif(ch == 7):
-            print ("Show me how to PUT(replace) an existing data view")
-        elif ch == 8:
-            topmenu()
-        else:
-            print("Invalid entry")
-        input("\nPress enter to continue")
-        os.system("clear")
-        submenu217()
 
 def submenu29():
     os.system("clear")

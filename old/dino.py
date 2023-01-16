@@ -2,13 +2,18 @@
 import os
 import re
 import subprocess
+import socket
 import deepy.cfg
 import deepy.deepui
 import get_context
 import pandas as pd
+import requests 
 import deepy.log as log
+import json 
 from subprocess import check_output as run
-
+from datetime import date
+#date 
+today = str(date.today())
 #statics
 logDir = '/pipedream/log/'
 uiLogName = 'ui.log'
@@ -37,61 +42,22 @@ apikey_regex = re.compile(r"api_key=([\w,.-]*)&?")
 boundaryslice_regex = re.compile(r"bs=\(([\w,-.()]*)\)&?")
 # pattern to extract each boundary from the boundary slice
 boundary_regex = re.compile(r"\((boundary\.[\w.-]*),.*\)")
-
+# api_key
+api_key = 'None' 
 
 def topmenu():
 
     os.system("clear")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
     print("\tDino - Deepfield customer engineer trainer")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\t-------------------------------------------------")
 
-    #incomming!!
-    #mops: create a mop dir. backup network config static and dynamic. backup slice. 
-    #routers.pt --list | | tr -s ' ' (list all routers)
-    #all daemon processes at 100% normd collectord dnsflowd 
-    #hdfs 
-    #hdfs dfsadmin -report
-    #birdc
-    #sudo birdc show protocols 
-    #sudo birdc show route protocol session_217_41_168_0 | wc -l 
-    #swap
-    #whats using my swap space
-    #for file in /proc/*/status ; do awk '/VmSwap|Name/{printf $2 " " $3}END{ print ""}' $file; done | sort -k 2 -n -r 
-    #how much swap do I have 
-    #grep -i swap /proc/meminfo
-    #mysql (<5.2)
-    #mysql -u root -e "show databases";
-    #mysql -u root -e "use defender_bt-tactical; show tables;"
-    #mysql -u root -e "use defender_bt-tactical; describe Interfaces;"
-    #postgres  (5.2+)
-    #impala-shell
-    #redis-cli keys "*license.json" | xargs redis-cli del
-    #flow tracing
-    #Check if we are receiving flow by router
-    #flow.py --show-realtime
-    #flow.py --show-realtime | grep worker02 | wc -l  
-    #normd
-    #pdvi.py traffic.json
-    #bgp bgp.py --search 213.187.233.0/24
-    #routemap.py -v show -a 213.187.233.0/24
-    #dims.py dump interfaces -p 15630
-    #flow.py --show-realtime | grep MLT1
-    #diagnostics.py --skip-config --build-only -v
-    #ptdump
-    #python community.py 
-    #dims.py dump suspicious | more
-    #hdfs dfs -ls /pipedream/cache/dimensions/
-    #mtr --no-dns --report --report-cycles 60 worker01
-    #nodes with dnsflow sudo salt -G roles:dnsflow cmd.run 'supervisorctl status | grep dns'
-    #genome genome.py check url /etc/hosts port
-    #data view management, see my bt ps ticket and steps in the git.  
     while True:
         print("""
             1.Whats a trainer ? 
@@ -107,7 +73,10 @@ def topmenu():
             11.tracing (empty)
             12.networking and bonding
             13.bgp (empty)
-            14.Exit""")
+            14.MOP
+            15.HDFS
+            16.Devices API, Routers and Interfaces
+            17.Exit""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -139,6 +108,12 @@ def topmenu():
         elif ch == 13:
             foldername=input("Enter the foldername: ")
         elif ch == 14:
+            submenu214() 
+        elif ch == 15:
+            submenu215() 
+        elif ch == 16:
+            submenu216() 
+        elif ch == 17:
             print("Exiting application")
             exit()
         else:
@@ -149,14 +124,14 @@ def topmenu():
 
 def submenu22():
     os.system("clear")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
     print("\tDeepfield Example Queries")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\t-------------------------------------------------")
     while True:
         print("""
@@ -182,14 +157,14 @@ def submenu22():
 
 def submenu23():
     os.system("clear")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
     print("\tDeepfield Cluster Health")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\t-------------------------------------------------")
     while True:
         print("""
@@ -205,7 +180,10 @@ def submenu23():
             10.show me the cpu details for each node 			#cpu details
             11.show me the cpu model for each node 			#cpu model
             12.get the cpu clock speeds for each node 			#wondering why one node is busy.. perhaps you have a fan out and the clock was stepped
-            13.Return""")
+            13.Whats taking up all my SWAP space
+            14.How much SWAP space do I have
+            15.flow                                                     #show router flow per DCU
+            16.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -257,6 +235,18 @@ def submenu23():
             print("Command is:" + mycmd )
             os.system(mycmd)
         elif ch == 13:
+            mycmd = ("for file in /proc/*/status ; do awk '/VmSwap|Name/{printf $2 \" \" $3}END{ print \"\"}' $file; done | sort -k 2 -n -r")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif ch == 14:
+            mycmd = ("grep -i swap /proc/meminfo")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif ch == 15:
+            mycmd = ("flow.py --show-realtime")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif ch == 16:
             topmenu()
         else:
             print("Invalid entry")
@@ -266,36 +256,41 @@ def submenu23():
 
 def submenu24():
     os.system("clear")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
     print("\tDeepfield Cluster Configuration")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\t-------------------------------------------------")
     while True:
         print("""
             1.salt roles configured on each node 			#shows the configured services on each node 
             2.who has the dnsflow salt role     			#which dcu's
             3.who has the collector salt role     			#which dcu's
-            4.Return""")
+            4.List all configured routers
+            5.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
             mycmd = "sudo salt \* grains.get roles"
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 2):
+        elif(ch == 2):
             mycmd = "sudo salt -G roles:dnsflow test.ping"
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 3):
+        elif(ch == 3):
             mycmd = "sudo salt -G roles:collector test.ping"
             print("Command is:" + mycmd )
             os.system(mycmd)
-        elif ch == 4:
+        elif(ch == 4):
+            mycmd = "routers.py --list | tr -s ' '"
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif ch == 5:
             topmenu()
         else:
             print("Invalid entry")
@@ -307,14 +302,14 @@ def submenu25():
     os.system("clear")
     #set the context as a global
     global mycontext 
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
     print("\tDeepfield Queries the customer is using most frequently (view optimization)")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\t-------------------------------------------------")
     while True:
         print("""
@@ -360,14 +355,14 @@ def submenu25():
 
 def submenu212():
     os.system("clear")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
     print("\tDeepfield Networking")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\t-------------------------------------------------")
     while True:
         print("""
@@ -390,48 +385,48 @@ def submenu212():
             mycmd = "sudo salt \* cmd.run \"ip addr show\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 2):
+        elif(ch == 2):
             mycmd = "sudo salt \* cmd.run \"netstat -rn\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 3):
+        elif(ch == 3):
             mycmd = "sudo salt \* cmd.run \"cat /proc/net/bonding/bond0 | grep up\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 4):
+        elif(ch == 4):
             mycmd = "sudo salt \* cmd.run \"cat /proc/net/bonding/bond0\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 5):
+        elif(ch == 5):
             mycmd = "sudo salt \* cmd.run \"netstat -i\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 6):
+        elif(ch == 6):
             mycmd = "sudo salt \* cmd.run \"netstat -s\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 7):
+        elif(ch == 7):
             mycmd = "sudo salt \* cmd.run \"sudo netstat -tulpn | grep LISTEN\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 8):
+        elif(ch == 8):
             myport=input("Enter your port: ")
             mycmd = "sudo salt \* cmd.run \"sudo lsof -i:" + myport + "\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 9):
+        elif(ch == 9):
             mycmd = "sudo salt \* cmd.run \"ntpq -p\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 10):
+        elif(ch == 10):
             mycmd = "sudo salt \* cmd.run \"date\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 11):
+        elif(ch == 11):
             mycmd = "sudo salt \* cmd.run \"nc -zv genome.deepfield.net 443\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 12):
+        elif(ch == 12):
             mycmd = "sudo salt \* cmd.run \"nc -zv monitoring.deepfield.net 443\""
             print("Command is:" + mycmd )
             os.system(mycmd)
@@ -443,17 +438,481 @@ def submenu212():
         os.system("clear")
         submenu212()
 
+def submenu214():
+    os.system("clear")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\n\t-------------------------------------------------")
+    # sets the text colour to green
+    os.system("tput setaf 2")
+    print("\tDeepfield MOPS and Backups")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\t-------------------------------------------------")
+    while True:
+        print("""
+            1.create a MOP directory on all DCUs based on todays date
+            2.backup the network configuration static and dynamic into the MOP directory, on all DCUs
+            3.backup the slice.json into the MOP directory, on all DCUs
+            4.backup the soup status into the MOP directory, on Master for all DCUs
+            5.delete todays mop directory, on all DCUs
+            6.Return""")
+        print("\n")
+        ch=int(input("Enter your choice: "))
+        if(ch == 1):
+            mycmd = ("sudo salt \* cmd.run \"mkdir -p /home/support/mop/mop-" + today + "\"")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 2):
+            mycmd = ("sudo salt \* cmd.run \"cp /etc/network/interfaces /home/support/mop/mop-" + today + "/interfaces.bkup\"")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+            mycmd = ("sudo salt \* cmd.run \"ifconfig | tee /home/support/mop/mop-" + today + "/ifconfig.bkup\"")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+            mycmd = ("sudo salt \* cmd.run \"ip addr show | tee /home/support/mop/mop-" + today + "/ipaddr.bkup\"")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+            mycmd = ("sudo salt \* cmd.run \"netstat -rn | tee /home/support/mop/mop-" + today + "/netstat.bkup\"")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 3):
+            mycmd = ("sudo salt \* cmd.run \"cp /pipedream/cache/config/slice.json /home/support/mop/mop-" + today + "/slice.json.bkup\"")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 4):
+            mycmd = ("sudo salt \* cmd.run \"sudo supervisorctl status | tee /home/support/mop/mop-" + today + "/soup.status.bkup\"")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 5):
+            mycmd = ("sudo salt \* cmd.run \"rm -rf /home/support/mop/mop-" + today + "\"")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 6):
+            topmenu()
+        else:
+            print("Invalid entry")
+        input("Press enter to continue")
+        os.system("clear")
+        submenu214()
+
+def submenu215():
+    os.system("clear")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\n\t-------------------------------------------------")
+    # sets the text colour to green
+    os.system("tput setaf 2")
+    print("\tHDFS")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\t-------------------------------------------------")
+    while True:
+        print("""
+            1.HDFS Status Report
+            2.List all HDFS Dimensions, sorted by size
+            3.Return""")
+        print("\n")
+        ch=int(input("Enter your choice: "))
+        if(ch == 1):
+            mycmd = ("hdfs dfsadmin -report")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 2):
+            mycmd = ("hdfs dfs -ls /pipedream/cache/dimensions/ | sort -n -k+5")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 3):
+            topmenu()
+        else:
+            print("Invalid entry")
+        input("Press enter to continue")
+        os.system("clear")
+        submenu215()
+
+
+def submenu216():
+    os.system("clear")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\n\t-------------------------------------------------")
+    # sets the text colour to green
+    os.system("tput setaf 2")
+    print("\tDevices API")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\t-------------------------------------------------")
+    while True:
+        print("""
+            1.Get the Device API Topology Schema
+            2.Get the Device API utilisation Schema
+            3.Get a list of routers via the devices API
+            4.Get a list of routers using the routers dimension
+            5.Get a list of all interfaces via the interface dimension (this is a big list, perhaps the next one is better)
+            6.Get a list of interfaces for a given router via the interface dimension
+            7.Build a router model from an existing router, so you can add/remove interfaces using the devices api 
+            8.Set a specified routers interface to active true/false
+            9.Overwrite a specified routers interface name, intended for config rules (works but then gets reset to router name + ifname )
+            10.Debugging hints
+            11.Return""")
+        print("\n")
+        #grab the first API key from the support users list of keys
+        supportKeys = deepy.deepui.get_root_api_keys()
+        firstSupportKey = supportKeys[0]
+        #check its really set, if not ask for a manualy entered key
+        if not firstSupportKey:
+            print ("I did not manage to extract your support user API key, so could you past it here")
+            firstSupportKey=input("Enter your API key: ")
+        else: 
+            #print("The support user API key is " , firstSupportKey)
+            print("")
+        ch=int(input("Enter your choice: "))
+        if(ch == 1):
+            print("To see the Device API Topology Schema, point your browser here ")
+            print("https://" + re.sub("^[a-z]+\.", "", socket.gethostname())+ "/docs/api/devices/topology")
+        elif(ch == 2):
+            print("To see the Device API Utilisation Schema, point your browser here ")
+            print("https://" + re.sub("^[a-z]+\.", "", socket.gethostname())+ "/docs/api/devices/utilization")
+        elif(ch == 3):
+            print("Method GET is as of 5.4 not supported, so this command will fail. Only POST is supported")
+            print("curl --insecure -X GET 'https:/localhost/api/devices/topology?api_key=" + firstSupportKey + "'")
+            print("I've provided an alternative more complex methods in the following options")
+        elif(ch == 4):
+            print("Get a list of routers and attributes using the routers dimension")
+            mycmd = ("curl --insecure -X GET 'https://localhost/dimension/router/positions?&attributes=(*)&api_key=" + firstSupportKey + "' | tee routerlist.json")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+            print("\n\nI've written the output to file routerlist.json for you")
+        elif(ch == 5):
+            print("Get a list of all interfaces via the interface dimension")
+            mycmd = ("curl --insecure -X GET 'https://localhost/dimension/interfaces/positions?&attributes=(*)&api_key=" + firstSupportKey + "' | tee interfacelist.json")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+            print("\n\nI've written the output to file interfacelist.json for you")
+        elif(ch == 6):
+            print("Get a list of interfaces for a given router via the interface dimension")
+            #url = 'https://localhost/dimension/router/positions?api_key=' + firstSupportKey
+            url = 'https://localhost/dimension/router/positions?attributes=*&api_key=' + firstSupportKey
+            routerlist = requests.get(url, verify=False).json()
+            #for debug the two lines below prints the json
+            json_formatted_routerlist = json.dumps(routerlist, indent=2)
+            #print ("\nDebug routerlist: " , json_formatted_routerlist)
+            #build the text menu
+            user_input = ''
+            input_message = "Select a router:\n"
+            index = 0
+            for key in routerlist:
+                index += 1
+                routername = routerlist[key]['name']
+                input_message += f'{index}) {routername}\n'
+            input_message += 'You selected router: '
+            #prompt for the router by number x) 
+            user_input = input(input_message)
+            #now find the selected router name and possition for the selected number
+            index = 0
+            for key in routerlist:
+                index += 1
+                if index == int(user_input):
+                    routername = routerlist[key]['name']
+                    routerpossition = routerlist[key]['position_id']
+            print ("You selected Router name:", routername)
+            print ("That Router has possition:", routerpossition)
+            print ("The following command will get the router interfaces")
+            mycmd = ("curl --insecure -X GET 'https://localhost/dimension/interfaces/positions?filter=(interface:router_pos_id,=," + str(routerpossition) + ")&attributes=(*)&api_key=" + firstSupportKey + "' | tee myrouterinterfacelist.json")
+            print("Command is:" + mycmd )
+            input("Press any key and I'll run the command...")
+            os.system(mycmd)
+            print("\n\nI've written the output to file myrouterinterfacelist.json for you")
+        elif(ch == 7):
+            print("Build a router model from an existing router")
+            print("show the POST to the Devices Topology API to recreate it") 
+            print ("If you then add/delete interfaces to the topology.json file they will change in the router")
+            print("This one works around the missing GET in devices API")
+            print("I am Building up the router model from several places")
+            #start by listing all routers and askign the user to pick one 
+            url = 'https://localhost/dimension/router/positions?attributes=*&api_key=' + firstSupportKey
+            routerlist = requests.get(url, verify=False).json()
+            #for debug the two lines below prints the json containing all of the router info
+            #json_formatted_routerlist = json.dumps(routerlist, indent=2)
+            #print ("\nDebug routerlist: " , json_formatted_routerlist)
+            #build the text menu
+            user_input = ''
+            input_message = "Select a router:\n"
+            index = 0
+            for key in routerlist:
+                index += 1
+                routername = routerlist[key]['name']
+                input_message += f'{index}) {routername}\n'
+            input_message += 'You selected router: '
+            #prompt for the router by number x) 
+            user_input = input(input_message)
+            #
+            #ok so we know the router. Lets gather up all of the information we need for the model 
+            #
+            #find the router name and the possition
+            index = 0
+            for key in routerlist:
+                index += 1
+                if index == int(user_input):
+                    routername = routerlist[key]['name']
+                    routerpossition = routerlist[key]['position_id']
+                    routerflowip = routerlist[key]['router']['flow_ip']
+            #
+            #get the router interfaces
+            url = 'https://localhost/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + firstSupportKey
+            routerinterfaces = requests.get(url, verify=False).json()
+            #for debug the line below prints the json containing all of the router interfaces
+            #print ("\nDebug url: " + url)
+            #json_formatted_routerinterfaces = json.dumps(routerinterfaces, indent=2)
+            #print ("\nDebug routerinterfaces: ", json_formatted_routerinterfaces)
+            #
+            #we have router name, routername
+            #we have the router possition, routerpossition
+            #we have the router interfaces routerinterfaces json_formatted_routerinterfaces
+            #we have the router flow ip routerflowip 
+            #
+            #so we have all of the details required for the model. lets build the json
+            topologyjson = "{\n"
+            topologyjson += f'  "devices": [\n'
+            topologyjson += f'    {{\n'
+            topologyjson += f'      "name": "{routername}",\n'
+            topologyjson += f'      "flow_ip": "{routerflowip}",\n'
+            topologyjson += f'      "interfaces": [\n'
+            #we have to reformat the interfaces for the devices topology model
+            #index = 0
+            #for key in routerinterfaces["devices"]:
+            #    print(routerinterfaces["devices"])
+            for key in routerinterfaces:
+                 index += 1
+                 ifIndex = routerinterfaces[key]['interface']['ifIndex']
+                 ifName = routerinterfaces[key]['interface']['ifName']
+                 topologyjson += f'      {{\n'
+                 topologyjson += f'          "ifIndex": {ifIndex},\n'
+                 topologyjson += f'          "ifName": "{ifName}"\n'
+                 topologyjson += f'      }},\n'
+            #replace the last }, with a }
+            topologyjson = (replace_last(topologyjson, '},', '}'))
+            topologyjson += f'      ]\n'
+            topologyjson += f'    }}\n'
+            topologyjson += f'    ]\n'
+            topologyjson += f'}}\n'
+
+            #print ("Debug: topology_json\n", topologyjson)
+            file = open("topologyConfigFile.json", "w")
+            file.write(topologyjson)
+            file.close
+            #now show the command to provision the router model
+            mycmd = ("curl --insecure -X POST -d '@topologyConfigFile.json' https://localhost/api/devices/topology?api_key=" + firstSupportKey)
+            print("I have created a file for you topologyConfigFile.json with the routers topology model")
+            print("Check the file over carefully")
+            print("The device API POST is an update")
+            print("The devices api does not add routers, so add the in the ui first")
+            print("The devices api adds and updates interfaces")
+            print("You can include all interfaces (with the risk that you change them) or just the new ones")
+            print("for devices api to work snmp must be disabled 'unticked' on the router. Otherwise 200OK and nothing")
+            print("for devices api to work the router must have a name and a description. Otherwise 200OK and nothing")
+            print("I have not found a way to delete interfaces using device api")
+            print("Interfaces come up with this missing in the interfaces dimension devices active: false the next option fixes that")
+            print("Once you are happy copy paste the command below to provision/change the router or interface")
+            print("\nCommand is:" + mycmd )
+        elif(ch == 8):
+            print ("Set a routers interface to active true/false (receiving flow)")
+            #first get a router from the list
+            #start by listing all routers and askign the user to pick one 
+            url = 'https://localhost/dimension/router/positions?attributes=*&api_key=' + firstSupportKey
+            routerlist = requests.get(url, verify=False).json()
+            #for debug the two lines below prints the json containing all of the router info
+            #json_formatted_routerlist = json.dumps(routerlist, indent=2)
+            #print ("\nDebug routerlist: " , json_formatted_routerlist)
+            #build the text menu for the routers
+            user_input = ''
+            input_message = "Select a router:\n"
+            index = 0
+            for key in routerlist:
+                index += 1
+                routername = routerlist[key]['name']
+                input_message += f'{index}) {routername}\n'
+            input_message += 'You selected router: '
+            #prompt for the router by number x) 
+            user_input = input(input_message)
+            #
+            #find the router name and the possition
+            index = 0
+            for key in routerlist:
+                index += 1
+                if index == int(user_input):
+                    routername = routerlist[key]['name']
+                    routerpossition = routerlist[key]['position_id']
+                    routerflowip = routerlist[key]['router']['flow_ip']
+            # now have the user select the router interface they want to enable/disable from a list
+            url = 'https://localhost/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + firstSupportKey
+            routerinterfacelist = requests.get(url, verify=False).json()
+            #for debug the two lines below prints the json containing all of the router info
+            json_formatted_routerinterfacelist = json.dumps(routerinterfacelist, indent=2)
+            #print ("\nDebug routerinterfacelist: " , json_formatted_routerinterfacelist)
+            #build the text menu for the router interfaces
+            user_input = ''
+            input_message = "Select an interface from that router:\n"
+            index = 0
+            for key in routerinterfacelist:
+                index += 1
+                interfacename = routerinterfacelist[key]['name']
+                input_message += f'{index}) {interfacename}\n'
+            input_message += 'You selected router interface: '
+            #prompt for the router interface by number x) 
+            user_input = input(input_message)
+            #find the interface possition and name 
+            index = 0
+            for key in routerinterfacelist:
+                index += 1
+                if index == int(user_input):
+                    #get the name of the selected interface
+                    interfacenameselected = routerinterfacelist[key]['name']
+                    #get the possition of the selected interface
+                    interfacepossitionselected = routerinterfacelist[key]['id']
+                    #get the json for the selected interface
+                    routerinterfaceselectedjson = routerinterfacelist[key]
+                    #print ("Debug: interfacenameselected=", interfacenameselected)
+                    #print ("Debug: interfacepossitionselected=", interfacepossitionselected)
+                    #print ("Debug: routerinterfaceselectedjson=", routerinterfaceselectedjson)
+            print ("\nThe interfaces dimension api is buggy (5.4), doesn't allow us to set or add active")
+            print ("So we are going to have to do this directly in postgress (5.4+)")
+            print ("You selected router ", routername)
+            print ("You selected interface ", interfacenameselected)
+            print ("The interfaces current setting for active is\n-------")
+            mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active from \"Interfaces\" where id=" + str(interfacepossitionselected) + " order by id;'")
+            os.system(mycmd)
+            print("\nI used this Command: " + mycmd )
+            print("\nHow do you want me to set active)")
+            user_input = input("Input true or false any other key makes no change:")
+            if user_input == 'true':
+                print ("setting to active=true. I used this comand")
+                mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'update \"Interfaces\" set active='true' where id=" + str(interfacepossitionselected) + ";'")
+                print("\nRunning Command: " + mycmd )
+                os.system(mycmd)
+                print("\nDone")
+            elif user_input == 'false':
+                print ("setting to active=false. I used this comand")
+                mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'update \"Interfaces\" set active='false' where id=" + str(interfacepossitionselected) + ";'")
+                print("\nRunning Command: " + mycmd )
+                os.system(mycmd)
+                print("\nDone")
+            else:
+                print ("doing nothing")
+            print ("The interfaces current setting for active is now\n-------")
+            mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active from \"Interfaces\" where id=" + str(interfacepossitionselected) + " order by id;'")
+            os.system(mycmd)
+        elif(ch == 9):
+            print ("Overwrite a specified routers interface name, intended for config rules (works but then gets reset to router name + ifname )")
+            print ("this works, name and display_name change. However on the next update they are set back to the router name + ifname by the system")
+            #first get a router from the list
+            #start by listing all routers and askign the user to pick one 
+            url = 'https://localhost/dimension/router/positions?attributes=*&api_key=' + firstSupportKey
+            routerlist = requests.get(url, verify=False).json()
+            #for debug the two lines below prints the json containing all of the router info
+            #json_formatted_routerlist = json.dumps(routerlist, indent=2)
+            #print ("\nDebug routerlist: " , json_formatted_routerlist)
+            #build the text menu for the routers
+            user_input = ''
+            input_message = "Select a router:\n"
+            index = 0
+            for key in routerlist:
+                index += 1
+                routername = routerlist[key]['name']
+                input_message += f'{index}) {routername}\n'
+            input_message += 'You selected router: '
+            #prompt for the router by number x) 
+            user_input = input(input_message)
+            #
+            #find the router name and the possition
+            index = 0
+            for key in routerlist:
+                index += 1
+                if index == int(user_input):
+                    routername = routerlist[key]['name']
+                    routerpossition = routerlist[key]['position_id']
+                    routerflowip = routerlist[key]['router']['flow_ip']
+            # now have the user select the router interface they want to enable/disable from a list
+            url = 'https://localhost/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + firstSupportKey
+            routerinterfacelist = requests.get(url, verify=False).json()
+            #for debug the two lines below prints the json containing all of the router info
+            json_formatted_routerinterfacelist = json.dumps(routerinterfacelist, indent=2)
+            #print ("\nDebug routerinterfacelist: " , json_formatted_routerinterfacelist)
+            #build the text menu for the router interfaces
+            user_input = ''
+            input_message = "Select an interface from that router:\n"
+            index = 0
+            for key in routerinterfacelist:
+                index += 1
+                interfacename = routerinterfacelist[key]['name']
+                input_message += f'{index}) {interfacename}\n'
+            input_message += 'You selected router interface: '
+            #prompt for the router interface by number x) 
+            user_input = input(input_message)
+            #find the interface possition and name 
+            index = 0
+            for key in routerinterfacelist:
+                index += 1
+                if index == int(user_input):
+                    #get the name of the selected interface
+                    interfacenameselected = routerinterfacelist[key]['name']
+                    #get the possition of the selected interface
+                    interfacepossitionselected = routerinterfacelist[key]['id']
+                    #get the json for the selected interface
+                    routerinterfaceselectedjson = routerinterfacelist[key]
+                    #print ("Debug: interfacenameselected=", interfacenameselected)
+                    #print ("Debug: interfacepossitionselected=", interfacepossitionselected)
+                    #print ("Debug: routerinterfaceselectedjson=", routerinterfaceselectedjson)
+            print ("\nThe interfaces dimension api is buggy (5.4), doesn't allow us to set an interface name")
+            print ("\nhowever its the name we need for config rules, as the name is infact the description")
+            print ("So we are going to have to do this directly in postgress (5.4+)")
+            print ("You selected router ", routername)
+            print ("You selected interface ", interfacenameselected)
+            print ("The interfaces current setting for name is\n-------")
+            mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select name from \"Interfaces\" where id=" + str(interfacepossitionselected) + " order by id;'")
+            os.system(mycmd)
+            print("\nI used this Command: " + mycmd )
+            print("\nHow do you want me to this interfaces name")
+            user_input = input("Input a text string or hit enter to do nothing at all:")
+            #if user_input != '':
+            if(len(user_input) != 0):
+                print ("setting the name, I used this comand")
+                mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c \"update \\\"Interfaces\\\" set name='" + user_input + "' where id=" + str(interfacepossitionselected) + ";\"")
+                print("\nRunning Command: " + mycmd )
+                os.system(mycmd)
+                print("\nDone")
+            else:
+                print ("doing nothing")
+            print ("The interfaces current setting for name is now\n-------")
+            mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select name from \"Interfaces\" where id=" + str(interfacepossitionselected) + " order by id;'")
+            os.system(mycmd)
+        elif(ch == 10):
+            print ("To Debug check syslog: sudo less /var/log/syslog")
+            print ("Example Output below")
+            print ("but 200 OK just means the json was ok. If it fails to add its silent")
+            print ("")
+            print ("")
+            print ("Dec 15 19:48:39 master home.py[95936][INFO]: 200 POST /api/devices/topology?api_key=************ (127.0.0.1) 1284.48ms")
+            print ("Dec 15 19:48:39 master home.py[95936][INFO]: Request to /api/devices/topology?api_key=************ completed in 1.284 seconds. 0 bytes were transferred.")
+            print ("Dec 15 19:48:39 master home.py[95936][INFO]: /api/devices/topology?api_key=************ took 1 seconds to load for User 4acd26f26fa54fbbe02394be699dcd41bc9b1990 Status: 200")
+        elif(ch == 11):
+            topmenu()
+        else:
+            print("Invalid entry")
+        input("\nPress enter to continue")
+        os.system("clear")
+        submenu216()
 
 def submenu29():
     os.system("clear")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
     print("\tDeepfield Kafka")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\t-------------------------------------------------")
     while True:
         print("""
@@ -469,19 +928,19 @@ def submenu29():
             mycmd = "kafka-consumer-groups --bootstrap-server localhost:9092 --list"
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 2):
+        elif(ch == 2):
             mycmd = "kafka-consumer-groups --bootstrap-server localhost:9092 --describe --group df-dnsflowd"
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 3):
+        elif(ch == 3):
             mycmd = "kafka-topics --bootstrap-server localhost:9092 --describe --topic df-dnsflow-raw"
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 4):
+        elif(ch == 4):
             mycmd = "kafka-consumer-groups --bootstrap-server localhost:9092 --describe --group df-classifyd"
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 5):
+        elif(ch == 5):
             mycmd = "kafka-topics --bootstrap-server localhost:9092 --describe --topic df-flow"
             print("Command is:" + mycmd )
             os.system(mycmd)
@@ -497,14 +956,14 @@ def submenu29():
 
 def submenuexample():
     os.system("clear")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
     print("\tDeepfield Example")
-    # sets the text color to white
-    os.system("tput setaf 7")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
     print("\t-------------------------------------------------")
     while True:
         print("""
@@ -517,7 +976,7 @@ def submenuexample():
             mycmd = "sudo salt \* cmd.run \"ip addr show\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        if(ch == 2):
+        elif(ch == 2):
             mycmd = "sudo salt \* cmd.run \"netstat -rn\""
             print("Command is:" + mycmd )
             os.system(mycmd)
@@ -535,6 +994,12 @@ def submenuexample():
 
 def whatsatrainer():
      print("""
+               /@\            \|/   
+              `-\ \  ______  - 0 -   
+                 \ \/ ` /  \  /|\ _   
+                  \_i / \  |\____//   
+                    | |==| |=----/   
+              ----------------------  
               A trainer is code designed to teach how to write and execute day to day tasks and automations
               Trainer code is not fancy, as its intended to be readable. 
               It tells the user how it did the task, so they can do it themselfes 
@@ -713,6 +1178,9 @@ def makeTempDir():
     log.info('Creating dir ' + str(tmpDirPath))
     os.mkdir(str(tmpDirPath))
     os.chdir(tmpDirPath)
+
+def replace_last(string, old, new):
+    return new.join(string.rsplit(old, 1))
 
 # Main program  
 topmenu() 
