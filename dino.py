@@ -66,7 +66,7 @@ def topmenu():
             4.Deepfield Cluster Configuration 
             5.Queries the customer is using most frequently (view optimization, thanks ato)
             6.mysql (empty)
-            7.postgres (empty)
+            7.postgres
             8.impala (empty)
             9.kafka
             10.redis (empty)
@@ -93,7 +93,7 @@ def topmenu():
         elif ch == 6:
             os.system("date")
         elif ch == 7:
-            os.system("cal")
+            submenu27() 
         elif ch == 8:
             os.system("systemctl status httpd")
         elif ch == 9:
@@ -355,6 +355,62 @@ def submenu25():
         input("Press enter to continue")
         os.system("clear")
         submenu25()
+
+def submenu27():
+    os.system("clear")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\n\t-------------------------------------------------")
+    # sets the text colour to green
+    os.system("tput setaf 2")
+    print("\tpostgres")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\t-------------------------------------------------")
+    while True:
+        print("""
+            1.List the databases in postgres using psql
+            2.List the relations in a selected database (pending)
+            3.Count the entries in a selected database for a selected relation (pending)
+            4.Dump the entries in a selected database for a selected relation (pending)
+            5.postgres database hints 
+            6.Return""")
+        print("\n")
+        ch=int(input("Enter your choice: "))
+        if(ch == 1):
+            mycmd = "sudo -u postgres psql -c '\l'"
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 2):
+            mycmd = "sudo salt -G roles:dnsflow test.ping"
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 3):
+            mycmd = "sudo salt -G roles:collector test.ping"
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 4):
+            mycmd = "routers.py --list | tr -s ' '"
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 5):
+            print("connect to postgres:             sudo -u postgres psql")
+            print("list the databases:              \l")
+            print("list the tables:                 \dt")
+            print("switch to a new dataabse:        \c \"name\"")
+            print("select boundaries:               \d list all tables, views and sequences. \"Boundaries\"")
+            print("list ids from boundaries:        select id, name from \"Boundaries\";")
+            print("count the active interfaces:     select active, count(*) from \"Interfaces\" group by active;")
+            print("quit:                            \q")
+            print("run one command and exit:        sudo -u postgres psql -d \"defender_zen-saha\" -c 'select id, name from \"Boundaries\";'")
+            print("update an interface:             sudo -u postgres psql -d \"defender_nostalgic-penguin\" -c \"update \\\"Interfaces\\\" set name='test3' where id=2;\"")
+        elif ch == 6:
+            topmenu()
+        else:
+            print("Invalid entry")
+        input("Press enter to continue")
+        os.system("clear")
+        submenu27()
 
 def submenu212():
     os.system("clear")
