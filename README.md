@@ -33,7 +33,7 @@ You will see a menu like this one..
             4.Deepfield Cluster Configuration 
             5.Queries the customer is using most frequently (view optimization, thanks ato)
             6.mysql (empty)
-            7.postgres (empty)
+            7.postgres
             8.impala (empty)
             9.kafka
             10.redis (empty)
@@ -43,7 +43,9 @@ You will see a menu like this one..
             14.MOP
             15.HDFS
             16.Devices API, Routers and Interfaces
-            17.Exit
+            17.Data Views
+            18.Collect the logs and slice.json from all DCUs
+            19.Exit
 
 	-------------------------------------------------
 	Deepfield Cluster Health
