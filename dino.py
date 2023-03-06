@@ -78,7 +78,8 @@ def topmenu():
             16.Devices API, Routers and Interfaces
             17.Data Views
             18.Collect the logs and slice.json from all DCUs
-            19.Exit""")
+            19.Defender (DDoS)
+            20.Exit""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -120,6 +121,8 @@ def topmenu():
         elif ch == 18:
             submenu218() 
         elif ch == 19:
+            submenu219() 
+        elif ch == 20:
             print("Exiting application")
             exit()
         else:
@@ -557,6 +560,167 @@ def submenu218():
     os.system("clear")
     topmenu() 
 
+def submenu219():
+    os.system("clear")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\n\t-------------------------------------------------")
+    # sets the text colour to green
+    os.system("tput setaf 2")
+    print("\tDefender (DDoS)")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\t-------------------------------------------------")
+    while True:
+        print("""
+            1.Build up a def.py report, to gather up the defender configuration and running details
+            2.Return""")
+        print("\n")
+        ch=int(input("Enter your choice: "))
+        if(ch == 1):
+            print ("Building a report of all things Defender for this cluster. Using def.py")
+            print ("The result will be written to file DefenderReport.txt")
+            mycmd = ("rm -f DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo '*****************************************************' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo 'Defender Summary Status def.py status' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo '*****************************************************' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("def.py status | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo '*****************************************************' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo 'Defender Health Report def.py health' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo '*****************************************************' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("def.py health | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo '*****************************************************' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo 'All Router Details def.py rt' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo '*****************************************************' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("def.py rt | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo '*****************************************************' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo 'All Routers as a list def.py rt --list' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo '*****************************************************' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("def.py rt --list | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo '*****************************************************' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo 'Defender Device and interface set list def.py dev --list' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo '*****************************************************' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("def.py dev --list | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo '*****************************************************' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo 'Defender Mitigation Template list def.py template --list' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo '*****************************************************' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("def.py template --list | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo '*****************************************************' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo 'Defender Policy list def.py policy --list' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo '*****************************************************' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("def.py policy --list | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo '*****************************************************' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo 'Defender events def.py event' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo '*****************************************************' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("def.py event | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo '*****************************************************' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo 'Defender Mitigation list def.py mitigation --list' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo '*****************************************************' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("def.py mitigation --list | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo '*****************************************************' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo 'Defender acl list .py def.py acl -l' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("echo '*****************************************************' | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            mycmd = ("def.py acl -l | tee -a DefenderReport.txt")
+            os.system(mycmd)
+            input("Press any key to return to the menu")
+            os.system("clear")
+            submenu219() 
+        elif ch == 2:
+            topmenu()
+        else:
+            print("Invalid entry")
+        input("Press enter to continue")
+        os.system("clear")
+        submenu22
+    os.system("clear")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\n\t-------------------------------------------------")
+    # sets the text colour to green
+    os.system("tput setaf 2")
+    print("\tCollect the logs and slice.json on all DCUs")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\t-------------------------------------------------")
+    print ("Cleaning up old log backups")
+    mycmd = ("sudo salt \* cmd.run \"rm -f /pipedream/tmp/log.*.tar.gz || true\"")
+    print("Command is:" + mycmd )
+    #input("Press any key and I'll run the command...")
+    os.system(mycmd)
+    print ("tar and zip up the log files on all DCUs")
+    mycmd = ("sudo salt -t 3600 \* cmd.run 'tar czvf /pipedream/tmp/log.`hostname`.tar.gz /var/log/ /pipedream/log/ /pipedream/cache/config/slice.json || true'")
+    print("Command is:" + mycmd )
+    #input("Press any key and I'll run the command...")
+    os.system(mycmd)
+    print ("Setting file permissions")
+    mycmd = ("sudo salt \* cmd.run 'chown support:support /pipedream/tmp/log.`hostname`.tar.gz'")
+    print("Command is:" + mycmd )
+    #input("Press any key and I'll run the command...")
+    os.system(mycmd)
+    print ("Copying the files from the workers back to master")
+    mycmd = ("for i in $(awk '{if(/mgmt/ && /worker/){print $1}}' /etc/hosts); do scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q $i:/pipedream/tmp/log.worker*.tar.gz /pipedream/tmp; done")
+    print("Command is:" + mycmd )
+    #input("Press any key and I'll run the command...")
+    os.system(mycmd)
+    print ("tar up the tar files")
+    mycmd = ("tar cvf /pipedream/tmp/defender-all-logs.tar.gz /pipedream/tmp/log*.tar.gz")
+    print("Command is:" + mycmd )
+    #input("Press any key and I'll run the command...")
+    os.system(mycmd)
+    print ("Clean up")
+    mycmd = ("sudo salt \* cmd.run \"rm -f /pipedream/tmp/log.*.tar.gz || true\"")
+    print("Command is:" + mycmd )
+    #input("Press any key and I'll run the command...")
+    os.system(mycmd)
+    print("\n\nThe resultant file /pipedream/tmp/defender-all-logs.tar.gz is going to be large (10-20G in size).") 
+    print("move the file to your laptop, example laptop command follows") 
+    print("scp [host]/pipedream/tmp/defender-all-logs.tar.gz .") 
+    print("then use the next menu option to clean up") 
+    input("Press enter to return to the previouse menu")
+    os.system("clear")
+    topmenu() 
+
+
 def submenu212():
     os.system("clear")
     # sets the text color to magenta
@@ -582,7 +746,8 @@ def submenu212():
             10.show the date and time on all nodes 
             11.test connectivity to Deepfield genome
             12.test connectivity to Deepfield metrics 
-            13.Return""")
+            13.dump /etc/network/interfaces for all nodes
+            14.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -634,7 +799,11 @@ def submenu212():
             mycmd = "sudo salt \* cmd.run \"nc -zv monitoring.deepfield.net 443\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        elif ch == 13:
+        elif(ch == 13):
+            mycmd = "sudo salt \* cmd.run \"cat /etc/network/interfaces\""
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif ch == 14:
             topmenu()
         else:
             print("Invalid entry")
