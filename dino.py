@@ -574,7 +574,11 @@ def submenu219():
     while True:
         print("""
             1.Build up a def.py report, to gather up the defender configuration and running details
-            2.Return""")
+            2.Detection: Whats my current running Defender mitigation branch
+            3.Detection: Get a list of all available secure genome mitigation versions
+            4.Mitigation: Whats my current running Defender mitigation branch
+            5.Mitigation: Get a list of all available secure genome mitigation versions
+            6.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -665,7 +669,67 @@ def submenu219():
             input("Press any key to return to the menu")
             os.system("clear")
             submenu219() 
-        elif ch == 2:
+        elif(ch == 2):
+            print ("Grabbing your clusters current Secure Genome Detection rule set branch")
+            #grab the first API key from the support users list of keys
+            supportKeys = deepy.deepui.get_root_api_keys()
+            firstSupportKey = supportKeys[0]
+            #check its really set, if not ask for a manualy entered key
+            if not firstSupportKey:
+                print ("I did not manage to extract your support user API key, so could you past it here")
+                firstSupportKey=input("Enter your API key: ")
+            else: 
+                #print("The support user API key is " , firstSupportKey)
+                print("")
+            mycmd = ("curl --insecure -X GET https://localhost/api/secure_genome/version/detection?api_key=" + firstSupportKey + " | json_pp" )
+            print("\nCommand is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 3):
+            print ("Getting a list of all available secure genome versions")
+            #grab the first API key from the support users list of keys
+            supportKeys = deepy.deepui.get_root_api_keys()
+            firstSupportKey = supportKeys[0]
+            #check its really set, if not ask for a manualy entered key
+            if not firstSupportKey:
+                print ("I did not manage to extract your support user API key, so could you past it here")
+                firstSupportKey=input("Enter your API key: ")
+            else: 
+                #print("The support user API key is " , firstSupportKey)
+                print("")
+            mycmd = ("curl --insecure -X GET https://localhost/api/secure_genome/versions/detection?api_key=" + firstSupportKey + " | json_pp" )
+            print("\nCommand is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 4):
+            print ("Grabbing your clusters current Secure Genome Mitigation rule branch")
+            #grab the first API key from the support users list of keys
+            supportKeys = deepy.deepui.get_root_api_keys()
+            firstSupportKey = supportKeys[0]
+            #check its really set, if not ask for a manualy entered key
+            if not firstSupportKey:
+                print ("I did not manage to extract your support user API key, so could you past it here")
+                firstSupportKey=input("Enter your API key: ")
+            else: 
+                #print("The support user API key is " , firstSupportKey)
+                print("")
+            mycmd = ("curl --insecure -X GET https://localhost/api/secure_genome/version/mitigation?api_key=" + firstSupportKey + " | json_pp" )
+            print("\nCommand is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 5):
+            print ("Getting a list of all available secure genome Mitigation rule set versions")
+            #grab the first API key from the support users list of keys
+            supportKeys = deepy.deepui.get_root_api_keys()
+            firstSupportKey = supportKeys[0]
+            #check its really set, if not ask for a manualy entered key
+            if not firstSupportKey:
+                print ("I did not manage to extract your support user API key, so could you past it here")
+                firstSupportKey=input("Enter your API key: ")
+            else: 
+                #print("The support user API key is " , firstSupportKey)
+                print("")
+            mycmd = ("curl --insecure -X GET https://localhost/api/secure_genome/versions/mitigation?api_key=" + firstSupportKey + " | json_pp" )
+            print("\nCommand is:" + mycmd )
+            os.system(mycmd)
+        elif ch == 6:
             topmenu()
         else:
             print("Invalid entry")
