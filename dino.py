@@ -988,10 +988,14 @@ def submenu216():
             5.Get a list of all interfaces via the interface dimension (this is a big list, perhaps the next one is better)
             6.Get a list of interfaces for a given router via the interface dimension
             7.Build a router model from an existing router, so you can add/remove interfaces using the devices api 
-            8.Set a specified routers interface to active true/false
-            9.Overwrite a specified routers interface name, intended for config rules (works but then gets reset to router name + ifname )
-            10.Debugging hints
-            11.Return""")
+            8.Set a single specified routers interface to 'active' true/false
+            9.count 'active' for all interfaces on a specified router
+            10.Set all interfaces on a specified router to 'active' true/false (receiving flow)
+            11.count 'active' for all interfaces on all routers
+            12.Set all interfaces 'active' true/false on all routers
+            13.Overwrite a specified routers interface name, intended for config rules (works but then gets reset to router name + ifname )
+            14.Debugging hints
+            15.Return""")
         print("\n")
         #grab the first API key from the support users list of keys
         supportKeys = deepy.deepui.get_root_api_keys()
@@ -1153,7 +1157,7 @@ def submenu216():
             print("Once you are happy copy paste the command below to provision/change the router or interface")
             print("\nCommand is:" + mycmd )
         elif(ch == 8):
-            print ("Set a routers interface to active true/false (receiving flow)")
+            print ("Set a single routers interface to active true/false (receiving flow)")
             #first get a router from the list
             #start by listing all routers and askign the user to pick one 
             url = 'https://localhost/dimension/router/positions?attributes=*&api_key=' + firstSupportKey
@@ -1216,8 +1220,8 @@ def submenu216():
             print ("So we are going to have to do this directly in postgress (5.4+)")
             print ("You selected router ", routername)
             print ("You selected interface ", interfacenameselected)
-            print ("The interfaces current setting for active is\n-------")
-            mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active from \"Interfaces\" where id=" + str(interfacepossitionselected) + " order by id;'")
+            print ("The interface can have three settings t/f/[blank]\nwhich means true false or no 'active' parameter present\nThe current setting for active is\n")
+            mycmd = ("sudo -u postgres psql -t -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active from \"Interfaces\" where id=" + str(interfacepossitionselected) + " order by id;'")
             os.system(mycmd)
             print("\nI used this Command: " + mycmd )
             print("\nHow do you want me to set active)")
@@ -1228,18 +1232,144 @@ def submenu216():
                 print("\nRunning Command: " + mycmd )
                 os.system(mycmd)
                 print("\nDone")
+        elif(ch == 9):
+            print ("Count the 'active' settings t/f/[blank] on all interfaces of a specified router")
+            #first get a router from the list
+            #start by listing all routers and ask the user to pick one 
+            url = 'https://localhost/dimension/router/positions?attributes=*&api_key=' + firstSupportKey
+            routerlist = requests.get(url, verify=False).json()
+            #for debug the two lines below prints the json containing all of the router info
+            #json_formatted_routerlist = json.dumps(routerlist, indent=2)
+            #print ("\nDebug routerlist: " , json_formatted_routerlist)
+            #build the text menu for the routers
+            user_input = ''
+            input_message = "Select a router:\n"
+            index = 0
+            for key in routerlist:
+                index += 1
+                routername = routerlist[key]['name']
+                input_message += f'{index}) {routername}\n'
+            input_message += 'You selected router: '
+            #prompt for the router by number x) 
+            user_input = input(input_message)
+            #
+            #find the router name and the possition
+            index = 0
+            for key in routerlist:
+                index += 1
+                if index == int(user_input):
+                    routername = routerlist[key]['name']
+                    routerpossition = routerlist[key]['position_id']
+                    routerflowip = routerlist[key]['router']['flow_ip']
+            # now have the user select the router interface they want to enable/disable from a list
+            url = 'https://localhost/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + firstSupportKey
+            routerinterfacelist = requests.get(url, verify=False).json()
+            #for debug the two lines below prints the json containing all of the router info
+            json_formatted_routerinterfacelist = json.dumps(routerinterfacelist, indent=2)
+            #print ("\nDebug routerinterfacelist: " , json_formatted_routerinterfacelist)
+
+            #count the existing interfaces t/f/[blank]
+            print ("Counting the t/f/[blank] interfaces for the router ", routername)
+            mycmd = ("sudo -u postgres psql -t -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active, COUNT(*) from \"Interfaces\" where _interface_router_pos_id=" + str(routerpossition) + " group by active;'")
+            os.system(mycmd)
+            print("\nI used this Command: " + mycmd )
+
+        elif(ch == 10):
+            print ("Set all interfaces on a specified router to active true/false (receiving flow)")
+            #first get a router from the list
+            #start by listing all routers and ask the user to pick one 
+            url = 'https://localhost/dimension/router/positions?attributes=*&api_key=' + firstSupportKey
+            routerlist = requests.get(url, verify=False).json()
+            #for debug the two lines below prints the json containing all of the router info
+            #json_formatted_routerlist = json.dumps(routerlist, indent=2)
+            #print ("\nDebug routerlist: " , json_formatted_routerlist)
+            #build the text menu for the routers
+            user_input = ''
+            input_message = "Select a router:\n"
+            index = 0
+            for key in routerlist:
+                index += 1
+                routername = routerlist[key]['name']
+                input_message += f'{index}) {routername}\n'
+            input_message += 'You selected router: '
+            #prompt for the router by number x) 
+            user_input = input(input_message)
+            #
+            #find the router name and the possition
+            index = 0
+            for key in routerlist:
+                index += 1
+                if index == int(user_input):
+                    routername = routerlist[key]['name']
+                    routerpossition = routerlist[key]['position_id']
+                    routerflowip = routerlist[key]['router']['flow_ip']
+            # now have the user select the router interface they want to enable/disable from a list
+            url = 'https://localhost/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + firstSupportKey
+            routerinterfacelist = requests.get(url, verify=False).json()
+            #for debug the two lines below prints the json containing all of the router info
+            json_formatted_routerinterfacelist = json.dumps(routerinterfacelist, indent=2)
+            #print ("\nDebug routerinterfacelist: " , json_formatted_routerinterfacelist)
+            #count the existing interfaces t/f/[blank]
+            print ("Counting the t/f/[blank] interfaces for the router ", routername)
+            mycmd = ("sudo -u postgres psql -t -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active, COUNT(*) from \"Interfaces\" where _interface_router_pos_id=" + str(routerpossition) + " group by active;'")
+            os.system(mycmd)
+            print("\nI used this Command: " + mycmd )
+            print("\nHow do you want me to set active)")
+            print("\nHow do you want me to set the active parameter for all of router" + routername + " interfaces)")
+            user_input = input("Input true or false any other key makes no change:")
+            if user_input == 'true':
+                print ("setting to active=true for all interfaces on router " + routername + ". I used this comand")
+                mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'update \"Interfaces\" set active='true' where _interface_router_pos_id=" + str(routerpossition) + ";'")
+                print("\nRunning Command: " + mycmd )
+                os.system(mycmd)
+                print("\nDone")
             elif user_input == 'false':
-                print ("setting to active=false. I used this comand")
-                mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'update \"Interfaces\" set active='false' where id=" + str(interfacepossitionselected) + ";'")
+                print ("setting to active=false for all interfaces on router " +routername + ". I used this comand")
+                mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'update \"Interfaces\" set active='false' where _interface_router_pos_id=" + str(routerpossition) + ";'") 
                 print("\nRunning Command: " + mycmd )
                 os.system(mycmd)
                 print("\nDone")
             else:
                 print ("doing nothing")
-            print ("The interfaces current setting for active is now\n-------")
-            mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active from \"Interfaces\" where id=" + str(interfacepossitionselected) + " order by id;'")
+            #recount the existing interfaces t/f/[blank]
+            print ("Re-counting the t/f/[blank] interfaces for the router ", routername)
+            mycmd = ("sudo -u postgres psql -t -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active, COUNT(*) from \"Interfaces\" where _interface_router_pos_id=" + str(routerpossition) + " group by active;'")
             os.system(mycmd)
-        elif(ch == 9):
+        elif(ch == 11):
+            print ("Count the 'active' settings t/f/[blank] on all interfaces on all routers")
+            print ("Counting the t/f/[blank] interfaces for all routers")
+            mycmd = ("sudo -u postgres psql -t -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active, COUNT(*) from \"Interfaces\" group by active;'")
+            os.system(mycmd)
+            print("\nI used this Command: " + mycmd )
+
+        elif(ch == 12):
+            print ("Set all interfaces on all routers to active true/false (receiving flow)")
+            print ("Counting the t/f/[blank] interfaces for all routers ")
+            mycmd = ("sudo -u postgres psql -t -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active, COUNT(*) from \"Interfaces\" group by active;'")
+            os.system(mycmd)
+            print("\nI used this Command: " + mycmd )
+            print("\nHow do you want me to set active)")
+            print("\nHow do you want me to set the active parameter for all interfaces on all routers")
+            user_input = input("Input true or false any other key makes no change:")
+            if user_input == 'true':
+                print ("setting to active=true for all interfaces on all routers ")
+                mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'update \"Interfaces\" set active='true';'")
+                print("\nRunning Command: " + mycmd )
+                os.system(mycmd)
+                print("\nDone")
+            elif user_input == 'false':
+                print ("setting to active=false for all interfaces on all routers")
+                mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'update \"Interfaces\" set active='false';'") 
+                print("\nRunning Command: " + mycmd )
+                os.system(mycmd)
+                print("\nDone")
+            else:
+                print ("doing nothing")
+            #recount the existing interfaces t/f/[blank]
+            print ("Re-counting the t/f/[blank] interfaces for all routers ")
+            mycmd = ("sudo -u postgres psql -t -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active, COUNT(*) from \"Interfaces\" group by active;'")
+            os.system(mycmd)
+        elif(ch == 13):
             print ("Overwrite a specified routers interface name, intended for config rules (works but then gets reset to router name + ifname )")
             print ("this works, name and display_name change. However on the next update they are set back to the router name + ifname by the system")
             #first get a router from the list
@@ -1323,7 +1453,7 @@ def submenu216():
             print ("The interfaces current setting for name is now\n-------")
             mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select name from \"Interfaces\" where id=" + str(interfacepossitionselected) + " order by id;'")
             os.system(mycmd)
-        elif(ch == 10):
+        elif(ch == 14):
             print ("To Debug check syslog: sudo less /var/log/syslog")
             print ("Example Output below")
             print ("but 200 OK just means the json was ok. If it fails to add its silent")
@@ -1332,7 +1462,7 @@ def submenu216():
             print ("Dec 15 19:48:39 master home.py[95936][INFO]: 200 POST /api/devices/topology?api_key=************ (127.0.0.1) 1284.48ms")
             print ("Dec 15 19:48:39 master home.py[95936][INFO]: Request to /api/devices/topology?api_key=************ completed in 1.284 seconds. 0 bytes were transferred.")
             print ("Dec 15 19:48:39 master home.py[95936][INFO]: /api/devices/topology?api_key=************ took 1 seconds to load for User 4acd26f26fa54fbbe02394be699dcd41bc9b1990 Status: 200")
-        elif(ch == 11):
+        elif(ch == 15):
             topmenu()
         else:
             print("Invalid entry")
