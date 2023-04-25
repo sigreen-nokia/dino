@@ -1,5 +1,8 @@
 queries
 =======
+mitigation queueus
+kafka-consumer-groups --bootstrap-server localhost:9092 -group kafka_queue_adapter --describe
+came up in c8 recently
 defender policies
 https://continent8-rc.deepfield.net:44301/defender/config/policies/14
 ddos

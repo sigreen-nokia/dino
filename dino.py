@@ -1487,9 +1487,9 @@ def submenu217():
             2.For an example traffic query, show me how to find the data view that was used
             3.Get a list of all dataviews via the API, write to a file (this is a big list, perhaps the next one is better)
             4.Dump a specific data view, selected from a menu of all configured data views 
-            5.Show me how to create a new data view (in progress)
-            6.Show me how to patch(modify) an existing data view (in progress)
-            7.Show me how to PUT(replace) an existing data view (in progress)
+            5.Create a new ddos baseline dataview - A step by step using an example, this one comes up a lot
+            6.Create a new dataview - A step by step, using an existing dataview as a starting point 
+            7.Delete an existing dataview
             8.Return""")
         print("\n")
         #grab the first API key from the support users list of keys
@@ -1570,101 +1570,141 @@ def submenu217():
             os.system(mycmd)
             print("\n\nI've written the output to file mydataview.json for you")
         elif(ch == 5):
-            print("Show me how to create a new data view")
-            print("show the POST to the Devices Topology API to recreate it") 
-            print ("If you then add/delete interfaces to the topology.json file they will change in the router")
-            print("This one works around the missing GET in devices API")
-            print("I am Building up the router model from several places")
-            #start by listing all routers and askign the user to pick one 
-            url = 'https://localhost/dimension/router/positions?attributes=*&api_key=' + firstSupportKey
-            routerlist = requests.get(url, verify=False).json()
-            #for debug the two lines below prints the json containing all of the router info
-            #json_formatted_routerlist = json.dumps(routerlist, indent=2)
-            #print ("\nDebug routerlist: " , json_formatted_routerlist)
-            #build the text menu
+            print("Create a new ddos baseline - A step by step, this one comes up a lot")
+            url = 'https://localhost/api/data_views/?attributes=*&api_key=' + firstSupportKey
+            DdosBaselineExample = """{
+     "name" : "ddos-baseline-1",
+     "description" : "Custom view for ddos baselines",
+     "context" : "traffic",
+     "dimensions" : [
+  {"base" : "category"},
+  {"base" : "protocol"},
+  {"base" : "tcpflags"},
+  {"base" : "addr","split" : "dst"},
+  {"base" : "addr","split" : "src"},
+  {"base" : "slash16","split" : "src"},
+  {"base" : "boundary.Peering.input"}
+     ],
+     "timestep_retention_days" : {
+        "5min" : 10,
+        "2hour" : 30
+     },
+  "comment" : "Custom view for ddos baselines"
+}
+"""
+            print ("\n\nPrinting the JSON ddos example\n", DdosBaselineExample)
+            print ("\n\nWriting the JSON ddos example to file ddos-baseline-example.json\n\n")
+            with open('ddos-baseline-example.json', 'w') as f:
+               f.write(str(DdosBaselineExample))   
+            print ("\n\nThe following command will create the new ddos dataview")
+            mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@ddos-baseline-example.json' https://localhost/api/data_views/?api_key=" + firstSupportKey)
+            print("Command is:" + mycmd )
+            user_input = input("Input yes and I will create the dataview for you, any other key to do nothing at all:")
+            if user_input == 'yes':
+            #if(len(user_input) != 0):
+                print("\nRunning Command: " + mycmd )
+                os.system(mycmd)
+                print("\nDone")
+            else:
+                print ("doing nothing. You can use the curl above to create the dataview yourself")
+        elif(ch == 6):
+            print("Create a new dataview - A step by step, using an existing dataview as a starting point")
+            print ("Note If you modify the JSON I create, before posting it. you can use this to make your own dataviews")
+            url = 'https://localhost/api/data_views/?attributes=*&api_key=' + firstSupportKey
+            dataviewlist = requests.get(url, verify=False).json()
+            #for debug the two lines below prints the json
+            json_formatted_dataviewlist = json.dumps(dataviewlist, indent=2)
             user_input = ''
-            input_message = "Select a router:\n"
+            input_message = "Select a data view:\n"
             index = 0
-            for key in routerlist:
+            for key in dataviewlist['data']:
                 index += 1
-                routername = routerlist[key]['name']
-                input_message += f'{index}) {routername}\n'
-            input_message += 'You selected router: '
-            #prompt for the router by number x) 
+                #print ("DEBUG: key:", key)
+                dataviewname = key['name']
+                dataviewuuid = key['uuid']
+                #print ("DEBUG: dataviewname:", dataviewname)
+                #print ("DEBUG: dataviewuuid:", dataviewuuid)
+                input_message += f'{index}) {dataviewname}\n'
+            input_message += 'You selected data view: '
+            #prompt for the data view by number x) 
             user_input = input(input_message)
-            #
-            #ok so we know the router. Lets gather up all of the information we need for the model 
-            #
-            #find the router name and the possition
+            #now find the selected dataview name and uuid for the selected number
             index = 0
-            for key in routerlist:
+            for key in dataviewlist['data']:
                 index += 1
                 if index == int(user_input):
-                    routername = routerlist[key]['name']
-                    routerpossition = routerlist[key]['position_id']
-                    routerflowip = routerlist[key]['router']['flow_ip']
-            #
-            #get the router interfaces
-            url = 'https://localhost/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + firstSupportKey
-            routerinterfaces = requests.get(url, verify=False).json()
-            #for debug the line below prints the json containing all of the router interfaces
-            #print ("\nDebug url: " + url)
-            #json_formatted_routerinterfaces = json.dumps(routerinterfaces, indent=2)
-            #print ("\nDebug routerinterfaces: ", json_formatted_routerinterfaces)
-            #
-            #we have router name, routername
-            #we have the router possition, routerpossition
-            #we have the router interfaces routerinterfaces json_formatted_routerinterfaces
-            #we have the router flow ip routerflowip 
-            #
-            #so we have all of the details required for the model. lets build the json
-            topologyjson = "{\n"
-            topologyjson += f'  "devices": [\n'
-            topologyjson += f'    {{\n'
-            topologyjson += f'      "name": "{routername}",\n'
-            topologyjson += f'      "flow_ip": "{routerflowip}",\n'
-            topologyjson += f'      "interfaces": [\n'
-            #we have to reformat the interfaces for the devices topology model
-            #index = 0
-            #for key in routerinterfaces["devices"]:
-            #    print(routerinterfaces["devices"])
-            for key in routerinterfaces:
-                 index += 1
-                 ifIndex = routerinterfaces[key]['interface']['ifIndex']
-                 ifName = routerinterfaces[key]['interface']['ifName']
-                 topologyjson += f'      {{\n'
-                 topologyjson += f'          "ifIndex": {ifIndex},\n'
-                 topologyjson += f'          "ifName": "{ifName}"\n'
-                 topologyjson += f'      }},\n'
-            #replace the last }, with a }
-            topologyjson = (replace_last(topologyjson, '},', '}'))
-            topologyjson += f'      ]\n'
-            topologyjson += f'    }}\n'
-            topologyjson += f'    ]\n'
-            topologyjson += f'}}\n'
-
-            #print ("Debug: topology_json\n", topologyjson)
-            file = open("topologyConfigFile.json", "w")
-            file.write(topologyjson)
-            file.close
-            #now show the command to provision the router model
-            mycmd = ("curl --insecure -X POST -d '@topologyConfigFile.json' https://localhost/api/devices/topology?api_key=" + firstSupportKey)
-            print("I have created a file for you topologyConfigFile.json with the routers topology model")
-            print("Check the file over carefully")
-            print("The device API POST is an update")
-            print("The devices api does not add routers, so add the in the ui first")
-            print("The devices api adds and updates interfaces")
-            print("You can include all interfaces (with the risk that you change them) or just the new ones")
-            print("for devices api to work snmp must be disabled 'unticked' on the router. Otherwise 200OK and nothing")
-            print("for devices api to work the router must have a name and a description. Otherwise 200OK and nothing")
-            print("I have not found a way to delete interfaces using device api")
-            print("Interfaces come up with this missing in the interfaces dimension devices active: false the next option fixes that")
-            print("Once you are happy copy paste the command below to provision/change the router or interface")
-            print("\nCommand is:" + mycmd )
-        elif(ch == 6):
-            print("Show me how to patch(modify) an existing data view")
+                    dataviewname = key['name']
+                    dataviewuuid = key['uuid']
+            print ("You selected data view name:", dataviewname)
+            print ("Grabbing the dataview JSON for you")
+            mycmd = ("curl -k --silent -X GET 'https://localhost/api/data_views/" + dataviewuuid + "?api_key=" + firstSupportKey + "' | json_pp | tee example_dataview.json") 
+            print("Command is:" + mycmd )
+            input("Press any key and I'll run the command...")
+            os.system(mycmd)
+            print("\n\nLets cleanup that json file so you can reuse it..")
+            print("\n\nRemoving the existing uuid from the json")
+            mycmd = ("sed -i '/uuid/d' example_dataview.json") 
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+            print("\n\nRemoving the last_modified field from the json")
+            mycmd = ("sed -i '/last_modified/d' example_dataview.json") 
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+            print("\n\nChanging the name to example-dataview in the json")
+            #mycmd = ("sed -i 's/\"name\".*/\"name\" \: \"example_dataview\"/' example_dataview.json") 
+            mycmd = ("sed -i 's/\"name\".*/\"name\" \: \"example_dataview\",/' example_dataview.json") 
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+            print("\n\nI've written the JSON to file example_dataview.json for you")
+            print("\n\nThe following command will add the JSON in order to create a new dataview")
+            mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@example_dataview.json' https://localhost/api/data_views/?api_key=" + firstSupportKey)
+            print("Command is:" + mycmd )
+            user_input = input("Input yes and I will create the dataview for you, any other key to do nothing at all:")
+            if user_input == 'yes':
+            #if(len(user_input) != 0):
+                print("\nRunning Command: " + mycmd )
+                os.system(mycmd)
+                print("\nDone")
+            else:
+                print ("doing nothing. You can use the curl above to create the dataview yourself")
         elif(ch == 7):
-            print ("Show me how to PUT(replace) an existing data view")
+            print ("Delete an existing dataview")
+            url = 'https://localhost/api/data_views/?attributes=*&api_key=' + firstSupportKey
+            dataviewlist = requests.get(url, verify=False).json()
+            json_formatted_dataviewlist = json.dumps(dataviewlist, indent=2)
+            user_input = ''
+            input_message = "Select a data view:\n"
+            index = 0
+            for key in dataviewlist['data']:
+                index += 1
+                #print ("DEBUG: key:", key)
+                dataviewname = key['name']
+                dataviewuuid = key['uuid']
+                #print ("DEBUG: dataviewname:", dataviewname)
+                #print ("DEBUG: dataviewuuid:", dataviewuuid)
+                input_message += f'{index}) {dataviewname}\n'
+            input_message += 'You selected data view: '
+            #prompt for the data view by number x) 
+            user_input = input(input_message)
+            #now find the selected dataview name and uuid for the selected number
+            index = 0
+            for key in dataviewlist['data']:
+                index += 1
+                if index == int(user_input):
+                    dataviewname = key['name']
+                    dataviewuuid = key['uuid']
+            print ("You selected data view name:", dataviewname)
+            print("\n\nThe following command will delete that dataview")
+            #mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@example_dataview.json' https://localhost/api/data_views/?api_key=" + firstSupportKey)
+            mycmd = ("curl -k --silent -X DELETE 'https://localhost/api/data_views/" + dataviewuuid + "?api_key=" + firstSupportKey + "' ")
+            print("Command is:" + mycmd )
+            user_input = input("WARNING: Input yes and I will delete the dataview for you, any other key to do nothing at all:")
+            if user_input == 'yes':
+                print("\nRunning Command: " + mycmd )
+                os.system(mycmd)
+                print("\nDone")
+            else:
+                print ("doing nothing. You can use the curl above to delete the dataview yourself")
         elif ch == 8:
             topmenu()
         else:
