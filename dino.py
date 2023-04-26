@@ -1487,10 +1487,11 @@ def submenu217():
             2.For an example traffic query, show me how to find the data view that was used
             3.Get a list of all dataviews via the API, write to a file (this is a big list, perhaps the next one is better)
             4.Dump a specific data view, selected from a menu of all configured data views 
-            5.Create a new ddos baseline dataview - A step by step using an example, this one comes up a lot
-            6.Create a new dataview - A step by step, using an existing dataview as a starting point 
-            7.Delete an existing dataview
-            8.Return""")
+            5.Create a new custom ddos dataview for regs (retention) - A step by step using an example, this one comes up a lot
+            6.Create a new dataview from a json file - A step by step
+            7.Patch an existing data view retention - A step by step
+            8.Delete an existing dataview
+            9.Return""")
         print("\n")
         #grab the first API key from the support users list of keys
         supportKeys = deepy.deepui.get_root_api_keys()
@@ -1570,32 +1571,92 @@ def submenu217():
             os.system(mycmd)
             print("\n\nI've written the output to file mydataview.json for you")
         elif(ch == 5):
-            print("Create a new ddos baseline - A step by step, this one comes up a lot")
+            print("Create a new custom ddos data view for regs - A step by step, this one comes up a lot")
             url = 'https://localhost/api/data_views/?attributes=*&api_key=' + firstSupportKey
-            DdosBaselineExample = """{
-     "name" : "ddos-baseline-1",
-     "description" : "Custom view for ddos baselines",
-     "context" : "traffic",
-     "dimensions" : [
-  {"base" : "category"},
-  {"base" : "protocol"},
-  {"base" : "tcpflags"},
-  {"base" : "addr","split" : "dst"},
-  {"base" : "addr","split" : "src"},
-  {"base" : "slash16","split" : "src"},
-  {"base" : "boundary.Peering.input"}
-     ],
-     "timestep_retention_days" : {
-        "5min" : 10,
-        "2hour" : 30
-     },
-  "comment" : "Custom view for ddos baselines"
+            CustomDDOSDataView = """{
+   "timestep_retention_days" : {
+      "10s" : 7,
+      "5min" : 7,
+      "30min" : 7,
+      "2hour" : 7,
+      "day" : 7 
+   },
+   "context" : "traffic",
+   "slice" : {
+      "category" : {
+         "values" : [
+            "ddos"
+         ],
+         "type" : "include"
+      }
+   },
+   "name" : "custom-user-ddos-slice",
+   "description" : "Long Retention DDOS traffic for regs",
+   "comment" : "Creating a view for regs",
+   "source_timestep" : "10s",
+   "dimensions" : [
+      {
+         "split" : "src",
+         "base" : "origin_asn"
+      },
+      {
+         "base" : "protocol"
+      },
+      {
+         "base" : "protectiongroup",
+         "split" : "dst"
+      },
+      {
+         "base" : "tcpflags"
+      },
+      {
+         "base" : "avg_packet_size"
+      },
+      {
+         "base" : "suspicious"
+      },
+      {
+         "base" : "category"
+      },
+      {
+         "split" : "src",
+         "base" : "country"
+      },
+      {
+         "base" : "ddos"
+      },
+      {
+         "base" : "manual_ddos_ruleset"
+      },
+      {
+         "base" : "manual_ddos_policy"
+      },
+      {
+         "base" : "addr",
+         "split" : "dst"
+      },
+      {
+         "split" : "src",
+         "base" : "addr"
+      },
+      {
+         "base" : "all_boundary_columns_macro"
+      },
+      {
+         "split" : "dst",
+         "base" : "port"
+      },
+      {
+         "split" : "src",
+         "base" : "port"
+      }
+   ]
 }
 """
-            print ("\n\nPrinting the JSON ddos example\n", DdosBaselineExample)
+            print ("\n\nPrinting the JSON ddos example\n", CustomDDOSDataView)
             print ("\n\nWriting the JSON ddos example to file ddos-baseline-example.json\n\n")
             with open('ddos-baseline-example.json', 'w') as f:
-               f.write(str(DdosBaselineExample))   
+               f.write(str(CustomDDOSDataView))   
             print ("\n\nThe following command will create the new ddos dataview")
             mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@ddos-baseline-example.json' https://localhost/api/data_views/?api_key=" + firstSupportKey)
             print("Command is:" + mycmd )
@@ -1608,8 +1669,21 @@ def submenu217():
             else:
                 print ("doing nothing. You can use the curl above to create the dataview yourself")
         elif(ch == 6):
-            print("Create a new dataview - A step by step, using an existing dataview as a starting point")
-            print ("Note If you modify the JSON I create, before posting it. you can use this to make your own dataviews")
+            print("Create a new dataview from a json file - A step by step")
+            data_view_filename = input("enter the json filename to import the data view from:")
+            print("\n\nThe following command will add the JSON in order to create a new dataview")
+            mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@" + data_view_filename + "' https://localhost/api/data_views/?api_key=" + firstSupportKey)
+            print("Command is:" + mycmd )
+            user_input = input("Input yes and I will create the dataview for you, any other key to do nothing at all:")
+            if user_input == 'yes':
+            #if(len(user_input) != 0):
+                print("\nRunning Command: " + mycmd )
+                os.system(mycmd)
+                print("\nDone")
+            else:
+                print ("doing nothing. You can use the curl above to create the dataview yourself")
+        elif(ch == 7):
+            print("Patch an existing data view retention - A step by step")
             url = 'https://localhost/api/data_views/?attributes=*&api_key=' + firstSupportKey
             dataviewlist = requests.get(url, verify=False).json()
             #for debug the two lines below prints the json
@@ -1622,8 +1696,10 @@ def submenu217():
                 #print ("DEBUG: key:", key)
                 dataviewname = key['name']
                 dataviewuuid = key['uuid']
+                lastmodified = key['last_modified']
                 #print ("DEBUG: dataviewname:", dataviewname)
                 #print ("DEBUG: dataviewuuid:", dataviewuuid)
+                #print ("DEBUG: lastmodified:", lastmodified)
                 input_message += f'{index}) {dataviewname}\n'
             input_message += 'You selected data view: '
             #prompt for the data view by number x) 
@@ -1636,38 +1712,67 @@ def submenu217():
                     dataviewname = key['name']
                     dataviewuuid = key['uuid']
             print ("You selected data view name:", dataviewname)
-            print ("Grabbing the dataview JSON for you")
+            #print ("DEBUG: lastmodified:", lastmodified)
+            print ("Dumping the current data view JSON for this view")
             mycmd = ("curl -k --silent -X GET 'https://localhost/api/data_views/" + dataviewuuid + "?api_key=" + firstSupportKey + "' | json_pp | tee example_dataview.json") 
             print("Command is:" + mycmd )
-            input("Press any key and I'll run the command...")
             os.system(mycmd)
-            print("\n\nLets cleanup that json file so you can reuse it..")
-            print("\n\nRemoving the existing uuid from the json")
-            mycmd = ("sed -i '/uuid/d' example_dataview.json") 
-            print("Command is:" + mycmd )
-            os.system(mycmd)
-            print("\n\nRemoving the last_modified field from the json")
-            mycmd = ("sed -i '/last_modified/d' example_dataview.json") 
-            print("Command is:" + mycmd )
-            os.system(mycmd)
-            print("\n\nChanging the name to example-dataview in the json")
-            #mycmd = ("sed -i 's/\"name\".*/\"name\" \: \"example_dataview\"/' example_dataview.json") 
-            mycmd = ("sed -i 's/\"name\".*/\"name\" \: \"example_dataview\",/' example_dataview.json") 
-            print("Command is:" + mycmd )
-            os.system(mycmd)
-            print("\n\nI've written the JSON to file example_dataview.json for you")
-            print("\n\nThe following command will add the JSON in order to create a new dataview")
-            mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@example_dataview.json' https://localhost/api/data_views/?api_key=" + firstSupportKey)
-            print("Command is:" + mycmd )
-            user_input = input("Input yes and I will create the dataview for you, any other key to do nothing at all:")
+            print("\n\nLets change the retention days\n")
+            input_10s = input("Enter the retention for 10s data (in days) or leave blank to not change 10s data:")
+            input_5min = input("Enter the retention for 5min data (in days) or leave blank to not change 5min data:")
+            input_30min = input("Enter the retention for 30min data (in days) or leave blank to not change 30min data:")
+            input_2hour = input("Enter the retention for 2hour data (in days) or leave blank to not change 2hour data:")
+            input_day = input("Enter the retention for day data (in days) or leave blank to not change day data:")
+            json_header = "{\n   \"elements\" : ["
+            if(len(input_10s) != 0):
+                 json_10s = "\n      {\n        \"uuid\" : \"" + dataviewuuid + "\",\n        \"timestep\" : \"10s\",\n        \"retention_days\" : " + input_10s + ",\n        \"last_modified\" : \"" + lastmodified + "\"\n      }," 
+            else:
+                 json_10s = "" 
+            if(len(input_5min) != 0):
+                 json_5min = "\n      {\n        \"uuid\" : \"" + dataviewuuid + "\",\n        \"timestep\" : \"5min\",\n        \"retention_days\" : " + input_5min + ",\n        \"last_modified\" : \"" + lastmodified + "\"\n      }," 
+            else:
+                 json_5min = "" 
+            if(len(input_30min) != 0):
+                 json_30min = "\n      {\n        \"uuid\" : \"" + dataviewuuid + "\",\n        \"timestep\" : \"30min\",\n        \"retention_days\" : " + input_30min + ",\n        \"last_modified\" : \"" + lastmodified + "\"\n      }," 
+            else:
+                 json_30min = "" 
+            if(len(input_2hour) != 0):
+                 json_2hour = "\n      {\n        \"uuid\" : \"" + dataviewuuid + "\",\n        \"timestep\" : \"2hour\",\n        \"retention_days\" : " + input_2hour + ",\n        \"last_modified\" : \"" + lastmodified + "\"\n      }," 
+            else:
+                 json_2hour = "" 
+            if(len(input_day) != 0):
+                 json_day = "\n      {\n        \"uuid\" : \"" + dataviewuuid + "\",\n        \"timestep\" : \"day\",\n        \"retention_days\" : " + input_day + ",\n        \"last_modified\" : \"" + lastmodified + "\"\n      }," 
+            else:
+                 json_day = "" 
+            json_tail = "\n   ],\n   \"comment\" : \"Adjusting retention of data view " + dataviewname + "\"\n}"
+            #remove the last occurance of  }, in the json, replace with a }
+            strValue = json_header + json_10s + json_5min + json_30min + json_2hour + json_day + json_tail
+            strToReplace = "      },"
+            replacementStr = "      }"
+            # Reverse the substring that need to be replaced
+            strToReplaceReversed   = strToReplace[::-1]
+            # Reverse the replacement substring
+            replacementStrReversed = replacementStr[::-1]
+            # Replace last occurrences of substring 'is' in string with 'XX'
+            strValue = strValue[::-1].replace(strToReplaceReversed, replacementStrReversed, 1)[::-1]
+            #print("DEBUG: strValue\n", strValue)
+            print("\n\nWriting the patch configuration to file patch-data-view.json")
+            #file = open("patch-data-view.json", "w")
+            #file.write(strValue)
+            #file.close
+            with open('patch-data-view.json', 'w') as f:
+                f.write(strValue)
+            print("\n\nThe following command will patch the data view retention")
+            mycmd = ("curl --insecure -X PATCH -H 'Content-Type: application/json' -d '@patch-data-view.json' https://localhost/api/data_views/?api_key=" + firstSupportKey)
+            print("\nCommand is:" + mycmd )
+            user_input = input("\nInput yes and I will create the dataview for you, any other key to do nothing at all:")
             if user_input == 'yes':
-            #if(len(user_input) != 0):
                 print("\nRunning Command: " + mycmd )
                 os.system(mycmd)
                 print("\nDone")
             else:
                 print ("doing nothing. You can use the curl above to create the dataview yourself")
-        elif(ch == 7):
+        elif(ch == 8):
             print ("Delete an existing dataview")
             url = 'https://localhost/api/data_views/?attributes=*&api_key=' + firstSupportKey
             dataviewlist = requests.get(url, verify=False).json()
@@ -1705,7 +1810,7 @@ def submenu217():
                 print("\nDone")
             else:
                 print ("doing nothing. You can use the curl above to delete the dataview yourself")
-        elif ch == 8:
+        elif ch == 9:
             topmenu()
         else:
             print("Invalid entry")
