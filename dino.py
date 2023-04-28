@@ -1483,14 +1483,14 @@ def submenu217():
     print("\t-------------------------------------------------")
     while True:
         print("""
-            1.Get the Dataview API Topology Schema
+            1.Get the data view API Topology Schema
             2.For an example traffic query, show me how to find the data view that was used
-            3.Get a list of all dataviews via the API, write to a file (this is a big list, perhaps the next one is better)
+            3.Get a list of all data views via the API, write to a file (this is a big list, perhaps the next one is better)
             4.Dump a specific data view, selected from a menu of all configured data views 
-            5.Create a new custom ddos dataview for regs (retention) - A step by step using an example, this one comes up a lot
-            6.Create a new dataview from a json file - A step by step
+            5.Create a new custom ddos data view for regs (retention) - A step by step using an example, this one comes up a lot
+            6.Create a new data view from a json file - A step by step
             7.Patch an existing data view retention - A step by step
-            8.Delete an existing dataview
+            8.Delete an existing data view
             9.Return""")
         print("\n")
         #grab the first API key from the support users list of keys
@@ -1527,7 +1527,7 @@ def submenu217():
             os.system(mycmd)
             print("----all done-------")
         elif(ch == 3):
-            print ("Get a list of all dataviews via the data view API, write to a file (this is a big list, perhaps the next one is better)")
+            print ("Get a list of all data views via the data view API, write to a file (this is a big list, perhaps the next one is better)")
             mycmd = ("curl -k --silent -X GET 'https://localhost/api/data_views/?api_key=" + firstSupportKey + "' | json_pp | tee dataviewsdump.json") 
             print("Command is:" + mycmd )
             input("Press any key and I'll run the command...")
@@ -1670,18 +1670,20 @@ def submenu217():
                 print ("doing nothing. You can use the curl above to create the dataview yourself")
         elif(ch == 6):
             print("Create a new dataview from a json file - A step by step")
+            print("hint1: build data views with 10s and 2min timesteps with a source_timestep of 10s")
+            print("hint2: build data views with 30min, 2hr and day timesteps from a parent view with a 5min timestamp and the same dimensions, base_view for example. you cannot use 10s")
             data_view_filename = input("enter the json filename to import the data view from:")
-            print("\n\nThe following command will add the JSON in order to create a new dataview")
+            print("\n\nThe following command will add the JSON in order to create a new data view")
             mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@" + data_view_filename + "' https://localhost/api/data_views/?api_key=" + firstSupportKey)
             print("Command is:" + mycmd )
-            user_input = input("Input yes and I will create the dataview for you, any other key to do nothing at all:")
+            user_input = input("Input yes and I will create the data view for you, any other key to do nothing at all:")
             if user_input == 'yes':
             #if(len(user_input) != 0):
                 print("\nRunning Command: " + mycmd )
                 os.system(mycmd)
                 print("\nDone")
             else:
-                print ("doing nothing. You can use the curl above to create the dataview yourself")
+                print ("doing nothing. You can use the curl above to create the data view yourself")
         elif(ch == 7):
             print("Patch an existing data view retention - A step by step")
             url = 'https://localhost/api/data_views/?attributes=*&api_key=' + firstSupportKey
@@ -1704,7 +1706,7 @@ def submenu217():
             input_message += 'You selected data view: '
             #prompt for the data view by number x) 
             user_input = input(input_message)
-            #now find the selected dataview name and uuid for the selected number
+            #now find the selected data view name and uuid for the selected number
             index = 0
             for key in dataviewlist['data']:
                 index += 1
@@ -1765,15 +1767,15 @@ def submenu217():
             print("\n\nThe following command will patch the data view retention")
             mycmd = ("curl --insecure -X PATCH -H 'Content-Type: application/json' -d '@patch-data-view.json' https://localhost/api/data_views/?api_key=" + firstSupportKey)
             print("\nCommand is:" + mycmd )
-            user_input = input("\nInput yes and I will create the dataview for you, any other key to do nothing at all:")
+            user_input = input("\nInput yes and I will create the data view for you, any other key to do nothing at all:")
             if user_input == 'yes':
                 print("\nRunning Command: " + mycmd )
                 os.system(mycmd)
                 print("\nDone")
             else:
-                print ("doing nothing. You can use the curl above to create the dataview yourself")
+                print ("doing nothing. You can use the curl above to create the data view yourself")
         elif(ch == 8):
-            print ("Delete an existing dataview")
+            print ("Delete an existing data view")
             url = 'https://localhost/api/data_views/?attributes=*&api_key=' + firstSupportKey
             dataviewlist = requests.get(url, verify=False).json()
             json_formatted_dataviewlist = json.dumps(dataviewlist, indent=2)
@@ -1791,7 +1793,7 @@ def submenu217():
             input_message += 'You selected data view: '
             #prompt for the data view by number x) 
             user_input = input(input_message)
-            #now find the selected dataview name and uuid for the selected number
+            #now find the selected data view name and uuid for the selected number
             index = 0
             for key in dataviewlist['data']:
                 index += 1
@@ -1799,17 +1801,17 @@ def submenu217():
                     dataviewname = key['name']
                     dataviewuuid = key['uuid']
             print ("You selected data view name:", dataviewname)
-            print("\n\nThe following command will delete that dataview")
+            print("\n\nThe following command will delete that data view")
             #mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@example_dataview.json' https://localhost/api/data_views/?api_key=" + firstSupportKey)
             mycmd = ("curl -k --silent -X DELETE 'https://localhost/api/data_views/" + dataviewuuid + "?api_key=" + firstSupportKey + "' ")
             print("Command is:" + mycmd )
-            user_input = input("WARNING: Input yes and I will delete the dataview for you, any other key to do nothing at all:")
+            user_input = input("WARNING: Input yes and I will delete the data view for you, any other key to do nothing at all:")
             if user_input == 'yes':
                 print("\nRunning Command: " + mycmd )
                 os.system(mycmd)
                 print("\nDone")
             else:
-                print ("doing nothing. You can use the curl above to delete the dataview yourself")
+                print ("doing nothing. You can use the curl above to delete the data view yourself")
         elif ch == 9:
             topmenu()
         else:
