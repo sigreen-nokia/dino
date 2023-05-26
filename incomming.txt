@@ -12,6 +12,8 @@ https://library.deepfield.net/attack/4410
 https://defend.exponential-e.com/explore-beta/timegraph/traffic?slice=timestamp(2022-11-29T01-00-00:2022-11-29T02-30-00)&dimensions=timestamp,Non_DDoS_services.dst,detection&measures=max.bps&slice:or=(addr.dst(31.221.116.217))&slice:or=(protocol(17))&slice:or=(port.src(0,123))&apply=timestep(10s,10s)&apply=sort(timestamp,asc)&apply=top(auto,n:100)&apply=smooth(60s)&bs=((boundary.peering.input,true))
 #To get a sample of all seen dnsflow domains: 
 https://charter-subi.deepfield.net/cube/dnsfqdn.csv?s=timestamp(-60min:)&d=dnsfqdn
+#genome chat
+/explore-beta/timegraph/traffic?slice=timestamp(-15minutes:now)&dimensions=timestamp,dnsfqdn,category,cdn.src,addr.src&measures=avg.bps,pctl95.bps,percent_total(sum.bytes)&slice:or=(sites(4055))&slice:or=(cdn.src(7))&apply=sort(timestamp,asc)&apply=top(auto,n:100)&bs=((boundary.peering.input,true))
 
 defender
 ========
