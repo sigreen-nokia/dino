@@ -581,8 +581,7 @@ def submenu219():
             3.Detection: Get a list of all available secure genome mitigation versions
             4.Mitigation: Whats my current running Defender mitigation branch
             5.Mitigation: Get a list of all available secure genome mitigation versions
-            6.Create a custom protection group with ipv4 subnets covering the internet.
-            7.Return""")
+            6.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -734,8 +733,6 @@ def submenu219():
             print("\nCommand is:" + mycmd )
             os.system(mycmd)
         elif ch == 6:
-            print("\n Look in the Dimensions menu for this one.")
-        elif ch == 7:
             topmenu()
         else:
             print("Invalid entry")
@@ -806,9 +803,7 @@ def submenu220():
         print("""
             1.Dump the json for a dimension, selected from a list of all Dimensions
             2.Add a Dimension from a json file
-            3.Create a protected object (custom data view) with subnets covering the internet. Step by step example
-            4.Delete a dimension, selected from a list of all provisioned dimensions
-            5.Return""")
+            3.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         #grab the first API key from the support users list of keys
@@ -860,364 +855,16 @@ def submenu220():
             os.system(mycmd)
             print("\n\nI've written the output to file mydimension.json for you")
         elif(ch == 2):
-            print("Create a new dimension from a json file - A step by step")
-            dimension_filename = input("enter the json filename to import the dimension from:")
-            DimensionName=input("Enter a name for your new custom dimension: ")
-            print("\n\nThe following command will add the JSON in order to create a new data view")
-            mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@" + dimension_filename + "' https://localhost/dimension/" + DimensionName + "?api_key=" + firstSupportKey)
-            print("Command is:" + mycmd )
-            user_input = input("Input yes and I will create the dimension for you, any other key to do nothing at all:")
-            if user_input == 'yes':
-                print("\nRunning Command: " + mycmd )
-                os.system(mycmd)
-                print("\nDone")
-            else:
-                print ("doing nothing. You can use the curl above to create the dimension yourself")
-        elif(ch == 3):
-            print("Create an example protected object (custom dimension) with a couple of subnets - A step by step")
-            CustomDimension = """{
-   "metadata" : {
-      "attributes" : {
-         "split" : true
-      },
-      "description" : "Test Protection Object",
-      "split" : true
-   }
-}
-"""
-            print ("\n\nPrinting the custom dimension example\n", CustomDimension)
-            print ("\n\nWriting the JSON ddos example to file custom-dimension-example.json\n\n")
-            with open('custom-dimension-example.json', 'w') as f:
-               f.write(str(CustomDimension))  
-            DimensionName="ExampleCustomProtectedObject"
-            print ("\n\nI will create the example custom dimension / protected object with name ", DimensionName)
-            print ("\nThe following command will create the new custom dimension")
-            mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@custom-dimension-example.json' https://localhost/dimension/" + DimensionName + "?api_key=" + firstSupportKey)
-            print("Command is:" + mycmd )
-            user_input = input("Input yes and I will create the dimension for you, any other key to do nothing at all:")
-            if user_input == 'yes':
-                print("\nRunning Command: " + mycmd )
-                os.system(mycmd)
-                print("\nDone")
-                ###########
-                print("Now lets add the possitions containing the subnets\n")
-                input("Press enter to continue")
-                SubnetList = """match:cidrs,position_id,display_name,description,name
-7.0.0.0/8,1,0.0.0.0/4,0.0.0.0/4,0.0.0.0/4
-11.0.0.0/8,1,0.0.0.0/4,0.0.0.0/4,0.0.0.0/4
-12.0.0.0/8,1,0.0.0.0/4,0.0.0.0/4,0.0.0.0/4
-4.0.0.0/8,1,0.0.0.0/4,0.0.0.0/4,0.0.0.0/4
-1.0.0.0/8,1,0.0.0.0/4,0.0.0.0/4,0.0.0.0/4
-5.0.0.0/8,1,0.0.0.0/4,0.0.0.0/4,0.0.0.0/4
-13.0.0.0/8,1,0.0.0.0/4,0.0.0.0/4,0.0.0.0/4
-14.0.0.0/8,1,0.0.0.0/4,0.0.0.0/4,0.0.0.0/4
-9.0.0.0/8,1,0.0.0.0/4,0.0.0.0/4,0.0.0.0/4
-6.0.0.0/8,1,0.0.0.0/4,0.0.0.0/4,0.0.0.0/4
-0.0.0.0/8,1,0.0.0.0/4,0.0.0.0/4,0.0.0.0/4
-3.0.0.0/8,1,0.0.0.0/4,0.0.0.0/4,0.0.0.0/4
-10.0.0.0/8,1,0.0.0.0/4,0.0.0.0/4,0.0.0.0/4
-8.0.0.0/8,1,0.0.0.0/4,0.0.0.0/4,0.0.0.0/4
-2.0.0.0/8,1,0.0.0.0/4,0.0.0.0/4,0.0.0.0/4
-15.0.0.0/8,1,0.0.0.0/4,0.0.0.0/4,0.0.0.0/4
-19.0.0.0/8,2,16.0.0.0/4,16.0.0.0/4,16.0.0.0/4
-27.0.0.0/8,2,16.0.0.0/4,16.0.0.0/4,16.0.0.0/4
-22.0.0.0/8,2,16.0.0.0/4,16.0.0.0/4,16.0.0.0/4
-18.0.0.0/8,2,16.0.0.0/4,16.0.0.0/4,16.0.0.0/4
-16.0.0.0/8,2,16.0.0.0/4,16.0.0.0/4,16.0.0.0/4
-23.0.0.0/8,2,16.0.0.0/4,16.0.0.0/4,16.0.0.0/4
-25.0.0.0/8,2,16.0.0.0/4,16.0.0.0/4,16.0.0.0/4
-30.0.0.0/8,2,16.0.0.0/4,16.0.0.0/4,16.0.0.0/4
-26.0.0.0/8,2,16.0.0.0/4,16.0.0.0/4,16.0.0.0/4
-24.0.0.0/8,2,16.0.0.0/4,16.0.0.0/4,16.0.0.0/4
-31.0.0.0/8,2,16.0.0.0/4,16.0.0.0/4,16.0.0.0/4
-17.0.0.0/8,2,16.0.0.0/4,16.0.0.0/4,16.0.0.0/4
-28.0.0.0/8,2,16.0.0.0/4,16.0.0.0/4,16.0.0.0/4
-20.0.0.0/8,2,16.0.0.0/4,16.0.0.0/4,16.0.0.0/4
-21.0.0.0/8,2,16.0.0.0/4,16.0.0.0/4,16.0.0.0/4
-29.0.0.0/8,2,16.0.0.0/4,16.0.0.0/4,16.0.0.0/4
-44.0.0.0/8,3,32.0.0.0/4,32.0.0.0/4,32.0.0.0/4
-33.0.0.0/8,3,32.0.0.0/4,32.0.0.0/4,32.0.0.0/4
-46.0.0.0/8,3,32.0.0.0/4,32.0.0.0/4,32.0.0.0/4
-39.0.0.0/8,3,32.0.0.0/4,32.0.0.0/4,32.0.0.0/4
-35.0.0.0/8,3,32.0.0.0/4,32.0.0.0/4,32.0.0.0/4
-32.0.0.0/8,3,32.0.0.0/4,32.0.0.0/4,32.0.0.0/4
-36.0.0.0/8,3,32.0.0.0/4,32.0.0.0/4,32.0.0.0/4
-47.0.0.0/8,3,32.0.0.0/4,32.0.0.0/4,32.0.0.0/4
-41.0.0.0/8,3,32.0.0.0/4,32.0.0.0/4,32.0.0.0/4
-34.0.0.0/8,3,32.0.0.0/4,32.0.0.0/4,32.0.0.0/4
-43.0.0.0/8,3,32.0.0.0/4,32.0.0.0/4,32.0.0.0/4
-40.0.0.0/8,3,32.0.0.0/4,32.0.0.0/4,32.0.0.0/4
-38.0.0.0/8,3,32.0.0.0/4,32.0.0.0/4,32.0.0.0/4
-45.0.0.0/8,3,32.0.0.0/4,32.0.0.0/4,32.0.0.0/4
-37.0.0.0/8,3,32.0.0.0/4,32.0.0.0/4,32.0.0.0/4
-42.0.0.0/8,3,32.0.0.0/4,32.0.0.0/4,32.0.0.0/4
-63.0.0.0/8,4,48.0.0.0/4,48.0.0.0/4,48.0.0.0/4
-54.0.0.0/8,4,48.0.0.0/4,48.0.0.0/4,48.0.0.0/4
-55.0.0.0/8,4,48.0.0.0/4,48.0.0.0/4,48.0.0.0/4
-50.0.0.0/8,4,48.0.0.0/4,48.0.0.0/4,48.0.0.0/4
-51.0.0.0/8,4,48.0.0.0/4,48.0.0.0/4,48.0.0.0/4
-59.0.0.0/8,4,48.0.0.0/4,48.0.0.0/4,48.0.0.0/4
-60.0.0.0/8,4,48.0.0.0/4,48.0.0.0/4,48.0.0.0/4
-62.0.0.0/8,4,48.0.0.0/4,48.0.0.0/4,48.0.0.0/4
-48.0.0.0/8,4,48.0.0.0/4,48.0.0.0/4,48.0.0.0/4
-52.0.0.0/8,4,48.0.0.0/4,48.0.0.0/4,48.0.0.0/4
-61.0.0.0/8,4,48.0.0.0/4,48.0.0.0/4,48.0.0.0/4
-58.0.0.0/8,4,48.0.0.0/4,48.0.0.0/4,48.0.0.0/4
-56.0.0.0/8,4,48.0.0.0/4,48.0.0.0/4,48.0.0.0/4
-53.0.0.0/8,4,48.0.0.0/4,48.0.0.0/4,48.0.0.0/4
-57.0.0.0/8,4,48.0.0.0/4,48.0.0.0/4,48.0.0.0/4
-49.0.0.0/8,4,48.0.0.0/4,48.0.0.0/4,48.0.0.0/4
-72.0.0.0/8,5,64.0.0.0/4,64.0.0.0/4,64.0.0.0/4
-67.0.0.0/8,5,64.0.0.0/4,64.0.0.0/4,64.0.0.0/4
-68.0.0.0/8,5,64.0.0.0/4,64.0.0.0/4,64.0.0.0/4
-70.0.0.0/8,5,64.0.0.0/4,64.0.0.0/4,64.0.0.0/4
-76.0.0.0/8,5,64.0.0.0/4,64.0.0.0/4,64.0.0.0/4
-66.0.0.0/8,5,64.0.0.0/4,64.0.0.0/4,64.0.0.0/4
-74.0.0.0/8,5,64.0.0.0/4,64.0.0.0/4,64.0.0.0/4
-69.0.0.0/8,5,64.0.0.0/4,64.0.0.0/4,64.0.0.0/4
-64.0.0.0/8,5,64.0.0.0/4,64.0.0.0/4,64.0.0.0/4
-71.0.0.0/8,5,64.0.0.0/4,64.0.0.0/4,64.0.0.0/4
-77.0.0.0/8,5,64.0.0.0/4,64.0.0.0/4,64.0.0.0/4
-78.0.0.0/8,5,64.0.0.0/4,64.0.0.0/4,64.0.0.0/4
-73.0.0.0/8,5,64.0.0.0/4,64.0.0.0/4,64.0.0.0/4
-79.0.0.0/8,5,64.0.0.0/4,64.0.0.0/4,64.0.0.0/4
-75.0.0.0/8,5,64.0.0.0/4,64.0.0.0/4,64.0.0.0/4
-65.0.0.0/8,5,64.0.0.0/4,64.0.0.0/4,64.0.0.0/4
-94.0.0.0/8,6,80.0.0.0/4,80.0.0.0/4,80.0.0.0/4
-87.0.0.0/8,6,80.0.0.0/4,80.0.0.0/4,80.0.0.0/4
-80.0.0.0/8,6,80.0.0.0/4,80.0.0.0/4,80.0.0.0/4
-85.0.0.0/8,6,80.0.0.0/4,80.0.0.0/4,80.0.0.0/4
-91.0.0.0/8,6,80.0.0.0/4,80.0.0.0/4,80.0.0.0/4
-95.0.0.0/8,6,80.0.0.0/4,80.0.0.0/4,80.0.0.0/4
-90.0.0.0/8,6,80.0.0.0/4,80.0.0.0/4,80.0.0.0/4
-84.0.0.0/8,6,80.0.0.0/4,80.0.0.0/4,80.0.0.0/4
-88.0.0.0/8,6,80.0.0.0/4,80.0.0.0/4,80.0.0.0/4
-86.0.0.0/8,6,80.0.0.0/4,80.0.0.0/4,80.0.0.0/4
-92.0.0.0/8,6,80.0.0.0/4,80.0.0.0/4,80.0.0.0/4
-81.0.0.0/8,6,80.0.0.0/4,80.0.0.0/4,80.0.0.0/4
-89.0.0.0/8,6,80.0.0.0/4,80.0.0.0/4,80.0.0.0/4
-93.0.0.0/8,6,80.0.0.0/4,80.0.0.0/4,80.0.0.0/4
-82.0.0.0/8,6,80.0.0.0/4,80.0.0.0/4,80.0.0.0/4
-83.0.0.0/8,6,80.0.0.0/4,80.0.0.0/4,80.0.0.0/4
-101.0.0.0/8,7,96.0.0.0/4,96.0.0.0/4,96.0.0.0/4
-102.0.0.0/8,7,96.0.0.0/4,96.0.0.0/4,96.0.0.0/4
-109.0.0.0/8,7,96.0.0.0/4,96.0.0.0/4,96.0.0.0/4
-97.0.0.0/8,7,96.0.0.0/4,96.0.0.0/4,96.0.0.0/4
-106.0.0.0/8,7,96.0.0.0/4,96.0.0.0/4,96.0.0.0/4
-96.0.0.0/8,7,96.0.0.0/4,96.0.0.0/4,96.0.0.0/4
-98.0.0.0/8,7,96.0.0.0/4,96.0.0.0/4,96.0.0.0/4
-105.0.0.0/8,7,96.0.0.0/4,96.0.0.0/4,96.0.0.0/4
-103.0.0.0/8,7,96.0.0.0/4,96.0.0.0/4,96.0.0.0/4
-107.0.0.0/8,7,96.0.0.0/4,96.0.0.0/4,96.0.0.0/4
-100.0.0.0/8,7,96.0.0.0/4,96.0.0.0/4,96.0.0.0/4
-111.0.0.0/8,7,96.0.0.0/4,96.0.0.0/4,96.0.0.0/4
-104.0.0.0/8,7,96.0.0.0/4,96.0.0.0/4,96.0.0.0/4
-108.0.0.0/8,7,96.0.0.0/4,96.0.0.0/4,96.0.0.0/4
-110.0.0.0/8,7,96.0.0.0/4,96.0.0.0/4,96.0.0.0/4
-99.0.0.0/8,7,96.0.0.0/4,96.0.0.0/4,96.0.0.0/4
-112.0.0.0/8,8,112.0.0.0/4,112.0.0.0/4,112.0.0.0/4
-120.0.0.0/8,8,112.0.0.0/4,112.0.0.0/4,112.0.0.0/4
-119.0.0.0/8,8,112.0.0.0/4,112.0.0.0/4,112.0.0.0/4
-125.0.0.0/8,8,112.0.0.0/4,112.0.0.0/4,112.0.0.0/4
-126.0.0.0/8,8,112.0.0.0/4,112.0.0.0/4,112.0.0.0/4
-114.0.0.0/8,8,112.0.0.0/4,112.0.0.0/4,112.0.0.0/4
-122.0.0.0/8,8,112.0.0.0/4,112.0.0.0/4,112.0.0.0/4
-117.0.0.0/8,8,112.0.0.0/4,112.0.0.0/4,112.0.0.0/4
-118.0.0.0/8,8,112.0.0.0/4,112.0.0.0/4,112.0.0.0/4
-121.0.0.0/8,8,112.0.0.0/4,112.0.0.0/4,112.0.0.0/4
-127.0.0.0/8,8,112.0.0.0/4,112.0.0.0/4,112.0.0.0/4
-116.0.0.0/8,8,112.0.0.0/4,112.0.0.0/4,112.0.0.0/4
-123.0.0.0/8,8,112.0.0.0/4,112.0.0.0/4,112.0.0.0/4
-113.0.0.0/8,8,112.0.0.0/4,112.0.0.0/4,112.0.0.0/4
-124.0.0.0/8,8,112.0.0.0/4,112.0.0.0/4,112.0.0.0/4
-115.0.0.0/8,8,112.0.0.0/4,112.0.0.0/4,112.0.0.0/4
-140.0.0.0/8,9,128.0.0.0/4,128.0.0.0/4,128.0.0.0/4
-129.0.0.0/8,9,128.0.0.0/4,128.0.0.0/4,128.0.0.0/4
-137.0.0.0/8,9,128.0.0.0/4,128.0.0.0/4,128.0.0.0/4
-135.0.0.0/8,9,128.0.0.0/4,128.0.0.0/4,128.0.0.0/4
-138.0.0.0/8,9,128.0.0.0/4,128.0.0.0/4,128.0.0.0/4
-128.0.0.0/8,9,128.0.0.0/4,128.0.0.0/4,128.0.0.0/4
-130.0.0.0/8,9,128.0.0.0/4,128.0.0.0/4,128.0.0.0/4
-142.0.0.0/8,9,128.0.0.0/4,128.0.0.0/4,128.0.0.0/4
-143.0.0.0/8,9,128.0.0.0/4,128.0.0.0/4,128.0.0.0/4
-139.0.0.0/8,9,128.0.0.0/4,128.0.0.0/4,128.0.0.0/4
-136.0.0.0/8,9,128.0.0.0/4,128.0.0.0/4,128.0.0.0/4
-141.0.0.0/8,9,128.0.0.0/4,128.0.0.0/4,128.0.0.0/4
-134.0.0.0/8,9,128.0.0.0/4,128.0.0.0/4,128.0.0.0/4
-133.0.0.0/8,9,128.0.0.0/4,128.0.0.0/4,128.0.0.0/4
-132.0.0.0/8,9,128.0.0.0/4,128.0.0.0/4,128.0.0.0/4
-131.0.0.0/8,9,128.0.0.0/4,128.0.0.0/4,128.0.0.0/4
-146.0.0.0/8,10,144.0.0.0/4,144.0.0.0/4,144.0.0.0/4
-145.0.0.0/8,10,144.0.0.0/4,144.0.0.0/4,144.0.0.0/4
-150.0.0.0/8,10,144.0.0.0/4,144.0.0.0/4,144.0.0.0/4
-147.0.0.0/8,10,144.0.0.0/4,144.0.0.0/4,144.0.0.0/4
-156.0.0.0/8,10,144.0.0.0/4,144.0.0.0/4,144.0.0.0/4
-159.0.0.0/8,10,144.0.0.0/4,144.0.0.0/4,144.0.0.0/4
-144.0.0.0/8,10,144.0.0.0/4,144.0.0.0/4,144.0.0.0/4
-151.0.0.0/8,10,144.0.0.0/4,144.0.0.0/4,144.0.0.0/4
-153.0.0.0/8,10,144.0.0.0/4,144.0.0.0/4,144.0.0.0/4
-148.0.0.0/8,10,144.0.0.0/4,144.0.0.0/4,144.0.0.0/4
-155.0.0.0/8,10,144.0.0.0/4,144.0.0.0/4,144.0.0.0/4
-149.0.0.0/8,10,144.0.0.0/4,144.0.0.0/4,144.0.0.0/4
-152.0.0.0/8,10,144.0.0.0/4,144.0.0.0/4,144.0.0.0/4
-158.0.0.0/8,10,144.0.0.0/4,144.0.0.0/4,144.0.0.0/4
-154.0.0.0/8,10,144.0.0.0/4,144.0.0.0/4,144.0.0.0/4
-157.0.0.0/8,10,144.0.0.0/4,144.0.0.0/4,144.0.0.0/4
-170.0.0.0/8,11,160.0.0.0/4,160.0.0.0/4,160.0.0.0/4
-165.0.0.0/8,11,160.0.0.0/4,160.0.0.0/4,160.0.0.0/4
-161.0.0.0/8,11,160.0.0.0/4,160.0.0.0/4,160.0.0.0/4
-163.0.0.0/8,11,160.0.0.0/4,160.0.0.0/4,160.0.0.0/4
-168.0.0.0/8,11,160.0.0.0/4,160.0.0.0/4,160.0.0.0/4
-160.0.0.0/8,11,160.0.0.0/4,160.0.0.0/4,160.0.0.0/4
-167.0.0.0/8,11,160.0.0.0/4,160.0.0.0/4,160.0.0.0/4
-164.0.0.0/8,11,160.0.0.0/4,160.0.0.0/4,160.0.0.0/4
-166.0.0.0/8,11,160.0.0.0/4,160.0.0.0/4,160.0.0.0/4
-172.0.0.0/8,11,160.0.0.0/4,160.0.0.0/4,160.0.0.0/4
-174.0.0.0/8,11,160.0.0.0/4,160.0.0.0/4,160.0.0.0/4
-175.0.0.0/8,11,160.0.0.0/4,160.0.0.0/4,160.0.0.0/4
-173.0.0.0/8,11,160.0.0.0/4,160.0.0.0/4,160.0.0.0/4
-169.0.0.0/8,11,160.0.0.0/4,160.0.0.0/4,160.0.0.0/4
-171.0.0.0/8,11,160.0.0.0/4,160.0.0.0/4,160.0.0.0/4
-162.0.0.0/8,11,160.0.0.0/4,160.0.0.0/4,160.0.0.0/4
-183.0.0.0/8,12,176.0.0.0/4,176.0.0.0/4,176.0.0.0/4
-186.0.0.0/8,12,176.0.0.0/4,176.0.0.0/4,176.0.0.0/4
-177.0.0.0/8,12,176.0.0.0/4,176.0.0.0/4,176.0.0.0/4
-178.0.0.0/8,12,176.0.0.0/4,176.0.0.0/4,176.0.0.0/4
-179.0.0.0/8,12,176.0.0.0/4,176.0.0.0/4,176.0.0.0/4
-182.0.0.0/8,12,176.0.0.0/4,176.0.0.0/4,176.0.0.0/4
-181.0.0.0/8,12,176.0.0.0/4,176.0.0.0/4,176.0.0.0/4
-176.0.0.0/8,12,176.0.0.0/4,176.0.0.0/4,176.0.0.0/4
-188.0.0.0/8,12,176.0.0.0/4,176.0.0.0/4,176.0.0.0/4
-187.0.0.0/8,12,176.0.0.0/4,176.0.0.0/4,176.0.0.0/4
-189.0.0.0/8,12,176.0.0.0/4,176.0.0.0/4,176.0.0.0/4
-190.0.0.0/8,12,176.0.0.0/4,176.0.0.0/4,176.0.0.0/4
-180.0.0.0/8,12,176.0.0.0/4,176.0.0.0/4,176.0.0.0/4
-185.0.0.0/8,12,176.0.0.0/4,176.0.0.0/4,176.0.0.0/4
-184.0.0.0/8,12,176.0.0.0/4,176.0.0.0/4,176.0.0.0/4
-191.0.0.0/8,12,176.0.0.0/4,176.0.0.0/4,176.0.0.0/4
-207.0.0.0/8,13,192.0.0.0/4,192.0.0.0/4,192.0.0.0/4
-201.0.0.0/8,13,192.0.0.0/4,192.0.0.0/4,192.0.0.0/4
-194.0.0.0/8,13,192.0.0.0/4,192.0.0.0/4,192.0.0.0/4
-196.0.0.0/8,13,192.0.0.0/4,192.0.0.0/4,192.0.0.0/4
-198.0.0.0/8,13,192.0.0.0/4,192.0.0.0/4,192.0.0.0/4
-203.0.0.0/8,13,192.0.0.0/4,192.0.0.0/4,192.0.0.0/4
-192.0.0.0/8,13,192.0.0.0/4,192.0.0.0/4,192.0.0.0/4
-204.0.0.0/8,13,192.0.0.0/4,192.0.0.0/4,192.0.0.0/4
-197.0.0.0/8,13,192.0.0.0/4,192.0.0.0/4,192.0.0.0/4
-202.0.0.0/8,13,192.0.0.0/4,192.0.0.0/4,192.0.0.0/4
-205.0.0.0/8,13,192.0.0.0/4,192.0.0.0/4,192.0.0.0/4
-199.0.0.0/8,13,192.0.0.0/4,192.0.0.0/4,192.0.0.0/4
-195.0.0.0/8,13,192.0.0.0/4,192.0.0.0/4,192.0.0.0/4
-206.0.0.0/8,13,192.0.0.0/4,192.0.0.0/4,192.0.0.0/4
-200.0.0.0/8,13,192.0.0.0/4,192.0.0.0/4,192.0.0.0/4
-193.0.0.0/8,13,192.0.0.0/4,192.0.0.0/4,192.0.0.0/4
-212.0.0.0/8,14,208.0.0.0/4,208.0.0.0/4,208.0.0.0/4
-208.0.0.0/8,14,208.0.0.0/4,208.0.0.0/4,208.0.0.0/4
-214.0.0.0/8,14,208.0.0.0/4,208.0.0.0/4,208.0.0.0/4
-220.0.0.0/8,14,208.0.0.0/4,208.0.0.0/4,208.0.0.0/4
-213.0.0.0/8,14,208.0.0.0/4,208.0.0.0/4,208.0.0.0/4
-211.0.0.0/8,14,208.0.0.0/4,208.0.0.0/4,208.0.0.0/4
-215.0.0.0/8,14,208.0.0.0/4,208.0.0.0/4,208.0.0.0/4
-217.0.0.0/8,14,208.0.0.0/4,208.0.0.0/4,208.0.0.0/4
-218.0.0.0/8,14,208.0.0.0/4,208.0.0.0/4,208.0.0.0/4
-222.0.0.0/8,14,208.0.0.0/4,208.0.0.0/4,208.0.0.0/4
-223.0.0.0/8,14,208.0.0.0/4,208.0.0.0/4,208.0.0.0/4
-210.0.0.0/8,14,208.0.0.0/4,208.0.0.0/4,208.0.0.0/4
-219.0.0.0/8,14,208.0.0.0/4,208.0.0.0/4,208.0.0.0/4
-221.0.0.0/8,14,208.0.0.0/4,208.0.0.0/4,208.0.0.0/4
-216.0.0.0/8,14,208.0.0.0/4,208.0.0.0/4,208.0.0.0/4
-209.0.0.0/8,14,208.0.0.0/4,208.0.0.0/4,208.0.0.0/4
-232.0.0.0/8,15,224.0.0.0/4,224.0.0.0/4,224.0.0.0/4
-239.0.0.0/8,15,224.0.0.0/4,224.0.0.0/4,224.0.0.0/4
-225.0.0.0/8,15,224.0.0.0/4,224.0.0.0/4,224.0.0.0/4
-224.0.0.0/8,15,224.0.0.0/4,224.0.0.0/4,224.0.0.0/4
-233.0.0.0/8,15,224.0.0.0/4,224.0.0.0/4,224.0.0.0/4
-235.0.0.0/8,15,224.0.0.0/4,224.0.0.0/4,224.0.0.0/4
-226.0.0.0/8,15,224.0.0.0/4,224.0.0.0/4,224.0.0.0/4
-237.0.0.0/8,15,224.0.0.0/4,224.0.0.0/4,224.0.0.0/4
-238.0.0.0/8,15,224.0.0.0/4,224.0.0.0/4,224.0.0.0/4
-227.0.0.0/8,15,224.0.0.0/4,224.0.0.0/4,224.0.0.0/4
-229.0.0.0/8,15,224.0.0.0/4,224.0.0.0/4,224.0.0.0/4
-228.0.0.0/8,15,224.0.0.0/4,224.0.0.0/4,224.0.0.0/4
-234.0.0.0/8,15,224.0.0.0/4,224.0.0.0/4,224.0.0.0/4
-236.0.0.0/8,15,224.0.0.0/4,224.0.0.0/4,224.0.0.0/4
-231.0.0.0/8,15,224.0.0.0/4,224.0.0.0/4,224.0.0.0/4
-230.0.0.0/8,15,224.0.0.0/4,224.0.0.0/4,224.0.0.0/4
-241.0.0.0/8,16,240.0.0.0/4,240.0.0.0/4,240.0.0.0/4
-252.0.0.0/8,16,240.0.0.0/4,240.0.0.0/4,240.0.0.0/4
-248.0.0.0/8,16,240.0.0.0/4,240.0.0.0/4,240.0.0.0/4
-255.0.0.0/8,16,240.0.0.0/4,240.0.0.0/4,240.0.0.0/4
-245.0.0.0/8,16,240.0.0.0/4,240.0.0.0/4,240.0.0.0/4
-246.0.0.0/8,16,240.0.0.0/4,240.0.0.0/4,240.0.0.0/4
-251.0.0.0/8,16,240.0.0.0/4,240.0.0.0/4,240.0.0.0/4
-249.0.0.0/8,16,240.0.0.0/4,240.0.0.0/4,240.0.0.0/4
-243.0.0.0/8,16,240.0.0.0/4,240.0.0.0/4,240.0.0.0/4
-250.0.0.0/8,16,240.0.0.0/4,240.0.0.0/4,240.0.0.0/4
-240.0.0.0/8,16,240.0.0.0/4,240.0.0.0/4,240.0.0.0/4
-244.0.0.0/8,16,240.0.0.0/4,240.0.0.0/4,240.0.0.0/4
-247.0.0.0/8,16,240.0.0.0/4,240.0.0.0/4,240.0.0.0/4
-253.0.0.0/8,16,240.0.0.0/4,240.0.0.0/4,240.0.0.0/4
-254.0.0.0/8,16,240.0.0.0/4,240.0.0.0/4,240.0.0.0/4
-242.0.0.0/8,16,240.0.0.0/4,240.0.0.0/4,240.0.0.0/4
-"""
-                print ("\n\nI've writted a list of subnets covering all IPV4 addresses to file subnet-example.csv\n\n")
-                with open('subnet-example.csv', 'w') as f:
-                   f.write(str(SubnetList))  
-                print ("\n\nWe will use the Deepscript endpoint to read our csv file and turn it into possitions.")
-                print ("\nThe following command will create the possitions in our custom dimension")
-                mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' --data-binary '@subnet-example.csv' https://localhost/deepscript/dimension/" + DimensionName + "?api_key=" + firstSupportKey)
-                print("Command is:" + mycmd )
-                user_input = input("Input yes and I will create the possitions for you, any other key to do nothing at all:")
-                if user_input == 'yes':
-                    print("\nRunning Command: " + mycmd )
-                    os.system(mycmd)
-                    print("\nDone")
-        elif(ch == 4):
-            print("Delete a specific dimension, selected from a menu of all configured dimensions")
-            url = 'https://localhost/dimensions/index?attributes=*&api_key=' + firstSupportKey
-            #print ("\nDebug url: " , url)
-            dimensionlist = requests.get(url, verify=False).json()
-            #print ("\nDimensionlist: " , dimensionlist)
-            json_formatted_dimensionlist = json.dumps(dimensionlist, indent=2)
-            #print ("\nDebug dimensionlist: " , json_formatted_dimensionlist)
-            #build the text menu
-            user_input = ''
-            input_message = "Select a dimension:\n"
-            index = 0
-            for key in dimensionlist:
-                index += 1
-                #print ("DEBUG: key:", key)
-                dimensionname = dimensionlist[key]['name']
-                dimensionuuid = dimensionlist[key]['dimension_id']
-                #dimensionname = key['name']
-                #dimensionuuid = key['dimension_id']
-                input_message += f'{index}) {dimensionname}\n'
-            input_message += 'You selected dimension: '
-            #prompt for the dimension by number x) 
-            user_input = input(input_message)
-            #now find the selected dimension name and uuid for the selected number
-            index = 0
-            for key in dimensionlist:
-                index += 1
-                if index == int(user_input):
-                    dimensionname = dimensionlist[key]['name']
-                    dimensionuuid = dimensionlist[key]['dimension_id']
-            print ("You selected dimension name:", dimensionname)
-            print ("Which has dimension id:", dimensionuuid)
-            mycmd = ("curl -k --silent -X DELETE 'https://localhost/dimension/" + str(dimensionuuid) + "?api_key=" + firstSupportKey + "' | json_pp ") 
-            print("Command is:" + mycmd )
-            user_input = input("Input yes and I will delete the dimension for you, any other key to do nothing at all:")
-            if user_input == 'yes':
-                print("\nRunning Command: " + mycmd )
-                os.system(mycmd)
-                print("\n\nAll Done")
-        elif ch == 5:
+            input("Press any key to return to the menu")
+            os.system("clear")
+            submenu220()
+        elif ch == 3:
             topmenu()
         else:
             print("Invalid entry")
         input("\nPress enter to continue")
         os.system("clear")
-        submenu220()
+        submenu216()
 
 def submenu212():
     os.system("clear")
@@ -1921,12 +1568,11 @@ def submenu217():
             2.For an example traffic query, show me how to find the data view that was used
             3.Get a list of all data views via the API, write to a file (this is a big list, perhaps the next one is better)
             4.Dump a specific data view, selected from a menu of all configured data views 
-            5.Starhub Example Case:Create a new custom ddos data view for regs (high retention) - A step by step using an example
-            6.LGU+ Example Case: Create a new custom ddos data view sliced on a custom protection group - A step by step using an example
-            7.Create a new data view from a json file - A step by step
-            8.Patch an existing data view retention - A step by step
-            9.Delete an existing data view
-            10.Return""")
+            5.Create a new custom ddos data view for regs (retention) - A step by step using an example, this one comes up a lot
+            6.Create a new data view from a json file - A step by step
+            7.Patch an existing data view retention - A step by step
+            8.Delete an existing data view
+            9.Return""")
         print("\n")
         #grab the first API key from the support users list of keys
         supportKeys = deepy.deepui.get_root_api_keys()
@@ -2007,7 +1653,7 @@ def submenu217():
             os.system(mycmd)
             print("\n\nI've written the output to file mydataview.json for you")
         elif(ch == 5):
-            print("Starhub example case: Create a new custom ddos data view for regs (long retention) - A step by step")
+            print("Create a new custom ddos data view for regs - A step by step, this one comes up a lot")
             url = 'https://localhost/api/data_views/?attributes=*&api_key=' + firstSupportKey
             CustomDDOSDataView = """{
    "timestep_retention_days" : {
@@ -2105,94 +1751,6 @@ def submenu217():
             else:
                 print ("doing nothing. You can use the curl above to create the dataview yourself")
         elif(ch == 6):
-            print("LGU+ example case: Create a new custom ddos data view sliced on a custom protection group - A step by step")
-            url = 'https://localhost/api/data_views/?attributes=*&api_key=' + firstSupportKey
-            CustomDDOSDataView = """{
-   "timestep_retention_days" : {
-      "5min" : 30 
-   },
-   "context" : "traffic",
-   "source_timestep" : "10s",
-   "slice" : {
-      "category" : {
-         "values" : [
-            "ddos"
-         ],
-         "type" : "include"
-      }
-   },
-   "slice": {
-      "ExampleCustomProtectedObject.dst": {
-        "type": "exclude",
-        "values": ["0"]
-      }
-   },
-   "name" : "Example-Dataview-ingress-ddos-analysis",
-   "description" : "DDOS traffic details sliced against a custom protection group",
-   "comment" : "Creating a view to help with ddos analysis",
-   "dimensions" : [
-      {
-         "split" : "src",
-         "base" : "origin_asn"
-      },
-      {
-         "base" : "protocol"
-      },
-      {
-         "base" : "ExampleCustomProtectedObject",
-         "split" : "dst"
-      },
-      {
-         "base" : "tcpflags"
-      },
-      {
-         "base" : "category"
-      },
-      {
-         "split" : "src",
-         "base" : "country"
-      },
-      {
-         "base" : "ddos"
-      },
-      {
-         "base" : "addr",
-         "split" : "dst"
-      },
-      {
-         "split" : "src",
-         "base" : "addr"
-      },
-      {
-         "base" : "all_boundary_columns_macro"
-      },
-      {
-         "split" : "dst",
-         "base" : "port"
-      },
-      {
-         "split" : "src",
-         "base" : "port"
-      }
-   ]
-}
-"""
-            print ("\n\nPrinting the JSON ddos example\n", CustomDDOSDataView)
-            print ("\n\nWriting the JSON ddos example to file ddos-baseline-example.json\n\n")
-            with open('ddos-baseline-example.json', 'w') as f:
-               f.write(str(CustomDDOSDataView))   
-            print ("\n\nThe following command will create the new ddos dataview")
-            mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@ddos-baseline-example.json' https://localhost/api/data_views/?api_key=" + firstSupportKey)
-            print("Command is:" + mycmd )
-            user_input = input("Input yes and I will create the dataview for you, any other key to do nothing at all:")
-            if user_input == 'yes':
-            #if(len(user_input) != 0):
-                print("\nRunning Command: " + mycmd )
-                os.system(mycmd)
-                print("\nDone")
-            else:
-                print ("doing nothing. You can use the curl above to create the dataview yourself")
-        elif(ch == 7):
             print("Create a new dataview from a json file - A step by step")
             print("hint1: build data views with 10s and 2min timesteps with a source_timestep of 10s")
             print("hint2: build data views with 30min, 2hr and day timesteps from a parent view with a 5min timestamp and the same dimensions, base_view for example. you cannot use 10s")
@@ -2208,7 +1766,7 @@ def submenu217():
                 print("\nDone")
             else:
                 print ("doing nothing. You can use the curl above to create the data view yourself")
-        elif(ch == 8):
+        elif(ch == 7):
             print("Patch an existing data view retention - A step by step")
             url = 'https://localhost/api/data_views/?attributes=*&api_key=' + firstSupportKey
             dataviewlist = requests.get(url, verify=False).json()
@@ -2298,7 +1856,7 @@ def submenu217():
                 print("\nDone")
             else:
                 print ("doing nothing. You can use the curl above to create the data view yourself")
-        elif(ch == 9):
+        elif(ch == 8):
             print ("Delete an existing data view")
             url = 'https://localhost/api/data_views/?attributes=*&api_key=' + firstSupportKey
             dataviewlist = requests.get(url, verify=False).json()
@@ -2336,7 +1894,7 @@ def submenu217():
                 print("\nDone")
             else:
                 print ("doing nothing. You can use the curl above to delete the data view yourself")
-        elif ch == 10:
+        elif ch == 9:
             topmenu()
         else:
             print("Invalid entry")
