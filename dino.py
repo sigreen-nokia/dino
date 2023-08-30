@@ -2114,17 +2114,17 @@ def submenu217():
    "context" : "traffic",
    "source_timestep" : "10s",
    "slice" : {
+      "ExampleCustomProtectedObject.dst" : {
+         "type" : "exclude",
+         "values" : [
+            "0"
+         ]
+      },
       "category" : {
+         "type" : "include",
          "values" : [
             "ddos"
-         ],
-         "type" : "include"
-      }
-   },
-   "slice": {
-      "ExampleCustomProtectedObject.dst": {
-        "type": "exclude",
-        "values": ["0"]
+         ]
       }
    },
    "name" : "Example-Dataview-ingress-ddos-analysis",
