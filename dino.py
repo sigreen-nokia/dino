@@ -2189,7 +2189,9 @@ def submenu217():
             #if(len(user_input) != 0):
                 print("\nRunning Command: " + mycmd )
                 os.system(mycmd)
-                print("\nDone")
+                print("\n\nGive it an hour and the following example query should hit your new dataview")
+                print("\ncurl -k --silent -X GET 'https://localhost/cube/traffic.json?slice=timestamp(-60minutes:now)&dimensions=timestamp,ddos,origin_asn.src,protocol,tcpflags,category,country.src,addr.src,addr.dst,port.src,port.dst&measures=avg.bps,pctl95.bps,percent_total(sum.bytes)&apply=sort(timestamp,asc)&apply=top(all,n:100)&apply=timestep(5min,5min)&bs=((boundary.peering.input,true))&slice:or=(ExampleCustomProtectedObject.dst!(None))&slice:or=(category(12))&api_key=31UO2fiKwinzYl' | jq . | grep view_name")
+                print("\nAll Done")
             else:
                 print ("doing nothing. You can use the curl above to create the dataview yourself")
         elif(ch == 7):
