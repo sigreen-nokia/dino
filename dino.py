@@ -808,7 +808,8 @@ def submenu220():
             2.Add a Dimension from a json file
             3.Create a protected object (custom data view) with subnets covering the internet. Step by step example
             4.Delete a dimension, selected from a list of all provisioned dimensions
-            5.Return""")
+            5.Dump the csv for all possitions in a dimension, the dimension is selected from a list of all Dimensions
+            6.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         #grab the first API key from the support users list of keys
@@ -1211,7 +1212,45 @@ def submenu220():
                 print("\nRunning Command: " + mycmd )
                 os.system(mycmd)
                 print("\n\nAll Done")
-        elif ch == 5:
+        if(ch == 5):
+            print("Dump the csv for all possitions in a dimension, the dimension is selected from a list of all Dimensions")
+            url = 'https://localhost/dimensions/index?attributes=*&api_key=' + firstSupportKey
+            #print ("\nDebug url: " , url)
+            dimensionlist = requests.get(url, verify=False).json()
+            #print ("\nDimensionlist: " , dimensionlist)
+            json_formatted_dimensionlist = json.dumps(dimensionlist, indent=2)
+            #print ("\nDebug dimensionlist: " , json_formatted_dimensionlist)
+            #build the text menu
+            user_input = ''
+            input_message = "Select a dimension:\n"
+            index = 0
+            for key in dimensionlist:
+                index += 1
+                #print ("DEBUG: key:", key)
+                dimensionname = dimensionlist[key]['name']
+                dimensionuuid = dimensionlist[key]['dimension_id']
+                #dimensionname = key['name']
+                #dimensionuuid = key['dimension_id']
+                input_message += f'{index}) {dimensionname}\n'
+            input_message += 'You selected dimension: '
+            #prompt for the dimension by number x) 
+            user_input = input(input_message)
+            #now find the selected dimension name and uuid for the selected number
+            index = 0
+            for key in dimensionlist:
+                index += 1
+                if index == int(user_input):
+                    dimensionname = dimensionlist[key]['name']
+                    dimensionuuid = dimensionlist[key]['dimension_id']
+            print ("You selected dimension name:", dimensionname)
+            print ("Which has dimension id:", dimensionuuid)
+            print ("Grabbing the dimension positions for you")
+            mycmd = ("curl -k --silent -X GET 'https://localhost/dimension/" + str(dimensionuuid) + "/positions/download?filetype=csv&api_key=" + firstSupportKey + "' | tee example-dimension-position.csv") 
+            print("Command is:" + mycmd )
+            input("Press any key and I'll run the command to output the csv...")
+            os.system(mycmd)
+            print("\nI've also written the csv to a file for you example-dimension-position.csv...")
+        elif ch == 6:
             topmenu()
         else:
             print("Invalid entry")
