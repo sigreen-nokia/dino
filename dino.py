@@ -1,17 +1,49 @@
 # importing the modules
+#To add missing modues: 
+#                       pip install [module name]: 
+#                       or 
+#                       pip3 install [module name]: 
 import os
+import sys 
 import re
 import subprocess
 import socket
-import deepy.cfg
-import deepy.deepui
-import get_context
-import pandas as pd
-import requests 
-import deepy.log as log
 import json 
 from subprocess import check_output as run
 from datetime import date
+RunningOnMaster = "yes"
+#requests is a must have and is available with pip/pip3
+try:
+    import requests 
+except ImportError:
+    print ("\nPlease Install python module requests using")
+    print ("       'pip install requests'")
+    print ("       or")
+    print ("       'pip3 install requests'")
+    print ("Then rerun dino\n")
+    sys.exit(1) 
+#test for these modules to determine whether we are running on a master of a customers node
+try:
+    import deepy.cfg
+except ImportError:
+    RunningOnMaster = "no"
+try:
+    import deepy.deepui
+except ImportError:
+    RunningOnMaster = "no"
+try:
+    import get_context
+except ImportError:
+    RunningOnMaster = "no"
+try:
+    import pandas as pd
+except ImportError:
+    RunningOnMaster = "no"
+try:
+    import deepy.log as log
+except ImportError:
+    RunningOnMaster = "no"
+
 #date 
 today = str(date.today())
 #statics
@@ -46,7 +78,6 @@ boundary_regex = re.compile(r"\((boundary\.[\w.-]*),.*\)")
 api_key = 'None' 
 
 def topmenu():
-
     os.system("clear")
     # sets the text color to magenta
     os.system("tput setaf 6")
@@ -174,7 +205,7 @@ def submenu23():
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
-    print("\tDeepfield Cluster Health")
+    print("\tDeepfield Cluster Health (must be ran on the master)")
     # sets the text color to magenta
     os.system("tput setaf 6")
     print("\t-------------------------------------------------")
@@ -273,7 +304,7 @@ def submenu24():
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
-    print("\tDeepfield Cluster Configuration")
+    print("\tDeepfield Cluster Configuration (must be ran on the master)")
     # sets the text color to magenta
     os.system("tput setaf 6")
     print("\t-------------------------------------------------")
@@ -319,7 +350,7 @@ def submenu25():
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
-    print("\tDeepfield Queries the customer is using most frequently (view optimization)")
+    print("\tDeepfield Queries the customer is using most frequently (view optimization, must be ran on the master)")
     # sets the text color to magenta
     os.system("tput setaf 6")
     print("\t-------------------------------------------------")
@@ -334,7 +365,7 @@ def submenu25():
             7.Cleanup the dino-* directories used to store the queries
             8.Return""")
         print("\n")
-        #to get avialable cubes https://localhost:22222/cube/list
+        #to get available cubes https://localhost:22222/cube/list
         ch=int(input("Enter your choice: "))
         # you can list more than one context, coma seperated
         if(ch == 1):
@@ -372,7 +403,7 @@ def submenu27():
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
-    print("\tpostgres")
+    print("\tpostgres (must be ran on the master)")
     # sets the text color to magenta
     os.system("tput setaf 6")
     print("\t-------------------------------------------------")
@@ -428,7 +459,7 @@ def submenu218():
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
-    print("\tCollecting logs and config files")
+    print("\tCollecting logs and config files (must be ran on the master)")
     # sets the text color to magenta
     os.system("tput setaf 6")
     print("\t-------------------------------------------------")
@@ -570,19 +601,20 @@ def submenu219():
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
-    print("\tDefender (DDoS)")
+    print("\tDefender (DDoS, def.py must be ran on the master. The api's will work locally or remotely)")
     # sets the text color to magenta
     os.system("tput setaf 6")
     print("\t-------------------------------------------------")
     while True:
         print("""
             1.Build up a def.py report, to gather up the defender configuration and running details
-            2.Detection: Whats my current running Defender mitigation branch
-            3.Detection: Get a list of all available secure genome mitigation versions
-            4.Mitigation: Whats my current running Defender mitigation branch
-            5.Mitigation: Get a list of all available secure genome mitigation versions
-            6.Create a custom protection group with ipv4 subnets covering the internet.
-            7.Return""")
+            2.Whats my current running Defender Secure Genome branch version
+            3.Get a list of all available Defender Secure Genome versions
+            4.Show the Defender Secure Genome version history 
+            5.Lookup an ipv4 or ipv6 address in Secure Genome
+            6.Read a list of ipv4 or ipv6 addresses and look up each in Secure Genome, output to a file 
+            7.Create a custom protection group with ipv4 subnets covering the internet.
+            8.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -674,68 +706,42 @@ def submenu219():
             os.system("clear")
             submenu219() 
         elif(ch == 2):
-            print ("Grabbing your clusters current Secure Genome Detection rule set branch")
-            #grab the first API key from the support users list of keys
-            supportKeys = deepy.deepui.get_root_api_keys()
-            firstSupportKey = supportKeys[0]
-            #check its really set, if not ask for a manualy entered key
-            if not firstSupportKey:
-                print ("I did not manage to extract your support user API key, so could you past it here")
-                firstSupportKey=input("Enter your API key: ")
-            else: 
-                #print("The support user API key is " , firstSupportKey)
-                print("")
-            mycmd = ("curl --insecure -X GET https://localhost/api/secure_genome/version/detection?api_key=" + firstSupportKey + " | json_pp" )
+            print ("Grabbing your clusters current Secure Genome branch version")
+            mycmd = ("curl --insecure -X GET https://" + cluster_fqdn + "/api/secure_genome/version?api_key=" + API_Key + " | json_pp" )
             print("\nCommand is:" + mycmd )
             os.system(mycmd)
         elif(ch == 3):
             print ("Getting a list of all available secure genome versions")
-            #grab the first API key from the support users list of keys
-            supportKeys = deepy.deepui.get_root_api_keys()
-            firstSupportKey = supportKeys[0]
-            #check its really set, if not ask for a manualy entered key
-            if not firstSupportKey:
-                print ("I did not manage to extract your support user API key, so could you past it here")
-                firstSupportKey=input("Enter your API key: ")
-            else: 
-                #print("The support user API key is " , firstSupportKey)
-                print("")
-            mycmd = ("curl --insecure -X GET https://localhost/api/secure_genome/versions/detection?api_key=" + firstSupportKey + " | json_pp" )
+            mycmd = ("curl --insecure -X GET https://" + cluster_fqdn + "/api/secure_genome/versions?api_key=" + API_Key + " | json_pp" )
             print("\nCommand is:" + mycmd )
             os.system(mycmd)
         elif(ch == 4):
-            print ("Grabbing your clusters current Secure Genome Mitigation rule branch")
-            #grab the first API key from the support users list of keys
-            supportKeys = deepy.deepui.get_root_api_keys()
-            firstSupportKey = supportKeys[0]
-            #check its really set, if not ask for a manualy entered key
-            if not firstSupportKey:
-                print ("I did not manage to extract your support user API key, so could you past it here")
-                firstSupportKey=input("Enter your API key: ")
-            else: 
-                #print("The support user API key is " , firstSupportKey)
-                print("")
-            mycmd = ("curl --insecure -X GET https://localhost/api/secure_genome/version/mitigation?api_key=" + firstSupportKey + " | json_pp" )
+            print ("Grabbing your clusters Secure Genome version history")
+            mycmd = ("curl --insecure -X GET https://" + cluster_fqdn + "/api/secure_genome/history?api_key=" + API_Key + " | json_pp" )
             print("\nCommand is:" + mycmd )
             os.system(mycmd)
         elif(ch == 5):
-            print ("Getting a list of all available secure genome Mitigation rule set versions")
-            #grab the first API key from the support users list of keys
-            supportKeys = deepy.deepui.get_root_api_keys()
-            firstSupportKey = supportKeys[0]
-            #check its really set, if not ask for a manualy entered key
-            if not firstSupportKey:
-                print ("I did not manage to extract your support user API key, so could you past it here")
-                firstSupportKey=input("Enter your API key: ")
-            else: 
-                #print("The support user API key is " , firstSupportKey)
-                print("")
-            mycmd = ("curl --insecure -X GET https://localhost/api/secure_genome/versions/mitigation?api_key=" + firstSupportKey + " | json_pp" )
+            IP_Address = input("Enter an ipv4 or upv6 address to analyse in Secure Genome: ")
+            mycmd = ("curl --insecure -X GET https://" + cluster_fqdn + "/api/secure_genome/ip/" + IP_Address + "?api_key=" + API_Key + " | json_pp" )
             print("\nCommand is:" + mycmd )
             os.system(mycmd)
-        elif ch == 6:
-            print("\n Look in the Dimensions menu for this one.")
+        elif(ch == 6):
+            IP_List_Filename = input("enter the existing filename which contains the list of ipv4 and ipv6 addresses (one address per line): ")
+            if os.path.exists("my_ip_list_Genome_Lookups.json"):
+               os.remove("my_ip_list_Genome_Lookups.json")
+            if os.path.exists(IP_List_Filename):
+                with open(IP_List_Filename) as f:
+                    for line in f:
+                        mycmd = ("curl --insecure -X GET https://" + cluster_fqdn + "/api/secure_genome/ip/" + line.rstrip() + "?api_key=" + API_Key + " | json_pp | tee -a my_ip_list_Genome_Lookups.json" )
+                        os.system(mycmd)
+                        #print ("DEBUG: line:", line)
+                        #print ("DEBUG: Command is:" + mycmd )
+                    print ("I've processed the ip list and written the Secure Genome output to  file my_ip_list_Genome_Lookups.json for you")
+            else:
+                print ("Sorry that file does not exist")
         elif ch == 7:
+            print("\n Please look in the Dimensions menu option, for this one.")
+        elif ch == 8:
             topmenu()
         else:
             print("Invalid entry")
@@ -812,19 +818,9 @@ def submenu220():
             6.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
-        #grab the first API key from the support users list of keys
-        supportKeys = deepy.deepui.get_root_api_keys()
-        firstSupportKey = supportKeys[0]
-        #check its really set, if not ask for a manualy entered key
-        if not firstSupportKey:
-            print ("I did not manage to extract your support user API key, so could you past it here")
-            firstSupportKey=input("Enter your API key: ")
-        else:
-            #print("The support user API key is " , firstSupportKey)
-            print("")
         if(ch == 1):
             print("Dump a specific dimension, selected from a menu of all configured dimensions")
-            url = 'https://localhost/dimensions/index?attributes=*&api_key=' + firstSupportKey
+            url = 'https://' + cluster_fqdn + '/dimensions/index?attributes=*&api_key=' + API_Key
             #print ("\nDebug url: " , url)
             dimensionlist = requests.get(url, verify=False).json()
             #print ("\nDimensionlist: " , dimensionlist)
@@ -855,7 +851,7 @@ def submenu220():
             print ("You selected dimension name:", dimensionname)
             print ("Which has dimension id:", dimensionuuid)
             print ("Grabbing the dimension details for you")
-            mycmd = ("curl -k --silent -X GET 'https://localhost/dimension/" + str(dimensionuuid) + "?api_key=" + firstSupportKey + "' | json_pp | tee mydimension.json") 
+            mycmd = ("curl -k --silent -X GET 'https://" + cluster_fqdn + "/dimension/" + str(dimensionuuid) + "?api_key=" + API_Key + "' | json_pp | tee mydimension.json") 
             print("Command is:" + mycmd )
             input("Press any key and I'll run the command...")
             os.system(mycmd)
@@ -865,7 +861,7 @@ def submenu220():
             dimension_filename = input("enter the json filename to import the dimension from:")
             DimensionName=input("Enter a name for your new custom dimension: ")
             print("\n\nThe following command will add the JSON in order to create a new data view")
-            mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@" + dimension_filename + "' https://localhost/dimension/" + DimensionName + "?api_key=" + firstSupportKey)
+            mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@" + dimension_filename + "' https://" + cluster_fqdn + "/dimension/" + DimensionName + "?api_key=" + API_Key)
             print("Command is:" + mycmd )
             user_input = input("Input yes and I will create the dimension for you, any other key to do nothing at all:")
             if user_input == 'yes':
@@ -893,7 +889,7 @@ def submenu220():
             DimensionName="ExampleCustomProtectedObject"
             print ("\n\nI will create the example custom dimension / protected object with name ", DimensionName)
             print ("\nThe following command will create the new custom dimension")
-            mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@custom-dimension-example.json' https://localhost/dimension/" + DimensionName + "?api_key=" + firstSupportKey)
+            mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@custom-dimension-example.json' https://" + cluster_fqdn + "/dimension/" + DimensionName + "?api_key=" + API_Key)
             print("Command is:" + mycmd )
             user_input = input("Input yes and I will create the dimension for you, any other key to do nothing at all:")
             if user_input == 'yes':
@@ -1166,7 +1162,7 @@ def submenu220():
                    f.write(str(SubnetList))  
                 print ("\n\nWe will use the Deepscript endpoint to read our csv file and turn it into possitions.")
                 print ("\nThe following command will create the possitions in our custom dimension")
-                mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' --data-binary '@subnet-example.csv' https://localhost/deepscript/dimension/" + DimensionName + "?api_key=" + firstSupportKey)
+                mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' --data-binary '@subnet-example.csv' https://" + cluster_fqdn + "/deepscript/dimension/" + DimensionName + "?api_key=" + API_Key)
                 print("Command is:" + mycmd )
                 user_input = input("Input yes and I will create the possitions for you, any other key to do nothing at all:")
                 if user_input == 'yes':
@@ -1175,7 +1171,7 @@ def submenu220():
                     print("\nDone")
         elif(ch == 4):
             print("Delete a specific dimension, selected from a menu of all configured dimensions")
-            url = 'https://localhost/dimensions/index?attributes=*&api_key=' + firstSupportKey
+            url = 'https://' + cluster_fqdn + '/dimensions/index?attributes=*&api_key=' + API_Key
             #print ("\nDebug url: " , url)
             dimensionlist = requests.get(url, verify=False).json()
             #print ("\nDimensionlist: " , dimensionlist)
@@ -1205,7 +1201,7 @@ def submenu220():
                     dimensionuuid = dimensionlist[key]['dimension_id']
             print ("You selected dimension name:", dimensionname)
             print ("Which has dimension id:", dimensionuuid)
-            mycmd = ("curl -k --silent -X DELETE 'https://localhost/dimension/" + str(dimensionuuid) + "?api_key=" + firstSupportKey + "' | json_pp ") 
+            mycmd = ("curl -k --silent -X DELETE 'https://" + cluster_fqdn + "/dimension/" + str(dimensionuuid) + "?api_key=" + API_Key + "' | json_pp ") 
             print("Command is:" + mycmd )
             user_input = input("Input yes and I will delete the dimension for you, any other key to do nothing at all:")
             if user_input == 'yes':
@@ -1214,7 +1210,7 @@ def submenu220():
                 print("\n\nAll Done")
         if(ch == 5):
             print("Dump the csv for all possitions in a dimension, the dimension is selected from a list of all Dimensions")
-            url = 'https://localhost/dimensions/index?attributes=*&api_key=' + firstSupportKey
+            url = 'https://' + cluster_fqdn + '/dimensions/index?attributes=*&api_key=' + API_Key
             #print ("\nDebug url: " , url)
             dimensionlist = requests.get(url, verify=False).json()
             #print ("\nDimensionlist: " , dimensionlist)
@@ -1245,7 +1241,7 @@ def submenu220():
             print ("You selected dimension name:", dimensionname)
             print ("Which has dimension id:", dimensionuuid)
             print ("Grabbing the dimension positions for you")
-            mycmd = ("curl -k --silent -X GET 'https://localhost/dimension/" + str(dimensionuuid) + "/positions/download?filetype=csv&api_key=" + firstSupportKey + "' | tee example-dimension-position.csv") 
+            mycmd = ("curl -k --silent -X GET 'https://" + cluster_fqdn + "/dimension/" + str(dimensionuuid) + "/positions/download?filetype=csv&api_key=" + API_Key + "' | tee example-dimension-position.csv") 
             print("Command is:" + mycmd )
             input("Press any key and I'll run the command to output the csv...")
             os.system(mycmd)
@@ -1265,7 +1261,7 @@ def submenu212():
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
-    print("\tDeepfield Networking")
+    print("\tDeepfield Networking (must be ran on the master)")
     # sets the text color to magenta
     os.system("tput setaf 6")
     print("\t-------------------------------------------------")
@@ -1355,7 +1351,7 @@ def submenu214():
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
-    print("\tDeepfield MOPS and Backups")
+    print("\tDeepfield MOPS and Backups (must be ran on the master)")
     # sets the text color to magenta
     os.system("tput setaf 6")
     print("\t-------------------------------------------------")
@@ -1413,7 +1409,7 @@ def submenu215():
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
-    print("\tHDFS")
+    print("\tHDFS (must be ran on the master)")
     # sets the text color to magenta
     os.system("tput setaf 6")
     print("\t-------------------------------------------------")
@@ -1461,25 +1457,15 @@ def submenu216():
             5.Get a list of all interfaces via the interface dimension (this is a big list, perhaps the next one is better)
             6.Get a list of interfaces for a given router via the interface dimension
             7.Build a router model from an existing router, so you can add/remove interfaces using the devices api 
-            8.Set a single specified routers interface to 'active' true/false
-            9.count 'active' for all interfaces on a specified router
-            10.Set all interfaces on a specified router to 'active' true/false (receiving flow)
-            11.count 'active' for all interfaces on all routers
-            12.Set all interfaces 'active' true/false on all routers
+            8.Set a single specified routers interface to 'active' true/false (psql so must be on master)
+            9.count 'active' for all interfaces on a specified router (psql so must be on master)
+            10.Set all interfaces on a specified router to 'active' true/false (receiving flow) (psql so must be on master)
+            11.count 'active' for all interfaces on all routers (psql so must be on master)
+            12.Set all interfaces 'active' true/false on all router (psql so must be on master)s
             13.Overwrite a specified routers interface name, intended for config rules (works but then gets reset to router name + ifname )
             14.Debugging hints
             15.Return""")
         print("\n")
-        #grab the first API key from the support users list of keys
-        supportKeys = deepy.deepui.get_root_api_keys()
-        firstSupportKey = supportKeys[0]
-        #check its really set, if not ask for a manualy entered key
-        if not firstSupportKey:
-            print ("I did not manage to extract your support user API key, so could you past it here")
-            firstSupportKey=input("Enter your API key: ")
-        else: 
-            #print("The support user API key is " , firstSupportKey)
-            print("")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
             print("To see the Device API Topology Schema, point your browser here ")
@@ -1489,24 +1475,24 @@ def submenu216():
             print("https://" + re.sub("^[a-z]+\.", "", socket.gethostname())+ "/docs/api/devices/utilization")
         elif(ch == 3):
             print("Method GET is as of 5.4 not supported, so this command will fail. Only POST is supported")
-            print("curl --insecure -X GET 'https:/localhost/api/devices/topology?api_key=" + firstSupportKey + "'")
+            print("curl --insecure -X GET 'https:/" + cluster_fqdn + "/api/devices/topology?api_key=" + API_Key + "'")
             print("I've provided an alternative more complex methods in the following options")
         elif(ch == 4):
             print("Get a list of routers and attributes using the routers dimension")
-            mycmd = ("curl --insecure -X GET 'https://localhost/dimension/router/positions?&attributes=(*)&api_key=" + firstSupportKey + "' | tee routerlist.json")
+            mycmd = ("curl --insecure -X GET 'https://" + cluster_fqdn + "/dimension/router/positions?&attributes=(*)&api_key=" + API_Key + "' | tee routerlist.json")
             print("Command is:" + mycmd )
             os.system(mycmd)
             print("\n\nI've written the output to file routerlist.json for you")
         elif(ch == 5):
             print("Get a list of all interfaces via the interface dimension")
-            mycmd = ("curl --insecure -X GET 'https://localhost/dimension/interfaces/positions?&attributes=(*)&api_key=" + firstSupportKey + "' | tee interfacelist.json")
+            mycmd = ("curl --insecure -X GET 'https://" + cluster_fqdn + "/dimension/interfaces/positions?&attributes=(*)&api_key=" + API_Key + "' | tee interfacelist.json")
             print("Command is:" + mycmd )
             os.system(mycmd)
             print("\n\nI've written the output to file interfacelist.json for you")
         elif(ch == 6):
             print("Get a list of interfaces for a given router via the interface dimension")
-            #url = 'https://localhost/dimension/router/positions?api_key=' + firstSupportKey
-            url = 'https://localhost/dimension/router/positions?attributes=*&api_key=' + firstSupportKey
+            #url = 'https://' + cluster_fqdn + '/dimension/router/positions?api_key=' + API_Key
+            url = 'https://' + cluster_fqdn + '/dimension/router/positions?attributes=*&api_key=' + API_Key
             routerlist = requests.get(url, verify=False).json()
             #for debug the two lines below prints the json
             json_formatted_routerlist = json.dumps(routerlist, indent=2)
@@ -1532,7 +1518,7 @@ def submenu216():
             print ("You selected Router name:", routername)
             print ("That Router has possition:", routerpossition)
             print ("The following command will get the router interfaces")
-            mycmd = ("curl --insecure -X GET 'https://localhost/dimension/interfaces/positions?filter=(interface:router_pos_id,=," + str(routerpossition) + ")&attributes=(*)&api_key=" + firstSupportKey + "' | tee myrouterinterfacelist.json")
+            mycmd = ("curl --insecure -X GET 'https://" + cluster_fqdn + "/dimension/interfaces/positions?filter=(interface:router_pos_id,=," + str(routerpossition) + ")&attributes=(*)&api_key=" + API_Key + "' | tee myrouterinterfacelist.json")
             print("Command is:" + mycmd )
             input("Press any key and I'll run the command...")
             os.system(mycmd)
@@ -1544,7 +1530,7 @@ def submenu216():
             print("This one works around the missing GET in devices API")
             print("I am Building up the router model from several places")
             #start by listing all routers and askign the user to pick one 
-            url = 'https://localhost/dimension/router/positions?attributes=*&api_key=' + firstSupportKey
+            url = 'https://' + cluster_fqdn + '/dimension/router/positions?attributes=*&api_key=' + API_Key
             routerlist = requests.get(url, verify=False).json()
             #for debug the two lines below prints the json containing all of the router info
             #json_formatted_routerlist = json.dumps(routerlist, indent=2)
@@ -1573,7 +1559,7 @@ def submenu216():
                     routerflowip = routerlist[key]['router']['flow_ip']
             #
             #get the router interfaces
-            url = 'https://localhost/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + firstSupportKey
+            url = 'https://' + cluster_fqdn + '/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + API_Key
             routerinterfaces = requests.get(url, verify=False).json()
             #for debug the line below prints the json containing all of the router interfaces
             #print ("\nDebug url: " + url)
@@ -1616,7 +1602,7 @@ def submenu216():
             file.write(topologyjson)
             file.close
             #now show the command to provision the router model
-            mycmd = ("curl --insecure -X POST -d '@topologyConfigFile.json' https://localhost/api/devices/topology?api_key=" + firstSupportKey)
+            mycmd = ("curl --insecure -X POST -d '@topologyConfigFile.json' https://" + cluster_fqdn + "/api/devices/topology?api_key=" + API_Key)
             print("I have created a file for you topologyConfigFile.json with the routers topology model")
             print("Check the file over carefully")
             print("The device API POST is an update")
@@ -1633,7 +1619,7 @@ def submenu216():
             print ("Set a single routers interface to active true/false (receiving flow)")
             #first get a router from the list
             #start by listing all routers and askign the user to pick one 
-            url = 'https://localhost/dimension/router/positions?attributes=*&api_key=' + firstSupportKey
+            url = 'https://' + cluster_fqdn + '/dimension/router/positions?attributes=*&api_key=' + API_Key
             routerlist = requests.get(url, verify=False).json()
             #for debug the two lines below prints the json containing all of the router info
             #json_formatted_routerlist = json.dumps(routerlist, indent=2)
@@ -1659,7 +1645,7 @@ def submenu216():
                     routerpossition = routerlist[key]['position_id']
                     routerflowip = routerlist[key]['router']['flow_ip']
             # now have the user select the router interface they want to enable/disable from a list
-            url = 'https://localhost/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + firstSupportKey
+            url = 'https://' + cluster_fqdn + '/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + API_Key
             routerinterfacelist = requests.get(url, verify=False).json()
             #for debug the two lines below prints the json containing all of the router info
             json_formatted_routerinterfacelist = json.dumps(routerinterfacelist, indent=2)
@@ -1709,7 +1695,7 @@ def submenu216():
             print ("Count the 'active' settings t/f/[blank] on all interfaces of a specified router")
             #first get a router from the list
             #start by listing all routers and ask the user to pick one 
-            url = 'https://localhost/dimension/router/positions?attributes=*&api_key=' + firstSupportKey
+            url = 'https://' + cluster_fqdn + '/dimension/router/positions?attributes=*&api_key=' + API_Key
             routerlist = requests.get(url, verify=False).json()
             #for debug the two lines below prints the json containing all of the router info
             #json_formatted_routerlist = json.dumps(routerlist, indent=2)
@@ -1735,7 +1721,7 @@ def submenu216():
                     routerpossition = routerlist[key]['position_id']
                     routerflowip = routerlist[key]['router']['flow_ip']
             # now have the user select the router interface they want to enable/disable from a list
-            url = 'https://localhost/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + firstSupportKey
+            url = 'https://' + cluster_fqdn + '/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + API_Key
             routerinterfacelist = requests.get(url, verify=False).json()
             #for debug the two lines below prints the json containing all of the router info
             json_formatted_routerinterfacelist = json.dumps(routerinterfacelist, indent=2)
@@ -1751,7 +1737,7 @@ def submenu216():
             print ("Set all interfaces on a specified router to active true/false (receiving flow)")
             #first get a router from the list
             #start by listing all routers and ask the user to pick one 
-            url = 'https://localhost/dimension/router/positions?attributes=*&api_key=' + firstSupportKey
+            url = 'https://' + cluster_fqdn + '/dimension/router/positions?attributes=*&api_key=' + API_Key
             routerlist = requests.get(url, verify=False).json()
             #for debug the two lines below prints the json containing all of the router info
             #json_formatted_routerlist = json.dumps(routerlist, indent=2)
@@ -1777,7 +1763,7 @@ def submenu216():
                     routerpossition = routerlist[key]['position_id']
                     routerflowip = routerlist[key]['router']['flow_ip']
             # now have the user select the router interface they want to enable/disable from a list
-            url = 'https://localhost/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + firstSupportKey
+            url = 'https://' + cluster_fqdn + '/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + API_Key
             routerinterfacelist = requests.get(url, verify=False).json()
             #for debug the two lines below prints the json containing all of the router info
             json_formatted_routerinterfacelist = json.dumps(routerinterfacelist, indent=2)
@@ -1847,7 +1833,7 @@ def submenu216():
             print ("this works, name and display_name change. However on the next update they are set back to the router name + ifname by the system")
             #first get a router from the list
             #start by listing all routers and askign the user to pick one 
-            url = 'https://localhost/dimension/router/positions?attributes=*&api_key=' + firstSupportKey
+            url = 'https://' + cluster_fqdn + '/dimension/router/positions?attributes=*&api_key=' + API_Key
             routerlist = requests.get(url, verify=False).json()
             #for debug the two lines below prints the json containing all of the router info
             #json_formatted_routerlist = json.dumps(routerlist, indent=2)
@@ -1873,7 +1859,7 @@ def submenu216():
                     routerpossition = routerlist[key]['position_id']
                     routerflowip = routerlist[key]['router']['flow_ip']
             # now have the user select the router interface they want to enable/disable from a list
-            url = 'https://localhost/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + firstSupportKey
+            url = 'https://' + cluster_fqdn + '/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + API_Key
             routerinterfacelist = requests.get(url, verify=False).json()
             #for debug the two lines below prints the json containing all of the router info
             json_formatted_routerinterfacelist = json.dumps(routerinterfacelist, indent=2)
@@ -1967,20 +1953,10 @@ def submenu217():
             9.Delete an existing data view
             10.Return""")
         print("\n")
-        #grab the first API key from the support users list of keys
-        supportKeys = deepy.deepui.get_root_api_keys()
-        firstSupportKey = supportKeys[0]
-        #check its really set, if not ask for a manualy entered key
-        if not firstSupportKey:
-            print ("I did not manage to extract your support user API key, so could you past it here")
-            firstSupportKey=input("Enter your API key: ")
-        else: 
-            #print("The support user API key is " , firstSupportKey)
-            print("")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
             print("To see the data view API Schema, point your browser here ")
-            mycmd = ("curl --insecure --silent -X OPTIONS 'https://localhost/api/data_views/?api_key=" + firstSupportKey + "' | json_pp | tee dataviewschema.json")
+            mycmd = ("curl --insecure --silent -X OPTIONS 'https://" + cluster_fqdn + "/api/data_views/?api_key=" + API_Key + "' | json_pp | tee dataviewschema.json")
             os.system(mycmd)
             print("Command was:" + mycmd )
             print("\n\nI've written the schema output to file dataviewschema.json for you")
@@ -1989,29 +1965,29 @@ def submenu217():
             print("For an example traffic query, show me how to find the data view that was used")
             print("-------------------------")
             print("Lets take the following simple query,\n   15 minutes of traffic\n   dimensions=timestamp&sites\n   top 100\n   output format csv")
-            mycmd = ("curl -k -X GET 'https://localhost/cube/traffic.csv?slice=timestamp(-15minutes:now)&dimensions=timestamp,sites&measures=sum.total.bytes&api_key=" + firstSupportKey + "&a=top(auto,n:100)'")
+            mycmd = ("curl -k -X GET 'https://" + cluster_fqdn + "/cube/traffic.csv?slice=timestamp(-15minutes:now)&dimensions=timestamp,sites&measures=sum.total.bytes&api_key=" + API_Key + "&a=top(auto,n:100)'")
             print("Command is:" + mycmd )
             input("Press any key and I'll run the command...")
             os.system(mycmd)
             print("-------------------------")
             print("In order to find the data view the system used we just need to modify our query to json and grep for view_name")
             print("Hint: For very long query results json_pp can hang, in which case use jq . instead")
-            mycmd = ("curl -k --silent -X GET 'https://localhost/cube/traffic.json?slice=timestamp(-15minutes:now)&dimensions=timestamp,sites&measures=sum.total.bytes&api_key=" + firstSupportKey + "&a=top(auto,n:100)' | json_pp | grep view_name")
+            mycmd = ("curl -k --silent -X GET 'https://" + cluster_fqdn + "/cube/traffic.json?slice=timestamp(-15minutes:now)&dimensions=timestamp,sites&measures=sum.total.bytes&api_key=" + API_Key + "&a=top(auto,n:100)' | json_pp | grep view_name")
             print("Command is:" + mycmd )
             input("Press any key and I'll run the command...")
             os.system(mycmd)
             print("----all done-------")
         elif(ch == 3):
             print ("Get a list of all data views via the data view API, write to a file (this is a big list, perhaps the next one is better)")
-            mycmd = ("curl -k --silent -X GET 'https://localhost/api/data_views/?api_key=" + firstSupportKey + "' | json_pp | tee dataviewsdump.json") 
+            mycmd = ("curl -k --silent -X GET 'https://" + cluster_fqdn + "/api/data_views/?api_key=" + API_Key + "' | json_pp | tee dataviewsdump.json") 
             print("Command is:" + mycmd )
             input("Press any key and I'll run the command...")
             os.system(mycmd)
             print("I've send the output to file dataviewsdump.json")
         elif(ch == 4):
             print("Dump a specific data view, selected from a menu of all configured data views")
-            #url = 'https://localhost/dimension/router/positions?api_key=' + firstSupportKey
-            url = 'https://localhost/api/data_views/?attributes=*&api_key=' + firstSupportKey
+            #url = 'https://' + cluster_fqdn + '/dimension/router/positions?api_key=' + API_Key
+            url = 'https://' + cluster_fqdn + '/api/data_views/?attributes=*&api_key=' + API_Key
             dataviewlist = requests.get(url, verify=False).json()
             #for debug the two lines below prints the json
             json_formatted_dataviewlist = json.dumps(dataviewlist, indent=2)
@@ -2040,14 +2016,14 @@ def submenu217():
                     dataviewuuid = key['uuid']
             print ("You selected data view name:", dataviewname)
             print ("Grabbing the dataview details for you")
-            mycmd = ("curl -k --silent -X GET 'https://localhost/api/data_views/" + dataviewuuid + "?api_key=" + firstSupportKey + "' | json_pp | tee mydataview.json") 
+            mycmd = ("curl -k --silent -X GET 'https://" + cluster_fqdn + "/api/data_views/" + dataviewuuid + "?api_key=" + API_Key + "' | json_pp | tee mydataview.json") 
             print("Command is:" + mycmd )
             input("Press any key and I'll run the command...")
             os.system(mycmd)
             print("\n\nI've written the output to file mydataview.json for you")
         elif(ch == 5):
             print("Starhub example case: Create a new custom ddos data view for regs (long retention) - A step by step")
-            url = 'https://localhost/api/data_views/?attributes=*&api_key=' + firstSupportKey
+            url = 'https://' + cluster_fqdn + '/api/data_views/?attributes=*&api_key=' + API_Key
             CustomDDOSDataView = """{
    "timestep_retention_days" : {
       "10s" : 7,
@@ -2133,7 +2109,7 @@ def submenu217():
             with open('ddos-baseline-example.json', 'w') as f:
                f.write(str(CustomDDOSDataView))   
             print ("\n\nThe following command will create the new ddos dataview")
-            mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@ddos-baseline-example.json' https://localhost/api/data_views/?api_key=" + firstSupportKey)
+            mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@ddos-baseline-example.json' https://" + cluster_fqdn + "/api/data_views/?api_key=" + API_Key)
             print("Command is:" + mycmd )
             user_input = input("Input yes and I will create the dataview for you, any other key to do nothing at all:")
             if user_input == 'yes':
@@ -2145,7 +2121,7 @@ def submenu217():
                 print ("doing nothing. You can use the curl above to create the dataview yourself")
         elif(ch == 6):
             print("LGU+ example case: Create a new custom ddos data view sliced on a custom protection group - A step by step")
-            url = 'https://localhost/api/data_views/?attributes=*&api_key=' + firstSupportKey
+            url = 'https://' + cluster_fqdn + '/api/data_views/?attributes=*&api_key=' + API_Key
             CustomDDOSDataView = """{
    "timestep_retention_days" : {
       "5min" : 30 
@@ -2230,7 +2206,7 @@ def submenu217():
             with open('ddos-baseline-example.json', 'w') as f:
                f.write(str(CustomDDOSDataView))   
             print ("\n\nThe following command will create the new ddos dataview")
-            mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@ddos-baseline-example.json' https://localhost/api/data_views/?api_key=" + firstSupportKey)
+            mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@ddos-baseline-example.json' https://" + cluster_fqdn + "/api/data_views/?api_key=" + API_Key)
             print("Command is:" + mycmd )
             user_input = input("Input yes and I will create the dataview for you, any other key to do nothing at all:")
             if user_input == 'yes':
@@ -2238,7 +2214,7 @@ def submenu217():
                 print("\nRunning Command: " + mycmd )
                 os.system(mycmd)
                 print("\n\nGive it an hour and the following example query should hit your new dataview")
-                print("\ncurl -k --silent -X GET 'https://localhost/cube/traffic.json?slice=timestamp(-60minutes:now)&dimensions=timestamp,ddos,origin_asn.src,max_ttl,min_ttl,protocol,tcpflags,category,country.src,addr.src,addr.dst,port.src,port.dst&measures=avg.bps,pctl95.bps,percent_total(sum.bytes)&apply=sort(timestamp,asc)&apply=top(all,n:100)&apply=timestep(5min,5min)&bs=((boundary.peering.input,true))&slice:or=(ExampleCustomProtectedObject.dst!(None))&slice:or=(category(12))&api_key=31UO2fiKwinzYl' | jq . | grep view_name")
+                print("\ncurl -k --silent -X GET 'https://" + cluster_fqdn + "/cube/traffic.json?slice=timestamp(-60minutes:now)&dimensions=timestamp,ddos,origin_asn.src,max_ttl,min_ttl,protocol,tcpflags,category,country.src,addr.src,addr.dst,port.src,port.dst&measures=avg.bps,pctl95.bps,percent_total(sum.bytes)&apply=sort(timestamp,asc)&apply=top(all,n:100)&apply=timestep(5min,5min)&bs=((boundary.peering.input,true))&slice:or=(ExampleCustomProtectedObject.dst!(None))&slice:or=(category(12))&api_key=31UO2fiKwinzYl' | jq . | grep view_name")
                 print("\nAll Done")
             else:
                 print ("doing nothing. You can use the curl above to create the dataview yourself")
@@ -2248,7 +2224,7 @@ def submenu217():
             print("hint2: build data views with 30min, 2hr and day timesteps from a parent view with a 5min timestamp and the same dimensions, base_view for example. you cannot use 10s")
             data_view_filename = input("enter the json filename to import the data view from:")
             print("\n\nThe following command will add the JSON in order to create a new data view")
-            mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@" + data_view_filename + "' https://localhost/api/data_views/?api_key=" + firstSupportKey)
+            mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@" + data_view_filename + "' https://" + cluster_fqdn + "/api/data_views/?api_key=" + API_Key)
             print("Command is:" + mycmd )
             user_input = input("Input yes and I will create the data view for you, any other key to do nothing at all:")
             if user_input == 'yes':
@@ -2260,7 +2236,7 @@ def submenu217():
                 print ("doing nothing. You can use the curl above to create the data view yourself")
         elif(ch == 8):
             print("Patch an existing data view retention - A step by step")
-            url = 'https://localhost/api/data_views/?attributes=*&api_key=' + firstSupportKey
+            url = 'https://' + cluster_fqdn + '/api/data_views/?attributes=*&api_key=' + API_Key
             dataviewlist = requests.get(url, verify=False).json()
             #for debug the two lines below prints the json
             json_formatted_dataviewlist = json.dumps(dataviewlist, indent=2)
@@ -2290,7 +2266,7 @@ def submenu217():
             print ("You selected data view name:", dataviewname)
             #print ("DEBUG: lastmodified:", lastmodified)
             print ("Dumping the current data view JSON for this view")
-            mycmd = ("curl -k --silent -X GET 'https://localhost/api/data_views/" + dataviewuuid + "?api_key=" + firstSupportKey + "' | json_pp | tee example_dataview.json") 
+            mycmd = ("curl -k --silent -X GET 'https://" + cluster_fqdn + "/api/data_views/" + dataviewuuid + "?api_key=" + API_Key + "' | json_pp | tee example_dataview.json") 
             print("Command is:" + mycmd )
             os.system(mycmd)
             print("\n\nLets change the retention days\n")
@@ -2339,7 +2315,7 @@ def submenu217():
             with open('patch-data-view.json', 'w') as f:
                 f.write(strValue)
             print("\n\nThe following command will patch the data view retention")
-            mycmd = ("curl --insecure -X PATCH -H 'Content-Type: application/json' -d '@patch-data-view.json' https://localhost/api/data_views/?api_key=" + firstSupportKey)
+            mycmd = ("curl --insecure -X PATCH -H 'Content-Type: application/json' -d '@patch-data-view.json' https://" + cluster_fqdn + "/api/data_views/?api_key=" + API_Key)
             print("\nCommand is:" + mycmd )
             user_input = input("\nInput yes and I will create the data view for you, any other key to do nothing at all:")
             if user_input == 'yes':
@@ -2350,7 +2326,7 @@ def submenu217():
                 print ("doing nothing. You can use the curl above to create the data view yourself")
         elif(ch == 9):
             print ("Delete an existing data view")
-            url = 'https://localhost/api/data_views/?attributes=*&api_key=' + firstSupportKey
+            url = 'https://' + cluster_fqdn + '/api/data_views/?attributes=*&api_key=' + API_Key
             dataviewlist = requests.get(url, verify=False).json()
             json_formatted_dataviewlist = json.dumps(dataviewlist, indent=2)
             user_input = ''
@@ -2376,8 +2352,8 @@ def submenu217():
                     dataviewuuid = key['uuid']
             print ("You selected data view name:", dataviewname)
             print("\n\nThe following command will delete that data view")
-            #mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@example_dataview.json' https://localhost/api/data_views/?api_key=" + firstSupportKey)
-            mycmd = ("curl -k --silent -X DELETE 'https://localhost/api/data_views/" + dataviewuuid + "?api_key=" + firstSupportKey + "' ")
+            #mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' -d '@example_dataview.json' https://" + cluster_fqdn + "/api/data_views/?api_key=" + API_Key)
+            mycmd = ("curl -k --silent -X DELETE 'https://" + cluster_fqdn + "/api/data_views/" + dataviewuuid + "?api_key=" + API_Key + "' ")
             print("Command is:" + mycmd )
             user_input = input("WARNING: Input yes and I will delete the data view for you, any other key to do nothing at all:")
             if user_input == 'yes':
@@ -2401,7 +2377,7 @@ def submenu29():
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
-    print("\tDeepfield Kafka")
+    print("\tDeepfield Kafka (must be ran on the master)")
     # sets the text color to magenta
     os.system("tput setaf 6")
     print("\t-------------------------------------------------")
@@ -2673,8 +2649,37 @@ def makeTempDir():
 def replace_last(string, old, new):
     return new.join(string.rsplit(old, 1))
 
+def get_api_key():
+    if RunningOnMaster == 'no':
+        print ("You are not running on a master node, so you will have to provide your API key manually")
+        API_Key=input("Enter your API key: ")
+    else: 
+        #We are running on a mater node
+        #So grab the first API key from the support users list of keys using deepy
+        API_Keys = deepy.deepui.get_root_api_keys()
+        API_Key = API_Keys[0]
+        #check its really set, if not ask for a manualy entered key
+        if not API_Key:
+            print ("I did not manage to extract your support user API key, so could you please paste it here")
+            API_Key=input("Enter your API key: ")
+        else: 
+            print("Using the following API key for queries: " , API_Key)
+    return (API_Key)
+
+def get_cluster_fqdn():
+    if RunningOnMaster == 'no':
+        print ("You are not running on a master node, so you will have to provide your Deepfield clusters API fqdn manually example: mycluster.deepfield.net")
+        cluster_fqdn=input("Enter your clusters fqdn: ")
+        print ("Please keep in mind that while menu items using the APIs will work,  some other menu items will not work on a remote host,")
+        print ("As the master nodes commands will not be available")
+        input("Press any key to continue...")
+    else: 
+        cluster_fqdn = "localhost" 
+    print("Using the following fqdn for API queries: " , cluster_fqdn)
+    return (cluster_fqdn)
+
 # Main program  
+API_Key = get_api_key()
+cluster_fqdn = get_cluster_fqdn()
 topmenu() 
-
-
 

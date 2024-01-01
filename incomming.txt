@@ -1,3 +1,24 @@
+
+network audit (dynamic vs static config)
+========================================
+every deployment seems to have issues with networking dynamic config vs static
+every deploymet on power cycle looses service as a result. 
+on route I've seen so many issues, though having a tool to audit would help. 
+
+dump the dynamic config using ip ss etc. not net-tools
+dump the static config
+compare. 
+find missing static routes in either direction, static config vs dynamic config
+find missing interfaces in either direction, static config vs dynamic config
+look at interfaces for the following and alert.
+	no gateway (I've seen route add 0.0.0.0/0)
+	static routes that are ran as up rather than post-up which end up missing on boot
+	static routes that use route , net-tools was removed by default 10 yearsa go use ip route
+	1500 MTU's especially on the inter links 
+	routes shoudl be indented under the applicable interface not at the end
+	dns-nameservers should be indented under an interface owning the gateway not at the end
+
+
 queries
 =======
 directing a query to a dpecific data view , uses the uuid from the data views ui 
