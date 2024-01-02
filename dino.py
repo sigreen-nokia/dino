@@ -96,7 +96,7 @@ def topmenu():
             3.Deepfield Cluster Health
             4.Deepfield Cluster Configuration 
             5.Queries the customer is using most frequently (view optimization, thanks ato)
-            6.mysql (empty)
+            6.mysql (not used anymore)
             7.postgres
             8.impala (empty)
             9.kafka
@@ -125,7 +125,9 @@ def topmenu():
         elif ch == 5:
             submenu25() 
         elif ch == 6:
-            os.system("date")
+            print("mysql is not longer used in Deepfield, the sub menu has been removed, see the postgres menu")
+            input("Press any key to return to the menu")
+            topmenu()
         elif ch == 7:
             submenu27() 
         elif ch == 8:
@@ -178,9 +180,9 @@ def submenu22():
     print("\t-------------------------------------------------")
     while True:
         print("""
-            1.Traffic reports
-            2.Sub-i Reports
-            3.DDoS Reports
+            1.Traffic: 
+            2.Sub-i: 
+            3.DDoS:
             4.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))

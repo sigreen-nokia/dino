@@ -44,8 +44,6 @@ cat /pipedream/cache/config/dnf/dnf_mitigation_rules_5_0.json | json_pp
 cat /pipedream/cache/config/dnf/dnf_mitigation_rules_5_1.json | json_pp
 cat /pipedream/cache/config/dnf/dnf_mitigation_rules_5_3.json | json_pp
 cat /pipedream/cache/config/dnf/dnf_mitigation_rules_5_4.json | json_pp
-#version stable beta lagacy via api 
-curl -k 'https://127.0.0.1/api/secure_genome/version/detection?api_key=5t0xuVHgegvEkN'
 # detection rules from genome
 curl --insecure 'https://localhost/dimension/371/positions/download?&attributes=(*)&api_key=5bD2Aale9knBz3' | tee dimesion_detection_possitions.json
 #From the docs
@@ -71,11 +69,6 @@ other
     #sudo birdc show protocols
     #sudo birdc show route protocol session_217_41_168_0 | wc -l
     #for file in /proc/*/status ; do awk '/VmSwap|Name/{printf $2 " " $3}END{ print ""}' $file; done | sort -k 2 -n -r
-    #mysql (<5.2)
-    #mysql -u root -e "show databases";
-    #mysql -u root -e "use defender_bt-tactical; show tables;"
-    #mysql -u root -e "use defender_bt-tactical; describe Interfaces;"
-    #postgres  (5.2+)
     #impala-shell
     #redis-cli keys "*license.json" | xargs redis-cli del
     #flow tracing
