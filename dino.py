@@ -1280,7 +1280,8 @@ def submenu212():
             11.test connectivity to Deepfield genome
             12.test connectivity to Deepfield metrics 
             13.dump /etc/network/interfaces for all nodes
-            14.Return""")
+            14.dump every DCU's static and dynamic network configuration to file /home/support/network-all-files-all-hosts.tar.gz, placed on every DCU. Usefull before a reboot.
+            15.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -1336,7 +1337,74 @@ def submenu212():
             mycmd = "sudo salt \* cmd.run \"cat /etc/network/interfaces\""
             print("Command is:" + mycmd )
             os.system(mycmd)
-        elif ch == 14:
+        elif(ch == 14):
+            print("\t-------------------------------------------------")
+            print ("Step 1)Cleaning up old tar files")
+            print("\t-------------------------------------------------")
+            mycmd = ("sudo salt \* cmd.run \"rm -f /pipedream/tmp/network-config* || true\"")
+            print("Command is:" + mycmd )
+            mycmd = ("sudo rm -f /pipedream/tmp/network-all-files-all-hosts.tar.gz")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+            os.system("tput setaf 6")
+            print("\t-------------------------------------------------")
+            print ("Step 2)tar'ing and zip'ing up the network config files on all DCUs,")
+            print("\t-------------------------------------------------")
+            ####here 
+            mycmd = "sudo salt \* cmd.run \"echo ****ip-addr-show*** > /pipedream/tmp/network-config-dynamic-config.`hostname`.txt\""
+            os.system(mycmd)
+            mycmd = "sudo salt \* cmd.run \"ip addr show | tee -a /pipedream/tmp/network-config-dynamic-config.`hostname`.txt\""
+            os.system(mycmd)
+            mycmd = "sudo salt \* cmd.run \"echo ****ifconfig*** >> /pipedream/tmp/network-config-dynamic-config.`hostname`.txt\""
+            os.system(mycmd)
+            mycmd = "sudo salt \* cmd.run \"ifconfig | tee -a /pipedream/tmp/network-config-dynamic-config.`hostname`.txt\""
+            os.system(mycmd)
+            mycmd = "sudo salt \* cmd.run \"echo ****netstat-rn*** >> /pipedream/tmp/network-config-dynamic-config.`hostname`.txt\""
+            os.system(mycmd)
+            mycmd = "sudo salt \* cmd.run \"netstat -rn | tee -a /pipedream/tmp/network-config-dynamic-config.`hostname`.txt\""
+            os.system(mycmd)
+            mycmd = ("sudo salt -t 3600 \* cmd.run 'tar czvf /pipedream/tmp/network-config.`hostname`.tar.gz /etc/network/interfaces /etc/network/interfaces.d /etc/resolv.conf /etc/hosts /pipedream/tmp/network-config-dynamic-config* || true'")
+            os.system(mycmd)
+            os.system("tput setaf 6")
+            print("\t-------------------------------------------------")
+            print ("Step3) Setting file permissions")
+            print("\t-------------------------------------------------")
+            mycmd = ("sudo salt \* cmd.run 'chown support:support /pipedream/tmp/network-config.`hostname`.tar.gz'")
+            os.system(mycmd)
+            os.system("tput setaf 6")
+            print("\t-------------------------------------------------")
+            print ("Step 4)Copying the files from the workers back to master")
+            print("\t-------------------------------------------------")
+            mycmd = ("for i in $(awk '{if(/mgmt/ && /worker/){print $1}}' /etc/hosts); do scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q $i:/pipedream/tmp/network-config.worker*.tar.gz /pipedream/tmp; done")
+            os.system(mycmd)
+            os.system("tput setaf 6")
+            print("\t-------------------------------------------------")
+            print ("Step 5)tar'ing up the tar files into one big file")
+            print("\t-------------------------------------------------")
+            mycmd = ("tar cvf /pipedream/tmp/network-all-files-all-hosts.tar.gz /pipedream/tmp/network-config.*.tar.gz")
+            os.system(mycmd)
+            os.system("tput setaf 6")
+            print("\t-------------------------------------------------")
+            print ("Step 6)Clean up")
+            print("\t-------------------------------------------------")
+            mycmd = ("sudo salt \* cmd.run \"rm -f /pipedream/tmp/network-config* || true\"")
+            os.system(mycmd)
+            os.system("tput setaf 6")
+            print("\t-------------------------------------------------")
+            print ("Step 7)Copying the big zip file back out to all the workers")
+            print("\t-------------------------------------------------")
+            mycmd = ("for i in $(awk '{if(/mgmt/){print $1}}' /etc/hosts); do scp -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -q /pipedream/tmp/network-all-files-all-hosts.tar.gz $i:/home/support/network-all-files-all-hosts.tar.gz; done")
+            os.system(mycmd)
+            os.system("tput setaf 6")
+            print("All Done") 
+            print("\n\n=====================================================================================================") 
+            print("The resultant file /pipedream/tmp/network-all-files-all-hosts.tar.gz") 
+            print("is on all DCU's and contains every DCU's dynamic and static network configuration") 
+            print("=====================================================================================================") 
+            input("Press enter to return to the menu")
+            os.system("clear")
+            submenu212()
+        elif ch == 15:
             topmenu()
         else:
             print("Invalid entry")
