@@ -19,7 +19,8 @@
 ## How do I use it 
 
 * drop it onto a Deepfield DCU and run 
-* python dino.py 
+* python3 dino.py 
+* you can also run it remotely for the API menu options (it will realise and prompt for the api key and fqdn)
 
 You will see a menu like this one..   
 
