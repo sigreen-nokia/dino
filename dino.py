@@ -1282,8 +1282,9 @@ def submenu212():
             11.test connectivity to Deepfield genome
             12.test connectivity to Deepfield metrics 
             13.dump /etc/network/interfaces for all nodes
-            14.dump every DCU's static and dynamic network configuration to file /home/support/network-all-files-all-hosts.tar.gz, placed on every DCU. Usefull before a reboot.
-            15.Return""")
+            14.dump DCU's network configuration to all DCU's file /home/support/network-all-files-all-hosts.tar.gz, Use before a reboot.
+            15.Audit the DCUs network configuration, static and dynamic
+            16.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -1344,15 +1345,12 @@ def submenu212():
             print ("Step 1)Cleaning up old tar files")
             print("\t-------------------------------------------------")
             mycmd = ("sudo salt \* cmd.run \"rm -f /pipedream/tmp/network-config* || true\"")
-            print("Command is:" + mycmd )
             mycmd = ("sudo rm -f /pipedream/tmp/network-all-files-all-hosts.tar.gz")
-            print("Command is:" + mycmd )
             os.system(mycmd)
             os.system("tput setaf 6")
             print("\t-------------------------------------------------")
             print ("Step 2)tar'ing and zip'ing up the network config files on all DCUs,")
             print("\t-------------------------------------------------")
-            ####here 
             mycmd = "sudo salt \* cmd.run \"echo ****ip-addr-show*** > /pipedream/tmp/network-config-dynamic-config.`hostname`.txt\""
             os.system(mycmd)
             mycmd = "sudo salt \* cmd.run \"ip addr show | tee -a /pipedream/tmp/network-config-dynamic-config.`hostname`.txt\""
@@ -1406,7 +1404,149 @@ def submenu212():
             input("Press enter to return to the menu")
             os.system("clear")
             submenu212()
-        elif ch == 15:
+        elif(ch == 15):
+            print ("====================================================")
+            print ("Sumarising the running dynamic network configuration")
+            print ("====================================================")
+            ip_interface_names_ifconfig = get_dynamic_interface_name_list_ifconfig()
+            if ip_interface_names_ifconfig:
+                print(f"ifconfig Interface Names: {ip_interface_names_ifconfig}")
+            else: 
+                print(f"No ifconfig Interface Names")
+            for InterfaceName in get_dynamic_interface_name_list_ifconfig(): 
+                #ip_addresses = get_dynamic_interface_ips_ip(InterfaceName)
+                ip_addresses = get_dynamic_interface_ips_ifconfig(InterfaceName)
+                if ip_addresses:
+                    print(f"IP addresses of {InterfaceName}: {ip_addresses}")
+                else:
+                    print(f"No IP address found for {InterfaceName}")
+
+            dynamic_static_routes = get_dynamic_static_routes()
+            if dynamic_static_routes:
+                print(f"Dynamic Static Routes: {dynamic_static_routes}")
+            else: 
+                print(f"No Dynamnic Static Routes")
+
+            print ("===========================================")
+            print ("Sumarising the static network configuration")
+            print ("===========================================")
+            static_ip_interface_names = get_static_interface_name_list()
+            if static_ip_interface_names:
+                print(f"Static IP Interface Names: {static_ip_interface_names}")
+            else: 
+                print(f"No IP Interface Names")
+            for Static_InterfaceName in get_static_interface_name_list():
+                static_ip_addresses = get_static_interface_ip(Static_InterfaceName)
+                if static_ip_addresses:
+                    print(f"IP addresses of {Static_InterfaceName}: {static_ip_addresses}")
+                else:
+                    print(f"No IP address found for {Static_InterfaceName}")
+
+            print ("====================================================================================")
+            print ("Checking for interface name differences between the static and dynamic configuration")
+            print ("====================================================================================")
+            print ("####Checking for dynamic interfaces that are missing in static config###")
+            interface_name_differences = diff_list2_list1(get_static_interface_name_list(),get_dynamic_interface_name_list_ifconfig())
+            if interface_name_differences:
+                print(f"CRITICAL: The following interface names are present in ifconfig")
+                print(f"CRITICAL: However are missing in your static config /etc/network/interfaces or /etc/network/interfaces.d/*:") 
+                print(f"CRITICAL:{interface_name_differences}")
+                print(f"CRITICAL: If you restart the node you will most likely loose these interfaces")
+            else: 
+                print(f"No interface name differences were found between ifconfig and /etc/network/*")
+            print ("####Checking for static config that is missing in the dynamic interfaces####")
+            interface_name_differences = diff_list1_list2(get_static_interface_name_list(),get_dynamic_interface_name_list_ifconfig())
+            if interface_name_differences:
+                print(f"CRITICAL: The following interface names are present in static config /etc/network/interfaces or /etc/network/interfaces.d/*")
+                print(f"CRITICAL: However are missing in ifconfig") 
+                print(f"CRITICAL:{interface_name_differences}")
+                print(f"CRITICAL: If you restart these new static interfaces may appear and cause a problem")
+            else: 
+                print(f"No interface name differences were found between /etc/network/* and ifconfig")
+
+            print ("==========================================================================================")
+            print ("Checking for interface ip address differences between the static and dynamic configuration")
+            print ("==========================================================================================")
+            print ("####Checking for dynamic interfaces that are missing in static config####")
+            interface_ip_differences = diff_list2_list1(get_static_interface_ip_list(),get_dynamic_interface_ip_list())
+            if interface_ip_differences:
+                print(f"CRITICAL: The following interface ip addresses are present in ifconfig")
+                print(f"CRITICAL: However are missing in your static config /etc/network/interfaces or /etc/network/interfaces.d/*:") 
+                print(f"CRITICAL:{interface_ip_differences}")
+                print(f"CRITICAL: If you restart the node you will most likely loose these ip addresses")
+            else: 
+                print(f"No interface ip address differences were found between ifconfig and /etc/network/*")
+            print ("####Checking for static config that is missing in the dynamic interfaces####")
+            interface_ip_differences = diff_list1_list2(get_static_interface_ip_list(),get_dynamic_interface_ip_list())
+            if interface_ip_differences:
+                print(f"CRITICAL: The following interface ip addresses are present in static config /etc/network/interfaces or /etc/network/interfaces.d/*")
+                print(f"CRITICAL: However are missing in ifconfig") 
+                print(f"CRITICAL:{interface_ip_differences}")
+                print(f"CRITICAL: If you restart these new static interfaces may appear and cause a problem")
+            else: 
+                print(f"No interface ip address differences were found between /etc/network/* and ifconfig")
+
+#here 
+            print ("========================================================================================================")
+            print ("Check the number of static routes in static config matches the number of static routes in dynamic config")
+            print ("========================================================================================================")
+            static_static_routes=(get_static_static_routes())
+            number_of_static_static_routes=len(static_static_routes)
+            dynamic_static_routes=(get_dynamic_static_routes())
+            number_of_dynamic_static_routes=len(dynamic_static_routes)
+            #print ("DEBUG: number_of_static_static_routes.count:", number_of_static_static_routes)
+            #print ("DEBUG: number_of_dynamic_static_routes.count:", number_of_dynamic_static_routes)
+            if number_of_static_static_routes != number_of_dynamic_static_routes:
+                print (f"CRITICAL:The number of static routes in config does not match the number of static routes running in the OS")
+                print (f"CRITICAL:On the next restart you will likely end up loosing or gaining static routes, which will impact service")
+                print (f"CRITICAL:Here are the static routes I can find in your network configuration /etc/networks/*\n")
+                print (static_static_routes)
+                print (f"CRITICAL:Here are the static routes I can find in the runing kernel 'ip route show'\n")
+                print (dynamic_static_routes)
+                print (f"CRITICAL:You need to fix this\n")
+            else:
+                print (f"The number of static routes in config vs kernal match")
+                print (f"The number of Static routes in config={number_of_static_static_routes}")
+                print (f"The number of Static routes running in the kernel={number_of_dynamic_static_routes}")
+            print ("============================================================")
+            print ("Audit the static network configuration against best practise")
+            print ("============================================================")
+            #check whether routes are being added with up or post up
+            if check_static_route_post_up():
+                print(f"\nWARNING: #####Best practise: configuring static routes (1)######") 
+                print(f"WARNING: I see these static routes in your configuration files") 
+                print(check_static_route_post_up()) 
+                print(f"WARNING: So your network configuration files in /etc/networks use 'up route' to create static routes") 
+                print(f"WARNING: This can result in timing issues and race conditions where the route is not added on boot/powerup") 
+                print(f"WARNING: Best practice would be to use 'post-up' in place of 'up'") 
+                print(f"WARNING: 'post-up route' should also be indented under the interface you wish to add the static route to") 
+                print(f"WARNING: Not placed at the end of the file with no indent") 
+            #check whether routes are being added using net-tools 
+            if check_static_route_add():
+                print(f"\nWARNING: #####Best practise: configuring static routes (2)######") 
+                print(f"WARNING: I see these static routes in your configuration files") 
+                print(check_static_route_post_up()) 
+                print(f"WARNING: The 'route add' comand comes from the optional package net-tools") 
+                print(f"WARNING: net-tools 'route add' was depreciated  back in 2001, replaced by 'ip route add'") 
+                print(f"WARNING: You should consider changing your static routes to use 'ip route add'") 
+                print(f"WARNING: Remember to test a restart after the change") 
+            #check whether jumbo frames are being used 
+            if check_static_mtu():
+                print(f"\nWARNING: #####Best practise: configuring jumbo frames (mtu 9000)######") 
+                print(f"WARNING: I am not seeing any mtu's set in your interface configuration") 
+                print(f"WARNING: Which means all of your ethernet packets will have an mtu of 1500 or less") 
+                print(f"WARNING: Flow typically arrives with an mtu of 1500 or less anyway") 
+                print(f"WARNING: But for example, inter DCU traffic will be working very hard, sending 6x as many packets as it needs to") 
+                print(f"WARNING: This is especially problematic for VM's or servers with cheap SW focused  NIC's") 
+                print(f"WARNING: Most DC's have supported jumbo frames for many years now") 
+                print(f"WARNING: We are running jumbo frames in many of our deployments, you might consider migrating to use the same here") 
+
+            print ("===========================================================================")
+            print ("==================================All Done=================================")
+            print ("===========================================================================")
+
+
+        elif ch == 16:
             topmenu()
         else:
             print("Invalid entry")
@@ -2747,6 +2887,217 @@ def get_cluster_fqdn():
         cluster_fqdn = "localhost" 
     print("Using the following fqdn for API queries: " , cluster_fqdn)
     return (cluster_fqdn)
+
+def get_dynamic_interface_ips_ip(interface):
+    #Get IP addresses for a given network interface from ip addr show
+    command = f"ip addr show {interface}"
+    output = subprocess.check_output(command, shell=True).decode()
+    #print ("DEBUG: get_dynamic_interface_ips_ifconfig: output:", output)
+    ip_pattern = r'inet\s+(\d+\.\d+\.\d+\.\d+)'
+    match = re.findall(ip_pattern, output)
+    if match:
+        match = sorted(match)
+        #print ("DEBUG: get_dynamic_interface_ips_ifconfig: match:", match)
+        return match 
+    else:
+        return None
+
+def get_dynamic_interface_ips_ifconfig(interface):
+    #Get IP addresses for a given network interface from ifconfig
+    command = f"ifconfig {interface}"
+    output = subprocess.check_output(command, shell=True).decode()
+    #print ("DEBUG: get_dynamic_interface_ips_ifconfig: output:", output)
+    ip_pattern = r'inet addr:+(\d+\.\d+\.\d+\.\d+)'
+    match = re.findall(ip_pattern, output)
+    if match:
+        match = sorted(match)
+        #print ("DEBUG: get_dynamic_interface_ips_ifconfig: match:", match)
+        return match
+    else:
+        return None
+
+def get_dynamic_interface_name_list_ip():
+    #Get a list of all ip links interface name from ip addr shows
+    result = "" 
+    command = f"ip link show | grep \"^[0-9]\" | cut -d\" \" -f2 | sed \"s/://\" | sed \"s/@.*//\""
+    output = subprocess.check_output(command, shell=True).decode()
+    #remove blank lines
+    output = os.linesep.join([s for s in output.splitlines() if s])
+    #print ("DEBUG: interface_name_list output:", output)
+    if output:
+        InterfaceList = list(output.split("\n"))
+        InterfaceList = sorted(InterfaceList)
+        #print ("DEBUG: interface_name_list InterfaceList:", InterfaceList)
+        return InterfaceList 
+    else:
+        print ("ERROR: no ip link show interfaces found")
+        return None
+
+def get_dynamic_interface_name_list_ifconfig():
+    #Get a list of all ip links interface names from ifconfig
+    result = "" 
+    command = f"ifconfig | grep Link | cut -d\" \" -f1 | sed \"/^$/d\""
+    output = subprocess.check_output(command, shell=True).decode()
+    #remove blank lines
+    output = os.linesep.join([s for s in output.splitlines() if s])
+    #print ("DEBUG: interface_name_list output:", output)
+    if output:
+        IfconfigInterfaceList = list(output.split("\n"))
+        IfconfigInterfaceList = sorted(IfconfigInterfaceList)
+        #print ("DEBUG: interface_name_list IfconfigInterfaceList:", IfconfigInterfaceList)
+        return IfconfigInterfaceList 
+    else:
+        print ("ERROR: no ifconfig interfaces found")
+        return None
+#here
+def get_dynamic_static_routes():
+    command = f"ip route show | grep via"
+    output = subprocess.check_output(command, shell=True).decode()
+    #print ("DEBUG: get_dynamic_static_routes: output:\n", output)
+    output = os.linesep.join([s for s in output.splitlines() if s])
+    if output:
+        DynamicStaticRoutes  = list(output.split("\n"))
+        DynamicStaticRoutes = sorted(DynamicStaticRoutes)
+        #print ("DEBUG: get_dynamic_static_routes: DynamicStaticRoutes:\n", DynamicStaticRoutes)
+        return DynamicStaticRoutes 
+    else:
+        return None
+
+def get_static_static_routes():
+    command = f"cat /etc/network/interfaces /etc/network/interfaces.d/* | grep -e \"route add\" -e \"gateway\""
+    output = subprocess.check_output(command, shell=True).decode()
+    #print ("DEBUG: get_static_static_routes: output:\n", output)
+    output = os.linesep.join([s for s in output.splitlines() if s])
+    if output:
+        StaticStaticRoutes  = list(output.split("\n"))
+        StaticStaticRoutes = sorted(StaticStaticRoutes)
+        #print ("DEBUG: get_static_static_routes: StaticStaticRoutes:\n", StaticStaticRoutes)
+        return StaticStaticRoutes 
+    else:
+        return None
+
+
+def get_static_interface_name_list():
+    #Get a list of all interfaces files interface names
+    result = ""
+    command = f"cat /etc/network/interfaces /etc/network/interfaces.d/* | grep \"^auto\|^allow-hotplug\" | cut -d\" \" -f2"
+    output = subprocess.check_output(command, shell=True).decode()
+    #remove blank lines
+    output = os.linesep.join([s for s in output.splitlines() if s])
+    #print ("DEBUG: static_interface_name_list output:", output)
+    if output:
+        InterfaceList = list(output.split("\n"))
+        InterfaceList = sorted(InterfaceList)
+        #print ("DEBUG: interface_name_list InterfaceList:", InterfaceList)
+        return InterfaceList
+    else:
+        print ("ERROR: no ip link show interfaces found")
+        return None
+
+def diff_list2_list1(list1,list2):
+    #diff two lists
+    #print ("DEBUG: diff_list2_list1: list1:", list1)
+    #print ("DEBUG: diff_list2_list1: list2:", list2)
+    ListDiff = []
+    for element in list2 or []:
+        if element not in list1:
+            ListDiff.append(element)
+    #print ("DEBUG: diff_list2_list1: ListDiff:", ListDiff)
+    return(ListDiff)
+
+def diff_list1_list2(list1,list2):
+    #diff two lists
+    #print ("DEBUG: diff_list1_list2: list1:", list1)
+    #print ("DEBUG: diff_list1_list2: list2:", list2)
+    ListDiff = []
+    for element in list1 or []:
+        if element not in list2:
+            ListDiff.append(element)
+    #print ("DEBUG: diff_list1_list2: ListDiff:", ListDiff)
+    return(ListDiff)
+
+def get_static_interface_ip(interface):
+    #Get IP addresses for a given network interface from static config
+    #here we look for iface {interface name} then grab the block up to the next empoty line or end of file
+    command = f"cat /etc/network/interfaces /etc/network/interfaces.d/* | sed -n '/iface {interface} /,/^$/p'"
+    output = subprocess.check_output(command, shell=True).decode()
+    #print ("DEBUG: get_static_interface_ip output:", output)
+    ip_pattern = r'address\s+(\d+\.\d+\.\d+\.\d+)'
+    match = re.findall(ip_pattern, output)
+    if match:
+        match = sorted(match)
+        #print ("DEBUG: get_static_interface_ip match:", match)
+        return match
+    else:
+        return None
+
+def get_static_interface_ip_list():
+     #makes a sorted list of interface ip addresses for all interfaces fron static config
+     static_ip_addresses = []
+     for Static_InterfaceName in get_static_interface_name_list():
+         #print ("DEBUG: get_static_interface_ip_list: Static_InterfaceName:", Static_InterfaceName)
+         my_static_ip_addresses=get_static_interface_ip(Static_InterfaceName)
+         #for interfaces with no ip address we get a return None, convert to a list format
+         if my_static_ip_addresses is None:
+             my_static_ip_addresses = ['']
+         static_ip_addresses.append(my_static_ip_addresses)
+     if static_ip_addresses:
+         #print ("DEBUG: get_static_interface_ip_list: static_ip_addresses:", static_ip_addresses)
+         static_ip_addresses = sorted(static_ip_addresses)
+         #print ("DEBUG: get_static_interface_ip_list: static_ip_addresses sorted:", static_ip_addresses)
+         return static_ip_addresses
+     else:
+          return None 
+
+def get_dynamic_interface_ip_list():
+     #makes a sorted list of interface ip addresses for all interfaces fron dynamic config
+     dynamic_ip_addresses = []
+     for Dynamic_InterfaceName in get_dynamic_interface_name_list_ifconfig():
+         #print ("DEBUG: get_dynamic_interface_ip_list: Dynamic_InterfaceName:", Dynamic_InterfaceName)
+         my_dynamic_ip_addresses=get_dynamic_interface_ips_ifconfig(Dynamic_InterfaceName)
+         #for interfaces with no ip address we get a return None, convert to a list format
+         if my_dynamic_ip_addresses is None:
+             my_dynamic_ip_addresses = [''] 
+         #the local interface gets given a loopback ip address in ifconfig, but on in static config, so we should omit this one as a difference
+         if my_dynamic_ip_addresses == ['127.0.0.1']:
+             my_dynamic_ip_addresses = [''] 
+         dynamic_ip_addresses.append(my_dynamic_ip_addresses)
+     if dynamic_ip_addresses:
+         #print ("DEBUG: get_dynamic_interface_ip_list: dynamic_ip_addresses:", dynamic_ip_addresses)
+         dynamic_ip_addresses = sorted(dynamic_ip_addresses)
+         #print ("DEBUG: get_dynamic_interface_ip_list: dynamic_ip_addresses sorted:", dynamic_ip_addresses)
+         return dynamic_ip_addresses
+     else:
+         return None 
+
+
+def check_static_route_post_up():
+    command = f"cat /etc/network/interfaces /etc/network/interfaces.d/* | grep \"up route\" | grep -v \"post-up route\""
+    output = subprocess.check_output(command, shell=True).decode()
+    #print ("DEBUG: check_static_route_post_up:", output)
+    if output:
+        return output 
+    else:
+        return None 
+
+def check_static_route_add():
+    command = f"cat /etc/network/interfaces /etc/network/interfaces.d/* | grep \"route add\" | grep -v \"ip route add\""
+    output = subprocess.check_output(command, shell=True).decode()
+    #print ("DEBUG: check_static_route_route_add:", output)
+    if output:
+        return output 
+    else:
+        return None 
+
+def check_static_mtu():
+    command = f"cat /etc/network/interfaces /etc/network/interfaces.d/* | grep \"mtu\""
+    output = subprocess.check_output(command, shell=True).decode()
+    #print ("DEBUG: check_static_mtu:", output)
+    if output:
+        return output 
+    else:
+        return None 
+
 
 # Main program  
 API_Key = get_api_key()

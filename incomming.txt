@@ -134,3 +134,13 @@ I'm gettign fed up with nodes gettign lost and n one having the interfaces files
 add a menu item to backup all network dynamic and static config opn all nodes for all nodes. 
 So we always have a backup
 
+
+------------------
+bt after master restart
+
+sudo salt -G "roles:subi_ingest" cmd.run 'systemctl restart debezium-connector-postgres'
+fg
+repmgr cluster show
+soup restart collectd
+
+
