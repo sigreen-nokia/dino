@@ -18,6 +18,9 @@ look at interfaces for the following and alert.
 	routes shoudl be indented under the applicable interface not at the end
 	dns-nameservers should be indented under an interface owning the gateway not at the end
 
+debugging
+=========
+salt sysctl find any service which is not running on any dcu
 
 queries
 =======
@@ -142,5 +145,10 @@ sudo salt -G "roles:subi_ingest" cmd.run 'systemctl restart debezium-connector-p
 fg
 repmgr cluster show
 soup restart collectd
+
+-----------------------
+impala
+
+curl --silent http://localhost:25010/ | grep -A 3 Status 
 
 
