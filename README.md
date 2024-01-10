@@ -122,7 +122,8 @@ You will see a menu like this one..
                 4.show the kafka df-classifyd consumer groups 
                 5.show the kafka df-flow topic and partitions 
                 6.Return
-    
+   
+
     	-------------------------------------------------
     	Deepfield Networking (must be ran on the master)
     	-------------------------------------------------
@@ -140,8 +141,11 @@ You will see a menu like this one..
                 11.test connectivity to Deepfield genome
                 12.test connectivity to Deepfield metrics 
                 13.dump /etc/network/interfaces for all nodes
-                14.Return
-    
+                14.dump DCU's network configuration to all DCU's file /home/support/network-all-files-all-hosts.tar.gz, Use before a reboot.
+                15.Audit the DCUs network configuration, static and dynamic
+                16.Return
+
+
     	-------------------------------------------------
     	Deepfield MOPS and Backups (must be ran on the master)
     	-------------------------------------------------
