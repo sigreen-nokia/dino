@@ -426,9 +426,9 @@ else:
             print(f"No IP address found for {Static_InterfaceName} in /etc/networks/*")
 static_static_routes = get_static_static_routes()
 if static_static_routes:
-    print(f"Staticaly configured Static Routes found in /etc/networks/*: {static_static_routes}")
+    print(f"Statically configured Static Routes found in /etc/networks/*: {static_static_routes}")
 else:
-    print(f"No staticaly configured Static Routes found in /etc/networks/*")
+    print(f"No statically configured Static Routes found in /etc/networks/*")
 
 print ("====================================================================================")
 print ("Checking for interface name differences between the static and dynamic configuration")
