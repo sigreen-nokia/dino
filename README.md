@@ -23,7 +23,32 @@
 * python3 dino.py 
 * you can also run it remotely for the API menu options (it will realise and prompt for the api key and fqdn)
 
-You will see a menu like this one..   
+## Can I install it permanently
+
+* it may already be installed..
+* optionaly on the Master run these commands
+* cp dino.py /usr/local/sbin/ 
+* cp get_context.py /usr/local/sbin/ 
+* chmod a+x /usr/local/sbin/dino.py 
+* chmod a+x /usr/local/sbin/get_context.py 
+
+## Can I run it locally on my laptop
+
+* Yes you run it elsewhere
+* If for example you run it on your laptop, it will prompt you for the api key and cluster fqdn as it can't derive them
+* Menu options using Deepfield API's will still work fine
+* Menu options using local tools, salt for example, will just fail with command not found, as they need the master node
+* This can be helpfull for customer without master node access, to learn how to use our API's
+
+## How can I add new steps
+
+* edit the code yourself and commit to master
+* or    
+* email simon.green and ask if he can add it for you
+        
+
+
+Run it and you will see a menu like this one..   
 
     	-------------------------------------------------
     	Dino - Deepfield customer engineer trainer
@@ -264,29 +289,107 @@ You will see a menu like this one..
          LOCAL(0)        .LOCL.          14 l  36d   64    0    0.000    0.000   0.000
         +master.ite. 12.34.567.241    4 u  589 1024  377    0.586  -20.116  14.507
 
- 
-## Can I install it permanently 
 
-* it may already be installed.. 
-* optionaly on the Master run these commands
-* cp dino.py /usr/local/sbin/ 
-* cp get_context.py /usr/local/sbin/ 
-* chmod a+x /usr/local/sbin/dino.py 
-* chmod a+x /usr/local/sbin/get_context.py 
-
-## Can I run it locally on my laptop
-
-* Yes you run it elsewhere 
-* If for example you run it on your laptop, it will prompt you for the api key and cluster fqdn as it can't derive them
-* Menu options using Deepfield API's will still work fine
-* Menu options using local tools, salt for example, will just fail with command not found, as they need the master node
-* This can be helpfull for customer without master node access, to learn how to use our API's
-
-## How can I add new steps
-
-* edit the code yourself and commit to master    
-* or 
-* email simon.green and ask if he can add it for you 
-
-
-
+    Here is an example of a network audit that found some problems. Menu item 12 then 15
+    
+    bt-lab2-master:
+        ====================================================
+        Sumarising the running dynamic network configuration
+        ====================================================
+        ifconfig Interface Names: ['bond0', 'bond0.2100', 'bond0.2101', 'bond0.2101:1', 'bond0.2101:2', 'bond0.2102', 'bond0.2102:1', 'dummy10', 'eth0', 'eth1']
+        No IP address found for bond0
+        IP addresses of bond0.2100: ['192.168.0.1']
+        IP addresses of bond0.2101: ['10.22.237.4']
+        IP addresses of bond0.2101:1: ['10.22.237.100']
+        IP addresses of bond0.2101:2: ['10.22.237.101']
+        IP addresses of bond0.2102: ['10.22.237.132']
+        IP addresses of bond0.2102:1: ['10.22.146.2']
+        IP addresses of dummy10: ['10.20.30.40']
+        No IP address found for eth0
+        No IP address found for eth1
+        Dynamically configured Static Routes: ['52.206.103.227 via 10.22.237.1 dev bond0.2101 ', 'default via 10.22.237.1 dev bond0.2101 onlink ']
+        ==========================================================
+        Sumarising the static network configuration /etc/network/*
+        ==========================================================
+        Static IP Interface Names: ['bond0', 'bond0.2100', 'bond0.2101', 'bond0.2101:1', 'bond0.2101:2', 'bond0.2102', 'bond0.2102:1', 'eth0', 'eth1', 'eth5']
+        No IP address found for bond0 in /etc/networks/*
+        IP addresses of bond0.2100: ['192.168.0.1']
+        IP addresses of bond0.2101: ['10.22.237.4']
+        IP addresses of bond0.2101:1: ['10.22.237.100']
+        IP addresses of bond0.2101:2: ['10.22.237.101']
+        IP addresses of bond0.2102: ['10.22.237.132']
+        IP addresses of bond0.2102:1: ['10.22.146.2']
+        No IP address found for eth0 in /etc/networks/*
+        No IP address found for eth1 in /etc/networks/*
+        IP addresses of eth5: ['10.20.30.70']
+        Staticaly configured Static Routes found in /etc/networks/*: ['  gateway 10.22.237.1', '  up route add -net 52.206.103.227 netmask 255.255.255.255 gw 10.22.237.1']
+        ====================================================================================
+        Checking for interface name differences between the static and dynamic configuration
+        ====================================================================================
+        ####Checking for dynamic interfaces that are missing in static config###
+        CRITICAL: The following interface names are present in ifconfig
+        CRITICAL: However are missing in your static config /etc/network/interfaces or /etc/network/interfaces.d/*:
+        CRITICAL:['dummy10']
+        CRITICAL: If you restart the node you will most likely loose these interfaces
+        ####Checking for static config that is missing in the dynamic interfaces####
+        CRITICAL: The following interface names are present in static config /etc/network/interfaces or /etc/network/interfaces.d/*
+        CRITICAL: However are missing in ifconfig
+        CRITICAL:['eth5']
+        CRITICAL: If you restart these new static interfaces may appear and cause a problem
+        ==========================================================================================
+        Checking for interface ip address differences between the static and dynamic configuration
+        ==========================================================================================
+        ####Checking for dynamic interfaces that are missing in static config####
+        CRITICAL: The following interface ip addresses are present in ifconfig
+        CRITICAL: However are missing in your static config /etc/network/interfaces or /etc/network/interfaces.d/*:
+        CRITICAL:[['10.20.30.40']]
+        CRITICAL: If you restart the node you will most likely loose these ip addresses
+        ####Checking for static config that is missing in the dynamic interfaces####
+        CRITICAL: The following interface ip addresses are present in static config /etc/network/interfaces or /etc/network/interfaces.d/*
+        CRITICAL: However are missing in ifconfig
+        CRITICAL:[['10.20.30.70']]
+        CRITICAL: If you restart these new static interfaces may appear and cause a problem
+        ========================================================================================================
+        Check the number of static routes in static config matches the number of static routes in dynamic config
+        ========================================================================================================
+        The number of static routes in config vs kernal match
+        The number of Static routes in config=2
+        The number of Static routes running in the kernel=2
+        =====================================================================================
+        Audit the static network configuration files in /etc/networks/* against best practise
+        =====================================================================================
+        
+        ###Check whether we are configuring static routes with 'up' which can be problematic on reboot,  or 'post-up'
+        
+        WARNING: #####Best practise: configuring static routes (1)######
+        WARNING: I see these static routes in your configuration files
+        ['  up route add -net 52.206.103.227 netmask 255.255.255.255 gw 10.22.237.1']
+        WARNING: So your network configuration files in /etc/networks use 'up route' to create static routes
+        WARNING: This can result in timing issues and race conditions where the route is not added on boot/powerup
+        WARNING: Best practice would be to use 'post-up' in place of 'up'
+        WARNING: 'post-up route or post-up ip route' should also be indented under the interface you wish to add the static route to
+        WARNING: Not placed at the end of the file with no indent
+        
+        ###Check whether routes are being added using net-tools, which is quite old and has been replaced with ip tools
+        
+        WARNING: #####Best practise: configuring static routes (2)######
+        WARNING: I see these static routes in your configuration files
+        ['  up route add -net 52.206.103.227 netmask 255.255.255.255 gw 10.22.237.1']
+        WARNING: The 'route add' comand comes from the optional package net-tools
+        WARNING: net-tools 'route add' was depreciated  back in 2001, replaced by 'ip route add'
+        WARNING: You should consider changing your static routes to use 'ip route add'
+        WARNING: Remember to test a restart after the change
+        
+        ###Check whether we are using jumbo frames, or are sending all packets (even intra DCU packets) with a small <1500 MTUs
+        
+        We are setting mtu in the network static config. This is a good way to reduce the network overhead on the CPU, especually in VM's
+        ===========================================================================
+        ==================================All Done=================================
+        ===========================================================================
+    ------------------------------
+    ----------All Done-----------
+    -----------------------------
+    
+    
+    
+    
