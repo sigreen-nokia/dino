@@ -36,8 +36,8 @@
 
 ## Can I run it locally on my laptop
 
-* Yes you run it elsewhere
-* If for example you run it on your laptop, it will prompt you for the api key and cluster fqdn as it can't derive them
+* Yes you can run it from anywhere with python 
+* If for example you run it on your laptop, it will realise its not a master node and prompt you for the api key and cluster fqdn as it can't derive them
 * Menu options using Deepfield API's will still work fine
 * Menu options using local tools, salt for example, will just fail with command not found, as they need the master node
 * This can be helpfull for customer without master node access, to learn how to use our API's
