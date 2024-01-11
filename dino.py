@@ -1282,7 +1282,7 @@ def submenu212():
             11.test connectivity to Deepfield genome
             12.test connectivity to Deepfield metrics 
             13.dump /etc/network/interfaces for all nodes
-            14.dump DCU's network configuration to all DCU's file /home/support/network-all-files-all-hosts.tar.gz, Use before a reboot.
+            14.dump all DCU's network configuration to all DCU's file /home/support/network-all-files-all-hosts.tar.gz, Use before a reboot.
             15.Audit the DCUs network configuration, static and dynamic
             16.Return""")
         print("\n")
