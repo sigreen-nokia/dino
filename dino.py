@@ -2037,8 +2037,8 @@ def submenu217():
             2.For an example traffic query, show me how to find the data view that was used
             3.Get a list of all data views via the API, write to a file (this is a big list, perhaps the next one is better)
             4.Dump a specific data view, selected from a menu of all configured data views 
-            5.Starhub Example Case:Create a new custom ddos data view for regs (high retention) - A step by step using an example
-            6.LGU+ Example Case: Create a new custom ddos data view sliced on a custom protection group - A step by step using an example
+            5.Example Case:Create a new custom ddos data view for regs (high retention) - A step by step using an example
+            6.Example Case: Create a new custom ddos data view sliced on a custom protection group - A step by step using an example
             7.Create a new data view from a json file - A step by step
             8.Patch an existing data view retention - A step by step
             9.Delete an existing data view
@@ -2116,7 +2116,7 @@ def submenu217():
             os.system(mycmd)
             print("\n\nI've written the output to file mydataview.json for you")
         elif(ch == 5):
-            print("Starhub example case: Create a new custom ddos data view for regs (long retention) - A step by step")
+            print("Example case: Create a new custom ddos data view for regs (long retention) - A step by step")
             url = 'https://' + cluster_fqdn + '/api/data_views/?attributes=*&api_key=' + API_Key
             CustomDDOSDataView = """{
    "timestep_retention_days" : {
@@ -2214,7 +2214,7 @@ def submenu217():
             else:
                 print ("doing nothing. You can use the curl above to create the dataview yourself")
         elif(ch == 6):
-            print("LGU+ example case: Create a new custom ddos data view sliced on a custom protection group - A step by step")
+            print("Example case: Create a new custom ddos data view sliced on a custom protection group - A step by step")
             url = 'https://' + cluster_fqdn + '/api/data_views/?attributes=*&api_key=' + API_Key
             CustomDDOSDataView = """{
    "timestep_retention_days" : {
