@@ -2042,8 +2042,8 @@ def submenu217():
             7.Create a new data view from a json file - A step by step
             8.Patch an existing data view retention - A step by step
             9.Delete an existing data view
-            10.Log the current calculated disk space each data view
-            11.Configure a daily CRON job to log the current calculated disk space each data view
+            10.Log the current calculated disk space for each data view 
+            11.Configure a daily CRON job to log the current calculated disk space each data view to /pipedream/log/
             12.Remove the daily CRON job to log the current calculated disk space each data view
             13.Return""")
         print("\n")
@@ -2458,32 +2458,29 @@ def submenu217():
                 print ("doing nothing. You can use the curl above to delete the data view yourself")
         elif ch == 10:
 #here add the --options to the log-dataview so it does not prompt unless they are missing command, forget the master checks
-            print ("Logging the current calculated disk space each data view")
+            print ("Logging the current calculated disk space for each data view")
             print ("Appending the output to files {} and {}".format(str(disk_space_filename_sorted),str(disk_space_filename)))
-            mycmd = ("python3 log_dataview_size.py")
+            mycmd = ("python3 log_dataview_size.py " + cluster_fqdn + " " + API_Key + " -log_dir .")
+            print("Command is:" + mycmd )
             os.system(mycmd)
         elif ch == 11:
-            print ("Install a daily cron on mast to log the current calculated disk space each data view")
+            print ("Install a daily cron on mast to log the current calculated disk space each data view to /pipedream/log/")
             input("\nPress enter to continue")
             mycmd = ("sudo cp log_dataview_size.py /usr/local/sbin/log_dataview_size.py")
             os.system(mycmd)
             mycmd = ("sudo chmod a+x /usr/local/sbin/log_dataview_size.py")
             os.system(mycmd)
-            DataViewLogCron = ("#!/bin/sh\npython3 /usr/local/sbin/log_dataview_size.py --fqdn " + cluster_fqdn + " --api_key " + API_Key + " --logdir /var/log/") 
-            if RunningOnMaster == 'no':
-                print ("You are not running on a master node, so I am unable to schedule the cron job for you")
-                print ("The command you will need to schedule to run daily will be something like.. ")
-                print (DataViewLogCron)
-            else:
-                with open('/etc/cron.daily/log_dataview_size', 'w') as f:
-                    f.write(str(DataViewLogCron)) 
+            mycmd = ("(crontab -l 2>/dev/null; echo \"0 1 * * * /usr/bin/python3 /usr/local/sbin/log_dataview_size.py localhost 31UO2fiKwinzYl -log_dir /pipedream/log/\") | crontab -")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+            print ("The cron will log dataview sizes once a day to /pipedream/log/{} and /pipedream/log/{}".format(str(disk_space_filename_sorted),str(disk_space_filename)))
         elif ch == 12:
             print ("Remove the daily cron on master to log the current calculated disk space each data view")
             input("\nPress enter to continue")
-            if RunningOnMaster == 'no':
-                print ("You are not running on a master node, so I am unable to remove the cron job for you")
-            else:
-                os.remove("/etc/cron.daily/log_dataview_size")
+            mycmd = ("crontab -l 2>/dev/null | grep -v '/usr/local/sbin/log_dataview_size.py'  | crontab -")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+            print ("The cron job has been removed")
         elif ch == 13:
             topmenu()
         else:
@@ -2491,7 +2488,6 @@ def submenu217():
         input("\nPress enter to continue")
         os.system("clear")
         submenu217()
-
 def submenu29():
     os.system("clear")
     # sets the text color to magenta

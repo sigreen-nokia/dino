@@ -12,3 +12,4 @@ Thumbs.db
 tmp/
 /incomming.txt
 old/
+__pycache__

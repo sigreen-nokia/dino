@@ -1,15 +1,9 @@
 import os
 import sys
-#import re
-#import subprocess
-#import socket
 import json
 import csv
 import time
 from pathlib import Path
-#from subprocess import check_output as run
-#from datetime import date
-RunningOnMaster = "yes"
 #requests is a must have and is available with pip/pip3
 try:
     import requests
@@ -18,66 +12,59 @@ except ImportError:
     print ("       'pip install requests'")
     print ("       or")
     print ("       'pip3 install requests'")
-    print ("Then rerun dino\n")
+    print ("Then rerun\n")
     sys.exit(1)
-#test for these modules to determine whether we are running on a master of a customers node
+#we install urllibs just to disable cert warnings
 try:
-    import deepy.cfg
+    import urllib3
+    urllib3.disable_warnings()
 except ImportError:
-    RunningOnMaster = "no"
+    print ("\nPlease Install python module urlib3 using")
+    print ("       'pip install urllib3'")
+    print ("       or")
+    print ("       'pip3 install urllib3'")
+    print ("Then rerun\n")
+    sys.exit(1)
+#argparse is a must have and is available with pip/pip3
 try:
-    import deepy.deepui
+    import argparse 
 except ImportError:
-    RunningOnMaster = "no"
-try:
-    import get_context
-except ImportError:
-    RunningOnMaster = "no"
-try:
-    import pandas as pd
-except ImportError:
-    RunningOnMaster = "no"
-try:
-    import deepy.log as log
-except ImportError:
-    RunningOnMaster = "no"
+    print ("\nPlease Install python module argparse using")
+    print ("       'pip install argparse'")
+    print ("       or")
+    print ("       'pip3 install argparse'")
+    print ("Then rerun\n")
+    sys.exit(1)
 
-#functions to work out the fqdn and api key, prompt if this is not a dcu
-def get_api_key():
-    if RunningOnMaster == 'no':
-        print ("You are not running on a master node, so you will have to provide your API key manually")
-        API_Key=input("Enter your API key: ")
-    else:
-        #We are running on a mater node
-        #So grab the first API key from the support users list of keys using deepy
-        API_Keys = deepy.deepui.get_root_api_keys()
-        API_Key = API_Keys[0]
-        #check its really set, if not ask for a manualy entered key
-        if not API_Key:
-            print ("I did not manage to extract your support user API key, so could you please paste it here")
-            API_Key=input("Enter your API key: ")
-        else:
-            print("Using the following API key for queries: " , API_Key)
-    return (API_Key)
+#command line options handler
+parser = argparse.ArgumentParser(description="log_dataview_size",formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+parser.add_argument("fqdn", help="You Deepfleid cluster fqdn or ip adress")
+parser.add_argument("api_key", help="Your Deepfield cluster users API key")
+parser.add_argument("-log_dir", "--log_dir", action="store", default=".", help="The directory to store the log files, Example: /pipedream/log/")
+args = parser.parse_args()
+config = vars(args)
+#print ("DEBUG: :config", config)
+target_dir = Path(args.log_dir)
+API_Key = args.api_key
+cluster_fqdn =  args.fqdn
 
-def get_cluster_fqdn():
-    if RunningOnMaster == 'no':
-        print ("You are not running on a master node, so you will have to provide your Deepfield clusters API fqdn manually example: mycluster.deepfield.net")
-        cluster_fqdn=input("Enter your clusters fqdn: ")
-        print ("Please keep in mind that while menu items using the APIs will work,  some other menu items will not work on a remote host,")
-        print ("As the master nodes commands will not be available")
-        input("Press any key to continue...")
-    else:
-        cluster_fqdn = "localhost"
-    print("Using the following fqdn for API queries: " , cluster_fqdn)
-    return (cluster_fqdn)
+if not target_dir.exists():
+    print("The target directory doesn't exist")
+    raise SystemExit(1)
 
-API_Key = get_api_key()
-cluster_fqdn = get_cluster_fqdn()
+#print ("DEBUG: :target_dir", target_dir)
+#print ("DEBUG: :API_Key", API_Key)
+#print ("DEBUG: :cluster_fqdn", cluster_fqdn)
 
-disk_space_filename=Path("data_view_disk_space.csv")
-disk_space_filename_sorted=Path("data_view_disk_space_sorted.csv")
+#constants
+disk_space_filename=Path(str(target_dir) + "/data_view_disk_space.csv")
+disk_space_filename_sorted=Path(str(target_dir) + "/data_view_disk_space_sorted.csv")
+#print ("DEBUG: disk_space_filename:", disk_space_filename)
+#print ("DEBUG: disk_space_filename_sorted:", disk_space_filename_sorted)
+
 url = 'https://' + cluster_fqdn + '/api/data_views/?api_key=' + API_Key
+#print ("DEBUG: url:", url)
+#Main
 dataviewlist = requests.get(url, verify=False).json()
 json_formatted_dataviewlist = json.dumps(dataviewlist, indent=2)
 #print ("DEBUG: json_formatted_dataviewlist:", json_formatted_dataviewlist)
