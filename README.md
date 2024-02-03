@@ -21,7 +21,7 @@
 
 * drop it onto a Deepfield DCU and run 
 * python3 dino.py 
-* you can also run it remotely for the API menu options (it will realise and prompt for the api key and fqdn)
+* you can also run it remotely for the API menu options (it will realize and prompt for the api key and fqdn)
 
 ## Can I install it permanently
 
@@ -37,7 +37,7 @@
 ## Can I run it locally on my laptop
 
 * Yes you can run it from anywhere with python 
-* If for example you run it on your laptop, it will realise its not a master node and prompt you for the api key and cluster fqdn as it can't derive them
+* If for example you run it on your laptop, it will realize its not a master node and prompt you for the api key and cluster fqdn as it can't derive them
 * Menu options using Deepfield API's will still work fine
 * Menu options using local tools, salt for example, will just fail with command not found, as they need the master node
 * This can be helpfull for customer without master node access, to learn how to use our API's
