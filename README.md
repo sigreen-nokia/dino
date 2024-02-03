@@ -228,7 +228,10 @@ Run it and you will see a menu like this one..
                 7.Create a new data view from a json file - A step by step
                 8.Patch an existing data view retention - A step by step
                 9.Delete an existing data view
-                10.Return
+                10.Log the current calculated disk space for each data view 
+                11.Configure a daily CRON job to log the current calculated disk space each data view to /pipedream/log/
+                12.Remove the daily CRON job to log the current calculated disk space each data view
+                13.Return
     
     
     	-------------------------------------------------
