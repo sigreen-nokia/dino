@@ -223,8 +223,8 @@ Run it and you will see a menu like this one..
                 2.For an example traffic query, show me how to find the data view that was used
                 3.Get a list of all data views via the API, write to a file (this is a big list, perhaps the next one is better)
                 4.Dump a specific data view, selected from a menu of all configured data views 
-                5.Starhub Example Case:Create a new custom ddos data view for regs (high retention) - A step by step using an example
-                6.LGU+ Example Case: Create a new custom ddos data view sliced on a custom protection group - A step by step using an example
+                5.Example Case:Create a new custom ddos data view for regs (high retention) - A step by step using an example
+                6.Example Case: Create a new custom ddos data view sliced on a custom protection group - A step by step using an example
                 7.Create a new data view from a json file - A step by step
                 8.Patch an existing data view retention - A step by step
                 9.Delete an existing data view
