@@ -2043,8 +2043,8 @@ def submenu217():
             8.Patch an existing data view retention - A step by step
             9.Delete an existing data view
             10.Log the current calculated disk space for each data view 
-            11.Configure a daily CRON job to log the current calculated disk space each data view to /pipedream/log/
-            12.Remove the daily CRON job to log the current calculated disk space each data view
+            11.Configure a daily CRON job to log the current calculated disk space for each data view to /pipedream/log/
+            12.Remove the daily CRON job to log the current calculated disk space for each data view
             13.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
@@ -2457,7 +2457,6 @@ def submenu217():
             else:
                 print ("doing nothing. You can use the curl above to delete the data view yourself")
         elif ch == 10:
-#here add the --options to the log-dataview so it does not prompt unless they are missing command, forget the master checks
             print ("Logging the current calculated disk space for each data view")
             print ("Appending the output to files {} and {}".format(str(disk_space_filename_sorted),str(disk_space_filename)))
             mycmd = ("python3 log_dataview_size.py " + cluster_fqdn + " " + API_Key + " -log_dir .")
