@@ -9,8 +9,11 @@ import re
 import subprocess
 import socket
 import json 
+import csv 
+import time
 from subprocess import check_output as run
 from datetime import date
+from pathlib import Path
 RunningOnMaster = "yes"
 #requests is a must have and is available with pip/pip3
 try:
@@ -49,6 +52,9 @@ today = str(date.today())
 #statics
 logDir = '/pipedream/log/'
 uiLogName = 'ui.log'
+#data_view_size_logging
+disk_space_filename=Path("data_view_disk_space.csv")
+disk_space_filename_sorted=Path("data_view_disk_space_sorted.csv")
 # path to place the dino working files directory
 # WorkingDir = '/tmp'
 WorkingDir = '/pipedream/log/'
@@ -1405,7 +1411,6 @@ def submenu212():
             os.system("clear")
             submenu212()
         elif(ch == 15):
-#here
             print("\t-----------------------------------------------")
             print ("Copying network-audit.py out to all DCU's")
             print("\t-----------------------------------------------")
@@ -2037,7 +2042,10 @@ def submenu217():
             7.Create a new data view from a json file - A step by step
             8.Patch an existing data view retention - A step by step
             9.Delete an existing data view
-            10.Return""")
+            10.Log the current calculated disk space each data view
+            11.Configure a daily CRON job to log the current calculated disk space each data view
+            12.Remove the daily CRON job to log the current calculated disk space each data view
+            13.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -2449,6 +2457,34 @@ def submenu217():
             else:
                 print ("doing nothing. You can use the curl above to delete the data view yourself")
         elif ch == 10:
+#here add the --options to the log-dataview so it does not prompt unless they are missing command, forget the master checks
+            print ("Logging the current calculated disk space each data view")
+            print ("Appending the output to files {} and {}".format(str(disk_space_filename_sorted),str(disk_space_filename)))
+            mycmd = ("python3 log_dataview_size.py")
+            os.system(mycmd)
+        elif ch == 11:
+            print ("Install a daily cron on mast to log the current calculated disk space each data view")
+            input("\nPress enter to continue")
+            mycmd = ("sudo cp log_dataview_size.py /usr/local/sbin/log_dataview_size.py")
+            os.system(mycmd)
+            mycmd = ("sudo chmod a+x /usr/local/sbin/log_dataview_size.py")
+            os.system(mycmd)
+            DataViewLogCron = ("#!/bin/sh\npython3 /usr/local/sbin/log_dataview_size.py --fqdn " + cluster_fqdn + " --api_key " + API_Key + " --logdir /var/log/") 
+            if RunningOnMaster == 'no':
+                print ("You are not running on a master node, so I am unable to schedule the cron job for you")
+                print ("The command you will need to schedule to run daily will be something like.. ")
+                print (DataViewLogCron)
+            else:
+                with open('/etc/cron.daily/log_dataview_size', 'w') as f:
+                    f.write(str(DataViewLogCron)) 
+        elif ch == 12:
+            print ("Remove the daily cron on master to log the current calculated disk space each data view")
+            input("\nPress enter to continue")
+            if RunningOnMaster == 'no':
+                print ("You are not running on a master node, so I am unable to remove the cron job for you")
+            else:
+                os.remove("/etc/cron.daily/log_dataview_size")
+        elif ch == 13:
             topmenu()
         else:
             print("Invalid entry")
@@ -2763,7 +2799,6 @@ def get_cluster_fqdn():
         cluster_fqdn = "localhost" 
     print("Using the following fqdn for API queries: " , cluster_fqdn)
     return (cluster_fqdn)
-
 
 # Main program  
 API_Key = get_api_key()
