@@ -13,7 +13,7 @@
 * A trainers code is not fancy, as its intended to be readable.
 * It tells the user how it did the task, so they can do it themselfes
 * The code is intended to be shared, improved and reused.
-* Its written on top of other peoples code and hints, thanks Ato, thanks Chris thanks everyone
+* Its written on top of other peoples code and hints, thanks to all 
 * Its a quick way for Deepfield Customer Engineers to get started with day to day tasks 
 * It's a usefull tool for customers to learn the Deepfield API's
 
