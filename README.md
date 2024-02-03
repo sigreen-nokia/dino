@@ -30,9 +30,11 @@
 * cp dino.py /usr/local/sbin/ 
 * cp get_context.py /usr/local/sbin/ 
 * cp network-audit.py /usr/local/sbin/ 
+* cp log_dataview_size.py /usr/local/sbin/ 
 * chmod a+x /usr/local/sbin/dino.py 
 * chmod a+x /usr/local/sbin/get_context.py 
 * chmod a+x /usr/local/sbin/network-audit.py 
+* chmod a+x /usr/local/sbin/log_dataview_size.py
 
 ## Can I run it locally on my laptop
 
