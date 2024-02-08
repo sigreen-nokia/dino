@@ -2469,7 +2469,7 @@ def submenu217():
             os.system(mycmd)
             mycmd = ("sudo chmod a+x /usr/local/sbin/log_dataview_size.py")
             os.system(mycmd)
-            mycmd = ("(crontab -l 2>/dev/null; echo \"0 1 * * * /usr/bin/python3 /usr/local/sbin/log_dataview_size.py localhost 31UO2fiKwinzYl -log_dir /pipedream/log/\") | crontab -")
+            mycmd = ("(crontab -l 2>/dev/null; echo \"0 1 * * * /usr/bin/python3 /usr/local/sbin/log_dataview_size.py localhost " + API_Key + " -log_dir /pipedream/log/\") | crontab -")
             print("Command is:" + mycmd )
             os.system(mycmd)
             print ("The cron will log dataview sizes once a day to /pipedream/log/{} and /pipedream/log/{}".format(str(disk_space_filename_sorted),str(disk_space_filename)))
