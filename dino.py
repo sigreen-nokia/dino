@@ -622,7 +622,10 @@ def submenu219():
             5.Lookup an ipv4 or ipv6 address in Secure Genome
             6.Read a list of ipv4 or ipv6 addresses and look up each in Secure Genome, output to a file 
             7.Create a custom protection group with ipv4 subnets covering the internet.
-            8.Return""")
+            8.Dump the detection rules raw dfmatch in JSON
+            9.Dump the mitigation rules raw dfmatch in JSON
+            10.Dump the countermeasure dimension possitions in JSON
+            11.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -749,7 +752,118 @@ def submenu219():
                 print ("Sorry that file does not exist")
         elif ch == 7:
             print("\n Please look in the Dimensions menu option, for this one.")
-        elif ch == 8:
+        elif(ch == 8):
+            print("Dump the detection rules raw dfmatch in JSON")
+            url = 'https://' + cluster_fqdn + '/dimensions/index?attributes=*&api_key=' + API_Key
+            #print ("\nDebug url: " , url)
+            dimensionlist = requests.get(url, verify=False).json()
+            #print ("\nDimensionlist: " , dimensionlist)
+            json_formatted_dimensionlist = json.dumps(dimensionlist, indent=2)
+            #print ("\nDebug dimensionlist: " , json_formatted_dimensionlist)
+            #build the text menu
+            #find the detection dimension uuid
+            index = 0
+            for key in dimensionlist:
+                #print ("DEBUG: dimensionname ", dimensionlist[key]['name'])
+                if dimensionlist[key]['name'] == "detection":
+                    dimensionuuid = dimensionlist[key]['dimension_id']
+                    dimensionname = dimensionlist[key]['name']
+            print ("dimension name:", dimensionname)
+            print ("dimension id:", dimensionuuid)
+            print ("Grabbing the detection rules JSON")
+            url = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/positions?attribures=match,enabled&api_key=' + API_Key
+            #print ("\nDEBUG: url: " , url)
+            possitionlist = requests.get(url, verify=False).json()
+            #print ("\nDEBUG: possitionlist: " , possitionlist)
+            json_formatted_possitionlist = json.dumps(possitionlist, indent=2)
+            #print ("\nDEBUG: json_formatted_possitionlist: " , json_formatted_possitionlist)
+            #for each possition id in the selected dimension dump the details
+            print ("This will be a big list, so I will also write it to file detection_rules.txt")
+            input("Press any key to continue...")
+            with open('detection_rules.txt', 'w') as f:
+                for key in possitionlist:
+                    #print ("\nDEBUG: key: " , key)
+                    url2 = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/position/' + str(key) + '?attribures=match,enabled&api_key=' + API_Key
+                    possitiondetails = requests.get(url2, verify=False).json()
+                    json_formatted_possitiondetails = json.dumps(possitiondetails, indent=2)
+                    print (json_formatted_possitiondetails)
+                    f.write(str(json_formatted_possitiondetails))
+            print ("Output was also write it to file detection_rules.txt")
+        elif(ch == 9):
+            print("Dump the mitigation rules raw dfmatch in JSON")
+            url = 'https://' + cluster_fqdn + '/dimensions/index?attributes=*&api_key=' + API_Key
+            #print ("\nDebug url: " , url)
+            dimensionlist = requests.get(url, verify=False).json()
+            #print ("\nDimensionlist: " , dimensionlist)
+            json_formatted_dimensionlist = json.dumps(dimensionlist, indent=2)
+            #print ("\nDebug dimensionlist: " , json_formatted_dimensionlist)
+            #build the text menu
+            #find the mitigation dimension uuid
+            index = 0
+            for key in dimensionlist:
+                #print ("DEBUG: dimensionname ", dimensionlist[key]['name'])
+                if dimensionlist[key]['name'] == "mitigation_rule":
+                    dimensionuuid = dimensionlist[key]['dimension_id']
+                    dimensionname = dimensionlist[key]['name']
+            print ("dimension name:", dimensionname)
+            print ("dimension id:", dimensionuuid)
+            print ("Grabbing the mitigation rules JSON")
+            url = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/positions?attribures=match,enabled&api_key=' + API_Key
+            #print ("\nDEBUG: url: " , url)
+            possitionlist = requests.get(url, verify=False).json()
+            #print ("\nDEBUG: possitionlist: " , possitionlist)
+            json_formatted_possitionlist = json.dumps(possitionlist, indent=2)
+            #print ("\nDEBUG: json_formatted_possitionlist: " , json_formatted_possitionlist)
+            #for each possition id in the selected dimension dump the details
+            print ("This will be a big list, so I will also write it to file mitigation_rules.txt")
+            input("Press any key to continue...")
+            with open('mitigation_rules.txt', 'w') as f:
+                for key in possitionlist:
+                    #print ("\nDEBUG: key: " , key)
+                    url2 = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/position/' + str(key) + '?attribures=match,enabled&api_key=' + API_Key
+                    possitiondetails = requests.get(url2, verify=False).json()
+                    json_formatted_possitiondetails = json.dumps(possitiondetails, indent=2)
+                    print (json_formatted_possitiondetails)
+                    f.write(str(json_formatted_possitiondetails))
+            print ("Output was also write it to file mitigation_rules.txt")
+        elif(ch == 10):
+            print("Dump the countermeasure dimension possitions in JSON")
+            url = 'https://' + cluster_fqdn + '/dimensions/index?attributes=*&api_key=' + API_Key
+            #print ("\nDebug url: " , url)
+            dimensionlist = requests.get(url, verify=False).json()
+            #print ("\nDimensionlist: " , dimensionlist)
+            json_formatted_dimensionlist = json.dumps(dimensionlist, indent=2)
+            #print ("\nDebug dimensionlist: " , json_formatted_dimensionlist)
+            #build the text menu
+            #find the countermeasure dimension uuid
+            index = 0
+            for key in dimensionlist:
+                #print ("DEBUG: dimensionname ", dimensionlist[key]['name'])
+                if dimensionlist[key]['name'] == "countermeasure":
+                    dimensionuuid = dimensionlist[key]['dimension_id']
+                    dimensionname = dimensionlist[key]['name']
+            print ("dimension name:", dimensionname)
+            print ("dimension id:", dimensionuuid)
+            print ("Grabbing the countermeasure possitions in  JSON")
+            url = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/positions?attribures=match,enabled&api_key=' + API_Key
+            #print ("\nDEBUG: url: " , url)
+            possitionlist = requests.get(url, verify=False).json()
+            #print ("\nDEBUG: possitionlist: " , possitionlist)
+            json_formatted_possitionlist = json.dumps(possitionlist, indent=2)
+            #print ("\nDEBUG: json_formatted_possitionlist: " , json_formatted_possitionlist)
+            #for each possition id in the selected dimension dump the details
+            print ("This will be a big list, so I will also write it to file countermeasures.txt")
+            input("Press any key to continue...")
+            with open('countermeasures.txt', 'w') as f:
+                for key in possitionlist:
+                    #print ("\nDEBUG: key: " , key)
+                    url2 = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/position/' + str(key) + '?attribures=match,enabled&api_key=' + API_Key
+                    possitiondetails = requests.get(url2, verify=False).json()
+                    json_formatted_possitiondetails = json.dumps(possitiondetails, indent=2)
+                    print (json_formatted_possitiondetails)
+                    f.write(str(json_formatted_possitiondetails))
+            print ("Output was also write it to file countermeasures.txt")
+        elif ch == 11:
             topmenu()
         else:
             print("Invalid entry")
@@ -823,7 +937,8 @@ def submenu220():
             3.Create a protected object (custom data view) with subnets covering the internet. Step by step example
             4.Delete a dimension, selected from a list of all provisioned dimensions
             5.Dump the csv for all possitions in a dimension, the dimension is selected from a list of all Dimensions
-            6.Return""")
+            6.Dump the JSON for all possitions in a dimension, selected from a list of all dimensions
+            7.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -1216,7 +1331,7 @@ def submenu220():
                 print("\nRunning Command: " + mycmd )
                 os.system(mycmd)
                 print("\n\nAll Done")
-        if(ch == 5):
+        elif(ch == 5):
             print("Dump the csv for all possitions in a dimension, the dimension is selected from a list of all Dimensions")
             url = 'https://' + cluster_fqdn + '/dimensions/index?attributes=*&api_key=' + API_Key
             #print ("\nDebug url: " , url)
@@ -1254,7 +1369,58 @@ def submenu220():
             input("Press any key and I'll run the command to output the csv...")
             os.system(mycmd)
             print("\nI've also written the csv to a file for you example-dimension-position.csv...")
-        elif ch == 6:
+        elif(ch == 6):
+            print("Dump the JSON for all possitions in a dimension, selected from a list of all dimensions")
+            url = 'https://' + cluster_fqdn + '/dimensions/index?attributes=*&api_key=' + API_Key
+            #print ("\nDebug url: " , url)
+            dimensionlist = requests.get(url, verify=False).json()
+            #print ("\nDimensionlist: " , dimensionlist)
+            json_formatted_dimensionlist = json.dumps(dimensionlist, indent=2)
+            #print ("\nDebug dimensionlist: " , json_formatted_dimensionlist)
+            #build the text menu
+            user_input = ''
+            input_message = "Select a dimension:\n"
+            index = 0
+            for key in dimensionlist:
+                index += 1
+                #print ("DEBUG: key:", key)
+                dimensionname = dimensionlist[key]['name']
+                dimensionuuid = dimensionlist[key]['dimension_id']
+                #dimensionname = key['name']
+                #dimensionuuid = key['dimension_id']
+                input_message += f'{index}) {dimensionname}\n'
+            input_message += 'You selected dimension: '
+            #prompt for the dimension by number x) 
+            user_input = input(input_message)
+            #now find the selected dimension name and uuid for the selected number
+            index = 0
+            for key in dimensionlist:
+                index += 1
+                if index == int(user_input):
+                    dimensionname = dimensionlist[key]['name']
+                    dimensionuuid = dimensionlist[key]['dimension_id']
+            print ("You selected dimension name:", dimensionname)
+            print ("Which has dimension id:", dimensionuuid)
+            print ("Grabbing the dimension position ids and printing the details")
+            url = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/positions?attribures=match,enabled&api_key=' + API_Key
+            #print ("\nDEBUG: url: " , url)
+            possitionlist = requests.get(url, verify=False).json()
+            #print ("\nDEBUG: possitionlist: " , possitionlist)
+            json_formatted_possitionlist = json.dumps(possitionlist, indent=2)
+            #print ("\nDEBUG: json_formatted_possitionlist: " , json_formatted_possitionlist)
+            #for each possition id in the selected dimension dump the details 
+            print ("This will be a big list, so I will also write it to file dimension_possitions.json")
+            input("Press any key to continue...")
+            with open('dimension_possitions.json', 'w') as f:
+                for key in possitionlist:
+                    #print ("\nDEBUG: key: " , key)
+                    url2 = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/position/' + str(key) + '?attribures=match,enabled&api_key=' + API_Key
+                    possitiondetails = requests.get(url2, verify=False).json()
+                    json_formatted_possitiondetails = json.dumps(possitiondetails, indent=2)
+                    print (json_formatted_possitiondetails)
+                    f.write(str(json_formatted_possitiondetails))
+            print ("Output was also writen to file dimension_possitions.json")
+        elif ch == 7:
             topmenu()
         else:
             print("Invalid entry")
@@ -1404,7 +1570,7 @@ def submenu212():
             os.system("tput setaf 6")
             print("All Done") 
             print("\n\n=====================================================================================================") 
-            print("The resultant file /pipedream/tmp/network-all-files-all-hosts.tar.gz") 
+            print("The resultant file /home/support/network-all-files-all-hosts.tar.gz") 
             print("is on all DCU's and contains every DCU's dynamic and static network configuration") 
             print("=====================================================================================================") 
             input("Press enter to return to the menu")
