@@ -779,6 +779,10 @@ def submenu219():
             #print ("\nDEBUG: json_formatted_possitionlist: " , json_formatted_possitionlist)
             #for each possition id in the selected dimension dump the details
             print ("This will be a big list, so I will also write it to file detection_rules.txt")
+            print ("An example api query for one detection rules possition looks like this.")
+            print ("Where x is each possitions id in the dimension")
+            print ("curl -k --silent -X GET 'https://" + cluster_fqdn + "/dimension/" + str(dimensionuuid) + "/position/x?attribures=match,enabled&api_key=" + API_Key + "' | json_pp")
+            print ("I'll extract the list of rules and dump each one for you")
             input("Press any key to continue...")
             with open('detection_rules.txt', 'w') as f:
                 for key in possitionlist:
@@ -816,6 +820,10 @@ def submenu219():
             #print ("\nDEBUG: json_formatted_possitionlist: " , json_formatted_possitionlist)
             #for each possition id in the selected dimension dump the details
             print ("This will be a big list, so I will also write it to file mitigation_rules.txt")
+            print ("An example api query for one mitigation rules possition looks like this.")
+            print ("Where x is each possitions id in the dimension")
+            print ("curl -k --silent -X GET 'https://" + cluster_fqdn + "/dimension/" + str(dimensionuuid) + "/position/x?attribures=match,enabled&api_key=" + API_Key + "' | json_pp")
+            print ("I'll extract the list of rules and dump each one for you")
             input("Press any key to continue...")
             with open('mitigation_rules.txt', 'w') as f:
                 for key in possitionlist:
@@ -853,6 +861,10 @@ def submenu219():
             #print ("\nDEBUG: json_formatted_possitionlist: " , json_formatted_possitionlist)
             #for each possition id in the selected dimension dump the details
             print ("This will be a big list, so I will also write it to file countermeasures.txt")
+            print ("An example api query for one countermeasures possition looks like this.")
+            print ("Where x is each possitions id in the dimension")
+            print ("curl -k --silent -X GET 'https://" + cluster_fqdn + "/dimension/" + str(dimensionuuid) + "/position/x?attribures=match,enabled&api_key=" + API_Key + "' | json_pp")
+            print ("I'll extract the list of countermeasures and dump each one for you")
             input("Press any key to continue...")
             with open('countermeasures.txt', 'w') as f:
                 for key in possitionlist:
