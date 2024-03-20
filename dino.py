@@ -117,7 +117,8 @@ def topmenu():
             18.Collect the logs and slice.json from all DCUs
             19.Defender (DDoS)
             20.Dimensions
-            21.Exit""")
+            21.Organizations and Users
+            22.Exit""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -165,6 +166,8 @@ def topmenu():
         elif ch == 20:
             submenu220() 
         elif ch == 21:
+            submenu221() 
+        elif ch == 22:
             print("Exiting application")
             exit()
         else:
@@ -1439,6 +1442,55 @@ def submenu220():
         input("\nPress enter to continue")
         os.system("clear")
         submenu220()
+
+
+def submenu221():
+    os.system("clear")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\n\t-------------------------------------------------")
+    # sets the text colour to green
+    os.system("tput setaf 2")
+    print("\tOrganizations and Users")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\t-------------------------------------------------")
+    while True:
+        print("""
+            1.Dump a list of all organization user id's mapped to email address 
+            2.Dump a formatted json list of all users configuration
+            3.Return""")
+        print("\n")
+        ch=int(input("Enter your choice: "))
+        if(ch == 1):
+            print("Dump a list of all organization user id's mapped to email address")
+            url = 'https://' + cluster_fqdn + '/api/users?attributes=*&api_key=' + API_Key
+            #print ("\nDEBUG: url: " , url)
+            userlist = requests.get(url, verify=False).json()
+            #print ("\nDEBUG: userlist: " , userlist)
+            json_formatted_userlist = json.dumps(userlist, indent=2)
+            #print ("\nDEBUG: json formatted userlist: " , json_formatted_userlist)
+            index = 0
+            for key in userlist['users']:
+                #print ("DEBUG: userlist key ", key)
+                userid = userlist['users'][key]['id'] 
+                #print ("DEBUG: userid ", userid)
+                useremail = userlist['users'][key]['email']
+                #print ("DEBUG: email:", useremail)
+                print(" user id: " + userid + " email: " + useremail )
+        elif(ch == 2):
+            print("Dump a formatted json list of all users configuration")
+            mycmd = ("curl --insecure -X GET 'https://" + cluster_fqdn + "/api/users/?&attributes=(*)&api_key=" + API_Key + "' | json_pp | tee userlist.json")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+            print("\n\nI've written the output to file userlist.json for you")
+        elif ch == 3:
+            topmenu()
+        else:
+            print("Invalid entry")
+        input("\nPress enter to continue")
+        os.system("clear")
+        submenu221()
 
 def submenu212():
     os.system("clear")
