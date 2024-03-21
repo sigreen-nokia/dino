@@ -1517,10 +1517,11 @@ def submenu212():
             10.show the date and time on all nodes 
             11.test connectivity to Deepfield genome
             12.test connectivity to Deepfield metrics 
-            13.dump /etc/network/interfaces for all nodes
-            14.dump all DCU's network configuration to all DCU's file /home/support/network-all-files-all-hosts.tar.gz, Use before a reboot.
-            15.Audit the DCUs network configuration, static and dynamic
-            16.Return""")
+            13.test connectivity to Deepfield downloads 
+            14.dump /etc/network/interfaces for all nodes
+            16.dump all DCU's network configuration to all DCU's file /home/support/network-all-files-all-hosts.tar.gz, Use before a reboot.
+            16.Audit the DCUs network configuration, static and dynamic
+            17.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -1573,10 +1574,14 @@ def submenu212():
             print("Command is:" + mycmd )
             os.system(mycmd)
         elif(ch == 13):
-            mycmd = "sudo salt \* cmd.run \"cat /etc/network/interfaces\""
+            mycmd = "sudo salt \* cmd.run \"nc -zv download.deepfield.net 443\""
             print("Command is:" + mycmd )
             os.system(mycmd)
         elif(ch == 14):
+            mycmd = "sudo salt \* cmd.run \"cat /etc/network/interfaces\""
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 15):
             print("\t-------------------------------------------------")
             print ("Step 1)Cleaning up old tar files")
             print("\t-------------------------------------------------")
@@ -1640,7 +1645,7 @@ def submenu212():
             input("Press enter to return to the menu")
             os.system("clear")
             submenu212()
-        elif(ch == 15):
+        elif(ch == 16):
             print("\t-----------------------------------------------")
             print ("Copying network-audit.py out to all DCU's")
             print("\t-----------------------------------------------")
@@ -1657,7 +1662,7 @@ def submenu212():
             print("------------------------------")
             print ("----------All Done-----------")
             print ("-----------------------------")
-        elif ch == 16:
+        elif ch == 17:
             topmenu()
         else:
             print("Invalid entry")
