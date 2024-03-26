@@ -118,7 +118,8 @@ def topmenu():
             19.Defender (DDoS)
             20.Dimensions
             21.Organizations and Users
-            22.Exit""")
+            22.Boundaries
+            23.Exit""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -168,6 +169,8 @@ def topmenu():
         elif ch == 21:
             submenu221() 
         elif ch == 22:
+            submenu222() 
+        elif ch == 23:
             print("Exiting application")
             exit()
         else:
@@ -1485,6 +1488,37 @@ def submenu221():
             os.system(mycmd)
             print("\n\nI've written the output to file userlist.json for you")
         elif ch == 3:
+            topmenu()
+        else:
+            print("Invalid entry")
+        input("\nPress enter to continue")
+        os.system("clear")
+        submenu221()
+
+def submenu222():
+    os.system("clear")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\n\t-------------------------------------------------")
+    # sets the text colour to green
+    os.system("tput setaf 2")
+    print("\tBoundaries")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\t-------------------------------------------------")
+    while True:
+        print("""
+            1.Dump a formatted json list of all Boundaries 
+            2.Return""")
+        print("\n")
+        ch=int(input("Enter your choice: "))
+        if(ch == 1):
+            print("Dump a formatted json list of all users configuration")
+            mycmd = ("curl --insecure -X GET 'https://" + cluster_fqdn + "/api/boundaries?api_key=" + API_Key + "' | json_pp | tee boundaries.json")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+            print("\n\nI've written the output to file boundaries.json for you")
+        elif ch == 2:
             topmenu()
         else:
             print("Invalid entry")
