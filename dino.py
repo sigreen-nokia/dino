@@ -630,7 +630,7 @@ def submenu219():
             7.Create a custom protection group with ipv4 subnets covering the internet.
             8.Dump the detection rules raw dfmatch in JSON
             9.Dump the mitigation rules raw dfmatch in JSON
-            10.Dump the countermeasure dimension possitions in JSON
+            10.Dump the countermeasure dimension positions in JSON
             11.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
@@ -779,25 +779,25 @@ def submenu219():
             print ("Grabbing the detection rules JSON")
             url = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/positions?attribures=match,enabled&api_key=' + API_Key
             #print ("\nDEBUG: url: " , url)
-            possitionlist = requests.get(url, verify=False).json()
-            #print ("\nDEBUG: possitionlist: " , possitionlist)
-            json_formatted_possitionlist = json.dumps(possitionlist, indent=2)
-            #print ("\nDEBUG: json_formatted_possitionlist: " , json_formatted_possitionlist)
-            #for each possition id in the selected dimension dump the details
+            positionlist = requests.get(url, verify=False).json()
+            #print ("\nDEBUG: positionlist: " , positionlist)
+            json_formatted_positionlist = json.dumps(positionlist, indent=2)
+            #print ("\nDEBUG: json_formatted_positionlist: " , json_formatted_positionlist)
+            #for each position id in the selected dimension dump the details
             print ("This will be a big list, so I will also write it to file detection_rules.txt")
-            print ("An example api query for one detection rules possition looks like this.")
-            print ("Where x is each possitions id in the dimension")
+            print ("An example api query for one detection rules position looks like this.")
+            print ("Where x is each positions id in the dimension")
             print ("curl -k --silent -X GET 'https://" + cluster_fqdn + "/dimension/" + str(dimensionuuid) + "/position/x?attribures=match,enabled&api_key=" + API_Key + "' | json_pp")
             print ("I'll extract the list of rules and dump each one for you")
             input("Press any key to continue...")
             with open('detection_rules.txt', 'w') as f:
-                for key in possitionlist:
+                for key in positionlist:
                     #print ("\nDEBUG: key: " , key)
                     url2 = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/position/' + str(key) + '?attribures=match,enabled&api_key=' + API_Key
-                    possitiondetails = requests.get(url2, verify=False).json()
-                    json_formatted_possitiondetails = json.dumps(possitiondetails, indent=2)
-                    print (json_formatted_possitiondetails)
-                    f.write(str(json_formatted_possitiondetails))
+                    positiondetails = requests.get(url2, verify=False).json()
+                    json_formatted_positiondetails = json.dumps(positiondetails, indent=2)
+                    print (json_formatted_positiondetails)
+                    f.write(str(json_formatted_positiondetails))
             print ("Output was also write it to file detection_rules.txt")
         elif(ch == 9):
             print("Dump the mitigation rules raw dfmatch in JSON")
@@ -820,28 +820,28 @@ def submenu219():
             print ("Grabbing the mitigation rules JSON")
             url = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/positions?attribures=match,enabled&api_key=' + API_Key
             #print ("\nDEBUG: url: " , url)
-            possitionlist = requests.get(url, verify=False).json()
-            #print ("\nDEBUG: possitionlist: " , possitionlist)
-            json_formatted_possitionlist = json.dumps(possitionlist, indent=2)
-            #print ("\nDEBUG: json_formatted_possitionlist: " , json_formatted_possitionlist)
-            #for each possition id in the selected dimension dump the details
+            positionlist = requests.get(url, verify=False).json()
+            #print ("\nDEBUG: positionlist: " , positionlist)
+            json_formatted_positionlist = json.dumps(positionlist, indent=2)
+            #print ("\nDEBUG: json_formatted_positionlist: " , json_formatted_positionlist)
+            #for each position id in the selected dimension dump the details
             print ("This will be a big list, so I will also write it to file mitigation_rules.txt")
-            print ("An example api query for one mitigation rules possition looks like this.")
-            print ("Where x is each possitions id in the dimension")
+            print ("An example api query for one mitigation rules position looks like this.")
+            print ("Where x is each positions id in the dimension")
             print ("curl -k --silent -X GET 'https://" + cluster_fqdn + "/dimension/" + str(dimensionuuid) + "/position/x?attribures=match,enabled&api_key=" + API_Key + "' | json_pp")
             print ("I'll extract the list of rules and dump each one for you")
             input("Press any key to continue...")
             with open('mitigation_rules.txt', 'w') as f:
-                for key in possitionlist:
+                for key in positionlist:
                     #print ("\nDEBUG: key: " , key)
                     url2 = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/position/' + str(key) + '?attribures=match,enabled&api_key=' + API_Key
-                    possitiondetails = requests.get(url2, verify=False).json()
-                    json_formatted_possitiondetails = json.dumps(possitiondetails, indent=2)
-                    print (json_formatted_possitiondetails)
-                    f.write(str(json_formatted_possitiondetails))
+                    positiondetails = requests.get(url2, verify=False).json()
+                    json_formatted_positiondetails = json.dumps(positiondetails, indent=2)
+                    print (json_formatted_positiondetails)
+                    f.write(str(json_formatted_positiondetails))
             print ("Output was also write it to file mitigation_rules.txt")
         elif(ch == 10):
-            print("Dump the countermeasure dimension possitions in JSON")
+            print("Dump the countermeasure dimension positions in JSON")
             url = 'https://' + cluster_fqdn + '/dimensions/index?attributes=*&api_key=' + API_Key
             #print ("\nDebug url: " , url)
             dimensionlist = requests.get(url, verify=False).json()
@@ -858,28 +858,28 @@ def submenu219():
                     dimensionname = dimensionlist[key]['name']
             print ("dimension name:", dimensionname)
             print ("dimension id:", dimensionuuid)
-            print ("Grabbing the countermeasure possitions in  JSON")
+            print ("Grabbing the countermeasure positions in  JSON")
             url = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/positions?attribures=match,enabled&api_key=' + API_Key
             #print ("\nDEBUG: url: " , url)
-            possitionlist = requests.get(url, verify=False).json()
-            #print ("\nDEBUG: possitionlist: " , possitionlist)
-            json_formatted_possitionlist = json.dumps(possitionlist, indent=2)
-            #print ("\nDEBUG: json_formatted_possitionlist: " , json_formatted_possitionlist)
-            #for each possition id in the selected dimension dump the details
+            positionlist = requests.get(url, verify=False).json()
+            #print ("\nDEBUG: positionlist: " , positionlist)
+            json_formatted_positionlist = json.dumps(positionlist, indent=2)
+            #print ("\nDEBUG: json_formatted_positionlist: " , json_formatted_positionlist)
+            #for each position id in the selected dimension dump the details
             print ("This will be a big list, so I will also write it to file countermeasures.txt")
-            print ("An example api query for one countermeasures possition looks like this.")
-            print ("Where x is each possitions id in the dimension")
+            print ("An example api query for one countermeasures position looks like this.")
+            print ("Where x is each positions id in the dimension")
             print ("curl -k --silent -X GET 'https://" + cluster_fqdn + "/dimension/" + str(dimensionuuid) + "/position/x?attribures=match,enabled&api_key=" + API_Key + "' | json_pp")
             print ("I'll extract the list of countermeasures and dump each one for you")
             input("Press any key to continue...")
             with open('countermeasures.txt', 'w') as f:
-                for key in possitionlist:
+                for key in positionlist:
                     #print ("\nDEBUG: key: " , key)
                     url2 = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/position/' + str(key) + '?attribures=match,enabled&api_key=' + API_Key
-                    possitiondetails = requests.get(url2, verify=False).json()
-                    json_formatted_possitiondetails = json.dumps(possitiondetails, indent=2)
-                    print (json_formatted_possitiondetails)
-                    f.write(str(json_formatted_possitiondetails))
+                    positiondetails = requests.get(url2, verify=False).json()
+                    json_formatted_positiondetails = json.dumps(positiondetails, indent=2)
+                    print (json_formatted_positiondetails)
+                    f.write(str(json_formatted_positiondetails))
             print ("Output was also write it to file countermeasures.txt")
         elif ch == 11:
             topmenu()
@@ -954,9 +954,12 @@ def submenu220():
             2.Add a Dimension from a json file
             3.Create a protected object (custom data view) with subnets covering the internet. Step by step example
             4.Delete a dimension, selected from a list of all provisioned dimensions
-            5.Dump the csv for all possitions in a dimension, the dimension is selected from a list of all Dimensions
-            6.Dump the JSON for all possitions in a dimension, selected from a list of all dimensions
-            7.Return""")
+            5.Dump the csv for all positions in a dimension, the dimension is selected from a list of all Dimensions
+            6.Dump the JSON for all positions in a dimension, selected from a list of all dimensions
+            7.Delete all positions in a dimension, selected from a list of all dimensions
+            8.Set all positions in a dimension to disabled, selected from a list of all dimensions
+            9.Set all positions in a dimension to enabled, selected from a list of all dimensions
+            10.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -1038,7 +1041,7 @@ def submenu220():
                 os.system(mycmd)
                 print("\nDone")
                 ###########
-                print("Now lets add the possitions containing the subnets\n")
+                print("Now lets add the positions containing the subnets\n")
                 input("Press enter to continue")
                 SubnetList = """match:cidrs,position_id,display_name,description,name
 7.0.0.0/8,1,0.0.0.0/4,0.0.0.0/4,0.0.0.0/4
@@ -1301,11 +1304,11 @@ def submenu220():
                 print ("\n\nI've writted a list of subnets covering all IPV4 addresses to file subnet-example.csv\n\n")
                 with open('subnet-example.csv', 'w') as f:
                    f.write(str(SubnetList))  
-                print ("\n\nWe will use the Deepscript endpoint to read our csv file and turn it into possitions.")
-                print ("\nThe following command will create the possitions in our custom dimension")
+                print ("\n\nWe will use the Deepscript endpoint to read our csv file and turn it into positions.")
+                print ("\nThe following command will create the positions in our custom dimension")
                 mycmd = ("curl --insecure -X POST -H 'Content-Type: application/json' --data-binary '@subnet-example.csv' https://" + cluster_fqdn + "/deepscript/dimension/" + DimensionName + "?api_key=" + API_Key)
                 print("Command is:" + mycmd )
-                user_input = input("Input yes and I will create the possitions for you, any other key to do nothing at all:")
+                user_input = input("Input yes and I will create the positions for you, any other key to do nothing at all:")
                 if user_input == 'yes':
                     print("\nRunning Command: " + mycmd )
                     os.system(mycmd)
@@ -1350,7 +1353,7 @@ def submenu220():
                 os.system(mycmd)
                 print("\n\nAll Done")
         elif(ch == 5):
-            print("Dump the csv for all possitions in a dimension, the dimension is selected from a list of all Dimensions")
+            print("Dump the csv for all positions in a dimension, the dimension is selected from a list of all Dimensions")
             url = 'https://' + cluster_fqdn + '/dimensions/index?attributes=*&api_key=' + API_Key
             #print ("\nDebug url: " , url)
             dimensionlist = requests.get(url, verify=False).json()
@@ -1388,7 +1391,7 @@ def submenu220():
             os.system(mycmd)
             print("\nI've also written the csv to a file for you example-dimension-position.csv...")
         elif(ch == 6):
-            print("Dump the JSON for all possitions in a dimension, selected from a list of all dimensions")
+            print("Dump the JSON for all positions in a dimension, selected from a list of all dimensions")
             url = 'https://' + cluster_fqdn + '/dimensions/index?attributes=*&api_key=' + API_Key
             #print ("\nDebug url: " , url)
             dimensionlist = requests.get(url, verify=False).json()
@@ -1422,23 +1425,174 @@ def submenu220():
             print ("Grabbing the dimension position ids and printing the details")
             url = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/positions?attribures=match,enabled&api_key=' + API_Key
             #print ("\nDEBUG: url: " , url)
-            possitionlist = requests.get(url, verify=False).json()
-            #print ("\nDEBUG: possitionlist: " , possitionlist)
-            json_formatted_possitionlist = json.dumps(possitionlist, indent=2)
-            #print ("\nDEBUG: json_formatted_possitionlist: " , json_formatted_possitionlist)
-            #for each possition id in the selected dimension dump the details 
-            print ("This will be a big list, so I will also write it to file dimension_possitions.json")
+            positionlist = requests.get(url, verify=False).json()
+            #print ("\nDEBUG: positionlist: " , positionlist)
+            json_formatted_positionlist = json.dumps(positionlist, indent=2)
+            #print ("\nDEBUG: json_formatted_positionlist: " , json_formatted_positionlist)
+            #for each position id in the selected dimension dump the details 
+            print ("This will be a big list, so I will also write it to file dimension_positions.json")
             input("Press any key to continue...")
-            with open('dimension_possitions.json', 'w') as f:
-                for key in possitionlist:
+            with open('dimension_positions.json', 'w') as f:
+                for key in positionlist:
                     #print ("\nDEBUG: key: " , key)
                     url2 = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/position/' + str(key) + '?attribures=match,enabled&api_key=' + API_Key
-                    possitiondetails = requests.get(url2, verify=False).json()
-                    json_formatted_possitiondetails = json.dumps(possitiondetails, indent=2)
-                    print (json_formatted_possitiondetails)
-                    f.write(str(json_formatted_possitiondetails))
-            print ("Output was also writen to file dimension_possitions.json")
-        elif ch == 7:
+                    positiondetails = requests.get(url2, verify=False).json()
+                    json_formatted_positiondetails = json.dumps(positiondetails, indent=2)
+                    print (json_formatted_positiondetails)
+                    f.write(str(json_formatted_positiondetails))
+            print ("Output was also writen to file dimension_positions.json")
+        elif(ch == 7):
+            print("Delete all positions in a dimension, selected from a list of all dimensions")
+            url = 'https://' + cluster_fqdn + '/dimensions/index?attributes=*&api_key=' + API_Key
+            #print ("\nDebug url: " , url)
+            dimensionlist = requests.get(url, verify=False).json()
+            #print ("\nDimensionlist: " , dimensionlist)
+            json_formatted_dimensionlist = json.dumps(dimensionlist, indent=2)
+            #print ("\nDebug dimensionlist: " , json_formatted_dimensionlist)
+            #build the text menu
+            user_input = ''
+            input_message = "Select a dimension:\n"
+            index = 0
+            for key in dimensionlist:
+                index += 1
+                #print ("DEBUG: key:", key)
+                dimensionname = dimensionlist[key]['name']
+                dimensionuuid = dimensionlist[key]['dimension_id']
+                #dimensionname = key['name']
+                #dimensionuuid = key['dimension_id']
+                input_message += f'{index}) {dimensionname}\n'
+            input_message += 'You selected dimension: '
+            #prompt for the dimension by number x) 
+            user_input = input(input_message)
+            #now find the selected dimension name and uuid for the selected number
+            index = 0
+            for key in dimensionlist:
+                index += 1
+                if index == int(user_input):
+                    dimensionname = dimensionlist[key]['name']
+                    dimensionuuid = dimensionlist[key]['dimension_id']
+            print ("You selected dimension name:", dimensionname)
+            print ("Which has dimension id:", dimensionuuid)
+            url = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/positions?attribures=match,enabled&api_key=' + API_Key
+            #print ("\nDEBUG: url: " , url)
+            positionlist = requests.get(url, verify=False).json()
+            #print ("\nDEBUG: positionlist: " , positionlist)
+            json_formatted_positionlist = json.dumps(positionlist, indent=2)
+            #print ("\nDEBUG: json_formatted_positionlist: " , json_formatted_positionlist)
+            #for each position id in the selected dimension dump the details 
+            positionlistseperated = "[" 
+            for key in positionlist:
+                #print ("\nDEBUG: key: " , key)
+                #url2 = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/position/' + str(key) + '?attribures=match,enabled&api_key=' + API_Key
+                #positiondetails = requests.get(url2, verify=False).json()
+                positionlistseperated = positionlistseperated + key + "," 
+                print ("\nDEBUG: positionlistseperated: " , positionlistseperated)
+            positionlistseperated = positionlistseperated.rstrip(',')
+            positionlistseperated = positionlistseperated + "]" 
+            print ("\nDEBUG: positionlistseperated: " , positionlistseperated)
+            #curl -X DELETE -d '{"data": {"positions": [2,4]}}' "https://{host}/dimension/10001/positions?api_key={api-key}"
+            mycmd = ("curl -k --silent -X DELETE -d '{\"data\": {\"positions\": " + positionlistseperated + "}}' 'https://" + cluster_fqdn + "/dimension/" + str(dimensionuuid) + "/positions" + "?api_key=" + API_Key + "' | json_pp ")
+            print("Command is:" + mycmd )
+            user_input = input("Input yes and I will delete the dimension positions for you, any other key to do nothing at all:")
+            if user_input == 'yes':
+                print("\nRunning Command: " + mycmd )
+                os.system(mycmd)
+                print("\n\nAll Done")
+        elif(ch == 8):
+            print("set all positions in a dimension to disabled, selected from a list of all dimensions")
+            url = 'https://' + cluster_fqdn + '/dimensions/index?attributes=*&api_key=' + API_Key
+            #print ("\nDebug url: " , url)
+            dimensionlist = requests.get(url, verify=False).json()
+            #print ("\nDimensionlist: " , dimensionlist)
+            json_formatted_dimensionlist = json.dumps(dimensionlist, indent=2)
+            #print ("\nDebug dimensionlist: " , json_formatted_dimensionlist)
+            #build the text menu
+            user_input = ''
+            input_message = "Select a dimension:\n"
+            index = 0
+            for key in dimensionlist:
+                index += 1
+                #print ("DEBUG: key:", key)
+                dimensionname = dimensionlist[key]['name']
+                dimensionuuid = dimensionlist[key]['dimension_id']
+                #dimensionname = key['name']
+                #dimensionuuid = key['dimension_id']
+                input_message += f'{index}) {dimensionname}\n'
+            input_message += 'You selected dimension: '
+            #prompt for the dimension by number x) 
+            user_input = input(input_message)
+            #now find the selected dimension name and uuid for the selected number
+            index = 0
+            for key in dimensionlist:
+                index += 1
+                if index == int(user_input):
+                    dimensionname = dimensionlist[key]['name']
+                    dimensionuuid = dimensionlist[key]['dimension_id']
+            print ("You selected dimension name:", dimensionname)
+            print ("Which has dimension id:", dimensionuuid)
+            url = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/positions?attribures=match,enabled&api_key=' + API_Key
+            #print ("\nDEBUG: url: " , url)
+            positionlist = requests.get(url, verify=False).json()
+            #print ("\nDEBUG: positionlist: " , positionlist)
+            json_formatted_positionlist = json.dumps(positionlist, indent=2)
+            #print ("\nDEBUG: json_formatted_positionlist: " , json_formatted_positionlist)
+            #for each position id in the selected dimension disable the position 
+            user_input = input("Input yes and I will disable the dimension positions for you, any other key to do nothing at all:")
+            if user_input == 'yes':
+                for key in positionlist:
+                    #print ("\nDEBUG: key: " , key)
+                    mycmd = ("curl -k --silent -X PUT -H 'Content-Type: application/json' -d '{\"enabled\":\"false\"}' 'https://" + cluster_fqdn + "/dimension/" + str(dimensionuuid) + "/position/" + key + "?api_key=" + API_Key + "' | json_pp ")
+                    print("\nRunning Command: " + mycmd )
+                    os.system(mycmd)
+                print("\n\nAll Done")
+        elif(ch == 9):
+            print("set all positions in a dimension to enabled, selected from a list of all dimensions")
+            url = 'https://' + cluster_fqdn + '/dimensions/index?attributes=*&api_key=' + API_Key
+            #print ("\nDebug url: " , url)
+            dimensionlist = requests.get(url, verify=False).json()
+            #print ("\nDimensionlist: " , dimensionlist)
+            json_formatted_dimensionlist = json.dumps(dimensionlist, indent=2)
+            #print ("\nDebug dimensionlist: " , json_formatted_dimensionlist)
+            #build the text menu
+            user_input = ''
+            input_message = "Select a dimension:\n"
+            index = 0
+            for key in dimensionlist:
+                index += 1
+                #print ("DEBUG: key:", key)
+                dimensionname = dimensionlist[key]['name']
+                dimensionuuid = dimensionlist[key]['dimension_id']
+                #dimensionname = key['name']
+                #dimensionuuid = key['dimension_id']
+                input_message += f'{index}) {dimensionname}\n'
+            input_message += 'You selected dimension: '
+            #prompt for the dimension by number x) 
+            user_input = input(input_message)
+            #now find the selected dimension name and uuid for the selected number
+            index = 0
+            for key in dimensionlist:
+                index += 1
+                if index == int(user_input):
+                    dimensionname = dimensionlist[key]['name']
+                    dimensionuuid = dimensionlist[key]['dimension_id']
+            print ("You selected dimension name:", dimensionname)
+            print ("Which has dimension id:", dimensionuuid)
+            url = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/positions?attribures=match,enabled&api_key=' + API_Key
+            #print ("\nDEBUG: url: " , url)
+            positionlist = requests.get(url, verify=False).json()
+            #print ("\nDEBUG: positionlist: " , positionlist)
+            json_formatted_positionlist = json.dumps(positionlist, indent=2)
+            #print ("\nDEBUG: json_formatted_positionlist: " , json_formatted_positionlist)
+            #for each position id in the selected dimension disable the position 
+            user_input = input("Input yes and I will enable the dimension positions for you, any other key to do nothing at all:")
+            if user_input == 'yes':
+                for key in positionlist:
+                    #print ("\nDEBUG: key: " , key)
+                    mycmd = ("curl -k --silent -X PUT -H 'Content-Type: application/json' -d '{\"enabled\":\"true\"}' 'https://" + cluster_fqdn + "/dimension/" + str(dimensionuuid) + "/position/" + key + "?api_key=" + API_Key + "' | json_pp ")
+                    print("\nRunning Command: " + mycmd )
+                    os.system(mycmd)
+                print("\n\nAll Done")
+        elif ch == 10:
             topmenu()
         else:
             print("Invalid entry")
@@ -1868,17 +2022,17 @@ def submenu216():
             input_message += 'You selected router: '
             #prompt for the router by number x) 
             user_input = input(input_message)
-            #now find the selected router name and possition for the selected number
+            #now find the selected router name and position for the selected number
             index = 0
             for key in routerlist:
                 index += 1
                 if index == int(user_input):
                     routername = routerlist[key]['name']
-                    routerpossition = routerlist[key]['position_id']
+                    routerposition = routerlist[key]['position_id']
             print ("You selected Router name:", routername)
-            print ("That Router has possition:", routerpossition)
+            print ("That Router has position:", routerposition)
             print ("The following command will get the router interfaces")
-            mycmd = ("curl --insecure -X GET 'https://" + cluster_fqdn + "/dimension/interfaces/positions?filter=(interface:router_pos_id,=," + str(routerpossition) + ")&attributes=(*)&api_key=" + API_Key + "' | tee myrouterinterfacelist.json")
+            mycmd = ("curl --insecure -X GET 'https://" + cluster_fqdn + "/dimension/interfaces/positions?filter=(interface:router_pos_id,=," + str(routerposition) + ")&attributes=(*)&api_key=" + API_Key + "' | tee myrouterinterfacelist.json")
             print("Command is:" + mycmd )
             input("Press any key and I'll run the command...")
             os.system(mycmd)
@@ -1909,17 +2063,17 @@ def submenu216():
             #
             #ok so we know the router. Lets gather up all of the information we need for the model 
             #
-            #find the router name and the possition
+            #find the router name and the position
             index = 0
             for key in routerlist:
                 index += 1
                 if index == int(user_input):
                     routername = routerlist[key]['name']
-                    routerpossition = routerlist[key]['position_id']
+                    routerposition = routerlist[key]['position_id']
                     routerflowip = routerlist[key]['router']['flow_ip']
             #
             #get the router interfaces
-            url = 'https://' + cluster_fqdn + '/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + API_Key
+            url = 'https://' + cluster_fqdn + '/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerposition) + ')&attributes=(*)&api_key=' + API_Key
             routerinterfaces = requests.get(url, verify=False).json()
             #for debug the line below prints the json containing all of the router interfaces
             #print ("\nDebug url: " + url)
@@ -1927,7 +2081,7 @@ def submenu216():
             #print ("\nDebug routerinterfaces: ", json_formatted_routerinterfaces)
             #
             #we have router name, routername
-            #we have the router possition, routerpossition
+            #we have the router position, routerposition
             #we have the router interfaces routerinterfaces json_formatted_routerinterfaces
             #we have the router flow ip routerflowip 
             #
@@ -1996,16 +2150,16 @@ def submenu216():
             #prompt for the router by number x) 
             user_input = input(input_message)
             #
-            #find the router name and the possition
+            #find the router name and the position
             index = 0
             for key in routerlist:
                 index += 1
                 if index == int(user_input):
                     routername = routerlist[key]['name']
-                    routerpossition = routerlist[key]['position_id']
+                    routerposition = routerlist[key]['position_id']
                     routerflowip = routerlist[key]['router']['flow_ip']
             # now have the user select the router interface they want to enable/disable from a list
-            url = 'https://' + cluster_fqdn + '/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + API_Key
+            url = 'https://' + cluster_fqdn + '/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerposition) + ')&attributes=(*)&api_key=' + API_Key
             routerinterfacelist = requests.get(url, verify=False).json()
             #for debug the two lines below prints the json containing all of the router info
             json_formatted_routerinterfacelist = json.dumps(routerinterfacelist, indent=2)
@@ -2021,33 +2175,33 @@ def submenu216():
             input_message += 'You selected router interface: '
             #prompt for the router interface by number x) 
             user_input = input(input_message)
-            #find the interface possition and name 
+            #find the interface position and name 
             index = 0
             for key in routerinterfacelist:
                 index += 1
                 if index == int(user_input):
                     #get the name of the selected interface
                     interfacenameselected = routerinterfacelist[key]['name']
-                    #get the possition of the selected interface
-                    interfacepossitionselected = routerinterfacelist[key]['id']
+                    #get the position of the selected interface
+                    interfacepositionselected = routerinterfacelist[key]['id']
                     #get the json for the selected interface
                     routerinterfaceselectedjson = routerinterfacelist[key]
                     #print ("Debug: interfacenameselected=", interfacenameselected)
-                    #print ("Debug: interfacepossitionselected=", interfacepossitionselected)
+                    #print ("Debug: interfacepositionselected=", interfacepositionselected)
                     #print ("Debug: routerinterfaceselectedjson=", routerinterfaceselectedjson)
             print ("\nThe interfaces dimension api is buggy (5.4), doesn't allow us to set or add active")
             print ("So we are going to have to do this directly in postgress (5.4+)")
             print ("You selected router ", routername)
             print ("You selected interface ", interfacenameselected)
             print ("The interface can have three settings t/f/[blank]\nwhich means true false or no 'active' parameter present\nThe current setting for active is\n")
-            mycmd = ("sudo -u postgres psql -t -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active from \"Interfaces\" where id=" + str(interfacepossitionselected) + " order by id;'")
+            mycmd = ("sudo -u postgres psql -t -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active from \"Interfaces\" where id=" + str(interfacepositionselected) + " order by id;'")
             os.system(mycmd)
             print("\nI used this Command: " + mycmd )
             print("\nHow do you want me to set active)")
             user_input = input("Input true or false any other key makes no change:")
             if user_input == 'true':
                 print ("setting to active=true. I used this comand")
-                mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'update \"Interfaces\" set active='true' where id=" + str(interfacepossitionselected) + ";'")
+                mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'update \"Interfaces\" set active='true' where id=" + str(interfacepositionselected) + ";'")
                 print("\nRunning Command: " + mycmd )
                 os.system(mycmd)
                 print("\nDone")
@@ -2072,16 +2226,16 @@ def submenu216():
             #prompt for the router by number x) 
             user_input = input(input_message)
             #
-            #find the router name and the possition
+            #find the router name and the position
             index = 0
             for key in routerlist:
                 index += 1
                 if index == int(user_input):
                     routername = routerlist[key]['name']
-                    routerpossition = routerlist[key]['position_id']
+                    routerposition = routerlist[key]['position_id']
                     routerflowip = routerlist[key]['router']['flow_ip']
             # now have the user select the router interface they want to enable/disable from a list
-            url = 'https://' + cluster_fqdn + '/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + API_Key
+            url = 'https://' + cluster_fqdn + '/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerposition) + ')&attributes=(*)&api_key=' + API_Key
             routerinterfacelist = requests.get(url, verify=False).json()
             #for debug the two lines below prints the json containing all of the router info
             json_formatted_routerinterfacelist = json.dumps(routerinterfacelist, indent=2)
@@ -2089,7 +2243,7 @@ def submenu216():
 
             #count the existing interfaces t/f/[blank]
             print ("Counting the t/f/[blank] interfaces for the router ", routername)
-            mycmd = ("sudo -u postgres psql -t -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active, COUNT(*) from \"Interfaces\" where _interface_router_pos_id=" + str(routerpossition) + " group by active;'")
+            mycmd = ("sudo -u postgres psql -t -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active, COUNT(*) from \"Interfaces\" where _interface_router_pos_id=" + str(routerposition) + " group by active;'")
             os.system(mycmd)
             print("\nI used this Command: " + mycmd )
 
@@ -2114,23 +2268,23 @@ def submenu216():
             #prompt for the router by number x) 
             user_input = input(input_message)
             #
-            #find the router name and the possition
+            #find the router name and the position
             index = 0
             for key in routerlist:
                 index += 1
                 if index == int(user_input):
                     routername = routerlist[key]['name']
-                    routerpossition = routerlist[key]['position_id']
+                    routerposition = routerlist[key]['position_id']
                     routerflowip = routerlist[key]['router']['flow_ip']
             # now have the user select the router interface they want to enable/disable from a list
-            url = 'https://' + cluster_fqdn + '/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + API_Key
+            url = 'https://' + cluster_fqdn + '/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerposition) + ')&attributes=(*)&api_key=' + API_Key
             routerinterfacelist = requests.get(url, verify=False).json()
             #for debug the two lines below prints the json containing all of the router info
             json_formatted_routerinterfacelist = json.dumps(routerinterfacelist, indent=2)
             #print ("\nDebug routerinterfacelist: " , json_formatted_routerinterfacelist)
             #count the existing interfaces t/f/[blank]
             print ("Counting the t/f/[blank] interfaces for the router ", routername)
-            mycmd = ("sudo -u postgres psql -t -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active, COUNT(*) from \"Interfaces\" where _interface_router_pos_id=" + str(routerpossition) + " group by active;'")
+            mycmd = ("sudo -u postgres psql -t -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active, COUNT(*) from \"Interfaces\" where _interface_router_pos_id=" + str(routerposition) + " group by active;'")
             os.system(mycmd)
             print("\nI used this Command: " + mycmd )
             print("\nHow do you want me to set active)")
@@ -2138,13 +2292,13 @@ def submenu216():
             user_input = input("Input true or false any other key makes no change:")
             if user_input == 'true':
                 print ("setting to active=true for all interfaces on router " + routername + ". I used this comand")
-                mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'update \"Interfaces\" set active='true' where _interface_router_pos_id=" + str(routerpossition) + ";'")
+                mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'update \"Interfaces\" set active='true' where _interface_router_pos_id=" + str(routerposition) + ";'")
                 print("\nRunning Command: " + mycmd )
                 os.system(mycmd)
                 print("\nDone")
             elif user_input == 'false':
                 print ("setting to active=false for all interfaces on router " +routername + ". I used this comand")
-                mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'update \"Interfaces\" set active='false' where _interface_router_pos_id=" + str(routerpossition) + ";'") 
+                mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'update \"Interfaces\" set active='false' where _interface_router_pos_id=" + str(routerposition) + ";'") 
                 print("\nRunning Command: " + mycmd )
                 os.system(mycmd)
                 print("\nDone")
@@ -2152,7 +2306,7 @@ def submenu216():
                 print ("doing nothing")
             #recount the existing interfaces t/f/[blank]
             print ("Re-counting the t/f/[blank] interfaces for the router ", routername)
-            mycmd = ("sudo -u postgres psql -t -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active, COUNT(*) from \"Interfaces\" where _interface_router_pos_id=" + str(routerpossition) + " group by active;'")
+            mycmd = ("sudo -u postgres psql -t -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select active, COUNT(*) from \"Interfaces\" where _interface_router_pos_id=" + str(routerposition) + " group by active;'")
             os.system(mycmd)
         elif(ch == 11):
             print ("Count the 'active' settings t/f/[blank] on all interfaces on all routers")
@@ -2210,16 +2364,16 @@ def submenu216():
             #prompt for the router by number x) 
             user_input = input(input_message)
             #
-            #find the router name and the possition
+            #find the router name and the position
             index = 0
             for key in routerlist:
                 index += 1
                 if index == int(user_input):
                     routername = routerlist[key]['name']
-                    routerpossition = routerlist[key]['position_id']
+                    routerposition = routerlist[key]['position_id']
                     routerflowip = routerlist[key]['router']['flow_ip']
             # now have the user select the router interface they want to enable/disable from a list
-            url = 'https://' + cluster_fqdn + '/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerpossition) + ')&attributes=(*)&api_key=' + API_Key
+            url = 'https://' + cluster_fqdn + '/dimension/interfaces/positions?filter=(interface:router_pos_id,=,' + str(routerposition) + ')&attributes=(*)&api_key=' + API_Key
             routerinterfacelist = requests.get(url, verify=False).json()
             #for debug the two lines below prints the json containing all of the router info
             json_formatted_routerinterfacelist = json.dumps(routerinterfacelist, indent=2)
@@ -2235,19 +2389,19 @@ def submenu216():
             input_message += 'You selected router interface: '
             #prompt for the router interface by number x) 
             user_input = input(input_message)
-            #find the interface possition and name 
+            #find the interface position and name 
             index = 0
             for key in routerinterfacelist:
                 index += 1
                 if index == int(user_input):
                     #get the name of the selected interface
                     interfacenameselected = routerinterfacelist[key]['name']
-                    #get the possition of the selected interface
-                    interfacepossitionselected = routerinterfacelist[key]['id']
+                    #get the position of the selected interface
+                    interfacepositionselected = routerinterfacelist[key]['id']
                     #get the json for the selected interface
                     routerinterfaceselectedjson = routerinterfacelist[key]
                     #print ("Debug: interfacenameselected=", interfacenameselected)
-                    #print ("Debug: interfacepossitionselected=", interfacepossitionselected)
+                    #print ("Debug: interfacepositionselected=", interfacepositionselected)
                     #print ("Debug: routerinterfaceselectedjson=", routerinterfaceselectedjson)
             print ("\nThe interfaces dimension api is buggy (5.4), doesn't allow us to set an interface name")
             print ("\nhowever its the name we need for config rules, as the name is infact the description")
@@ -2255,7 +2409,7 @@ def submenu216():
             print ("You selected router ", routername)
             print ("You selected interface ", interfacenameselected)
             print ("The interfaces current setting for name is\n-------")
-            mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select name from \"Interfaces\" where id=" + str(interfacepossitionselected) + " order by id;'")
+            mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select name from \"Interfaces\" where id=" + str(interfacepositionselected) + " order by id;'")
             os.system(mycmd)
             print("\nI used this Command: " + mycmd )
             print("\nHow do you want me to this interfaces name")
@@ -2263,14 +2417,14 @@ def submenu216():
             #if user_input != '':
             if(len(user_input) != 0):
                 print ("setting the name, I used this comand")
-                mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c \"update \\\"Interfaces\\\" set name='" + user_input + "' where id=" + str(interfacepossitionselected) + ";\"")
+                mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c \"update \\\"Interfaces\\\" set name='" + user_input + "' where id=" + str(interfacepositionselected) + ";\"")
                 print("\nRunning Command: " + mycmd )
                 os.system(mycmd)
                 print("\nDone")
             else:
                 print ("doing nothing")
             print ("The interfaces current setting for name is now\n-------")
-            mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select name from \"Interfaces\" where id=" + str(interfacepossitionselected) + " order by id;'")
+            mycmd = ("sudo -u postgres psql -d \"defender_" + socket.gethostname().split('.', 2)[1] + "\" -c 'select name from \"Interfaces\" where id=" + str(interfacepositionselected) + " order by id;'")
             os.system(mycmd)
         elif(ch == 14):
             print ("To Debug check syslog: sudo less /var/log/syslog")
