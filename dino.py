@@ -959,7 +959,8 @@ def submenu220():
             7.Delete all positions in a dimension, selected from a list of all dimensions
             8.Set all positions in a dimension to disabled, selected from a list of all dimensions
             9.Set all positions in a dimension to enabled, selected from a list of all dimensions
-            10.Return""")
+            10.Delete one position in a dimension, selected from menu lists 
+            11.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -1592,15 +1593,87 @@ def submenu220():
                     print("\nRunning Command: " + mycmd )
                     os.system(mycmd)
                 print("\n\nAll Done")
-        elif ch == 10:
+        elif(ch == 10):
+            #here
+            print("Delete one position in a dimension, selected from menu lists")
+            url = 'https://' + cluster_fqdn + '/dimensions/index?attributes=*&api_key=' + API_Key
+            #print ("\nDebug url: " , url)
+            dimensionlist = requests.get(url, verify=False).json()
+            #print ("\nDimensionlist: " , dimensionlist)
+            json_formatted_dimensionlist = json.dumps(dimensionlist, indent=2)
+            #print ("\nDebug dimensionlist: " , json_formatted_dimensionlist)
+            #build the text menu
+            user_input = ''
+            input_message = "Select a dimension:\n"
+            index = 0
+            for key in dimensionlist:
+                index += 1
+                #print ("DEBUG: key:", key)
+                dimensionname = dimensionlist[key]['name']
+                dimensionuuid = dimensionlist[key]['dimension_id']
+                #dimensionname = key['name']
+                #dimensionuuid = key['dimension_id']
+                input_message += f'{index}) {dimensionname}\n'
+            input_message += 'You selected dimension: '
+            #prompt for the dimension by number x) 
+            user_input = input(input_message)
+            #now find the selected dimension name and uuid for the selected number
+            index = 0
+            for key in dimensionlist:
+                index += 1
+                if index == int(user_input):
+                    dimensionname = dimensionlist[key]['name']
+                    dimensionuuid = dimensionlist[key]['dimension_id']
+            print ("You selected dimension name:", dimensionname)
+            print ("Which has dimension id:", dimensionuuid)
+            #build the possitions text menu
+            #for the selected dimension
+            url = 'https://' + cluster_fqdn + '/dimension/' + str(dimensionuuid) + '/positions?attributes=*&api_key=' + API_Key
+            #print ("\nDebug possitions url: " , url)
+            possitionlist = requests.get(url, verify=False).json()
+            #print ("\nDebug possitionlist: " , possitionlist)
+            json_formatted_possitionlist = json.dumps(possitionlist, indent=2)
+            #print ("\nDebug json formatted possitionlist: " , json_formatted_possitionlist)
+            user_input = ''
+            input_message = "Select a possition to delete from this list of possition names and id's:\n"
+            index = 0
+            for key in possitionlist:
+                index += 1
+                #print ("DEBUG: key:", key)
+                possitionname = possitionlist[key]['name']
+                possitionuuid = possitionlist[key]['id']
+                input_message += f'{index}) name={possitionname} id={possitionuuid}\n'
+            input_message += 'You selected possition: '
+            #prompt for the possition by number x) 
+            user_input = input(input_message)
+            #now find the selected possition name and uuid for the selected number
+            index = 0
+            for key in possitionlist:
+                index += 1
+                if index == int(user_input):
+                    possitionname = possitionlist[key]['name']
+                    possitionuuid = possitionlist[key]['id']
+            print ("You selected possition name:", possitionname)
+            print ("Which has possition id:", possitionuuid)
+            positionlist = requests.get(url, verify=False).json()
+            #print ("\nDEBUG: positionlist: " , positionlist)
+            json_formatted_positionlist = json.dumps(positionlist, indent=2)
+            #print ("\nDEBUG: json_formatted_positionlist: " , json_formatted_positionlist)
+            #prompt then if the user enters yea delete the possition
+            mycmd = ("curl -k --silent -X DELETE -d '{\"data\": {\"positions\": [" + str(possitionuuid) + "]}}' 'https://" + cluster_fqdn + "/dimension/" + str(dimensionuuid) + "/positions" + "?api_key=" + API_Key + "' | json_pp ")
+            print("Command is:" + mycmd )
+            user_input = input("Input yes and I will delete the dimension positions for you, any other key to do nothing at all:")
+            if user_input == 'yes':
+                print("\nRunning Command: " + mycmd )
+                os.system(mycmd)
+                print("\n\nAll Done")
+        elif ch == 11:
             topmenu()
         else:
             print("Invalid entry")
         input("\nPress enter to continue")
         os.system("clear")
         submenu220()
-
-
 def submenu221():
     os.system("clear")
     # sets the text color to magenta
