@@ -814,7 +814,9 @@ def submenu219():
             8.Dump the detection rules raw dfmatch in JSON
             9.Dump the mitigation rules raw dfmatch in JSON
             10.Dump the countermeasure dimension positions in JSON
-            11.Return""")
+            11.Flip all policies to use flow rather than spm (config-sync use case)
+            12.Flip all policies to use spm rather than flow (config-sync use case)
+            13.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -1064,7 +1066,54 @@ def submenu219():
                     print (json_formatted_positiondetails)
                     f.write(str(json_formatted_positiondetails))
             print ("Output was also write it to file countermeasures.txt")
-        elif ch == 11:
+        elif(ch == 11):
+            print("Flip all policies to use flow rather than spm (config-sync use case)")
+            url = 'https://' + cluster_fqdn + '/api/defender/policies?attributes=*&api_key=' + API_Key
+            #print ("\nDebug url: " , url)
+            policylist = requests.get(url, verify=False).json()
+            #print ("\nDebug policylist: " , policylist)
+            json_formatted_policylist = json.dumps(policylist, indent=2)
+            #print ("\nDebug policylist: " , json_formatted_policylist)
+            #for each policy is_spm == false 
+            user_input = input("Input yes and I will  disable spm on all defender policies:")
+            if user_input == 'yes':
+                for key in policylist:
+                     #print ("\nDEBUG: key: " , key)
+                     if key == "entities":
+                        #print ("\nDEBUG: policylist when id=entities: " , policylist[key])
+                        for entities in policylist[key]:
+                             policyentitlesid = entities['id']
+                             #print ("\nDEBUG:policyentitlesid: " , policyentitlesid)
+                             mycmd = ("curl -k --silent -X PATCH -H 'Content-Type: application/json' -d '{\"id\": " + str(policyentitlesid) + ", \"is_spm\": false}' 'https://" + cluster_fqdn + "/api/defender/policy/" + str(policyentitlesid) + "?api_key=" + API_Key + "' | json_pp > policies-entities.json")
+                             #print("\nDEBUG: mycmd: " , mycmd )
+                             os.system(mycmd)
+                print("All Done")
+                print("Changes have been written to file policies-entities.json")
+        elif(ch == 12):
+            print("Flip all policies to use spm rather than flow (config-sync use case)")
+            url = 'https://' + cluster_fqdn + '/api/defender/policies?attributes=*&api_key=' + API_Key
+            #print ("\nDebug url: " , url)
+            policylist = requests.get(url, verify=False).json()
+            #print ("\nDebug policylist: " , policylist)
+            json_formatted_policylist = json.dumps(policylist, indent=2)
+            #print ("\nDebug policylist: " , json_formatted_policylist)
+            #for each policy is_spm == false 
+            user_input = input("Input yes and I will enable spm on all defender policies:")
+            if user_input == 'yes':
+                for key in policylist:
+                     #print ("\nDEBUG: key: " , key)
+                     if key == "entities":
+                        #print ("\nDEBUG: policylist when id=entities: " , policylist[key])
+                        for entities in policylist[key]:
+                             policyentitlesid = entities['id']
+                             #print ("\nDEBUG:policyentitlesid: " , policyentitlesid)
+                             mycmd = ("curl -k --silent -X PATCH -H 'Content-Type: application/json' -d '{\"id\": " + str(policyentitlesid) + ", \"is_spm\": true}' 'https://" + cluster_fqdn + "/api/defender/policy/" + str(policyentitlesid) + "?api_key=" + API_Key + "' | json_pp > policies-entities.json")
+                             #print("\nDEBUG: mycmd: " , mycmd )
+                             os.system(mycmd)
+                print("All Done")
+                print("Changes have been written to file policies-entities.json")
+
+        elif ch == 13:
             topmenu()
         else:
             print("Invalid entry")
