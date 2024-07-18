@@ -46,7 +46,10 @@ try:
     import deepy.log as log
 except ImportError:
     RunningOnMaster = "no"
-
+try:
+    from deepy.encryption_utils import EncryptFile
+except ImportError:
+    RunningOnMaster = "no"
 #date 
 today = str(date.today())
 #statics
@@ -483,7 +486,9 @@ def submenu218():
             2.Dump all DCU's network configuration to all DCU's to a tar file 
             3.Collect the config via api for Analytics, make one large tar file on master
             4.Clean up old tar files
-            5.Return""")
+            5.Generate a config_sync backup even without config sync enabled
+            6.Unencrypt a config_sync backup so you can look at its contents
+            7.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -737,6 +742,48 @@ def submenu218():
             os.system("clear")
             submenu218() 
         elif ch == 5:
+            print ("Generate a config_sync backup even without config sync enabled")
+            print ("#the following commands will generte a config_sync backup in directory")
+            print ("#/pipedream/cache/config_sync")
+            print ("#this should work on any release that supports config_sync, even if the feature is not enabled")
+            print ("#Don't forget to clean up afterwards")
+            print ("")
+            print ("cp /usr/local/sbin/config_sync.py ./custom_config_sync.py")
+            print ("sed -i '/CONFIG_SYNC_ENABLED/d' ./custom_config_sync.py")
+            print ("sed -i '/config sync not enabled/d' ./custom_config_sync.py")
+            print ("./custom_config_sync.py -d")
+            print ("#you can get the key for encryption/de-cryption with this command")
+            print ("grep deployment_encryption_key /pipedream/cache/config/config_sync.json")
+            print ("#you can find the config_sync backup files with command")
+            print ("ls -lrt /pipedream/cache/config_sync/")
+            input("Press any key to return to the menu")
+            os.system("clear")
+            submenu218() 
+        elif ch == 6:
+            print ("Unencrypt a config_sync backup so you can look at its contents")
+            Config_Sync_File = input("enter the full path to the encrypted config_sync backup file: ")
+            if os.path.exists(Config_Sync_File):
+                Config_Sync_Key = input("enter the encryption key (hint: /pipedream/cache/config/config_sync.json): ")
+                Config_Sync_Decrypted_File = "Decrypted_config_sync_backup.tar.gz"
+                with deepy.cfg.store.write_file_atomically(Config_Sync_Decrypted_File) as out_file:
+                    try:
+                        file_encryption_obj = EncryptFile(Config_Sync_Key.encode("utf8"), Config_Sync_File, out_file)
+                        file_encryption_obj.decrypt()
+                        print ("All Done.")
+                        print ("The original encrypted file was: " + Config_Sync_File)
+                        print ("The unencrypted file is here: " + Config_Sync_Decrypted_File)
+                        print ("The encryption key was: " + Config_Sync_Key)
+                        print ("You can untar the file with the following command:")
+                        print ("mkdir decrypted_config_sync")
+                        print ("tar zxvf Decrypted_config_sync_backup.tar.gz --directory ./decrypted_config_sync")
+                    except:
+                        print ("Error decrypting config_sync file: ")
+            else:
+                print ("Sorry that config_sync backup file does not exist")
+            input("Press any key to return to the menu")
+            os.system("clear")
+            submenu218() 
+        elif ch == 7:
             topmenu()
         else:
             print("Invalid entry")
@@ -1826,7 +1873,6 @@ def submenu220():
                     os.system(mycmd)
                 print("\n\nAll Done")
         elif(ch == 10):
-            #here
             print("Delete one position in a dimension, selected from menu lists")
             url = 'https://' + cluster_fqdn + '/dimensions/index?attributes=*&api_key=' + API_Key
             #print ("\nDebug url: " , url)
