@@ -715,6 +715,37 @@ def submenu218():
             print("Command is:" + mycmd )
             os.system(mycmd)
             print("-------------------------------------------------")
+            print ("Step 12)dump all possitions for all dimensions via the api")
+            print("-------------------------------------------------")
+            user_input = input("This step will generate a lot of data and take a long time to run. Input yes to run it any other key to skip it:")
+            if user_input == 'yes':
+                print("\nOk Running it: ")
+                url = 'https://' + cluster_fqdn + '/dimensions/index?attributes=*&api_key=' + API_Key
+                #print ("\nDebug url: " , url)
+                dimensionlist = requests.get(url, verify=False).json()
+                #print ("\nDebug: Dimensionlist: " , dimensionlist)
+                json_formatted_dimensionlist = json.dumps(dimensionlist, indent=2)
+                #print ("\nDebug json_formatted_dimensionlist: " , json_formatted_dimensionlist)
+                #build the text menu
+                index = 0
+                for key in dimensionlist:
+                    index += 1
+                    #print ("DEBUG: key:", key)
+                    dimensionname = dimensionlist[key]['name']
+                    dimensionuuid = dimensionlist[key]['dimension_id']
+                    #print ("\nDebug: dimensionname: " , dimensionname)
+                    #print ("\nDebug: dimensionuuid: " , dimensionuuid)
+                    print ("Working on dimension: " , dimensionname)
+                    mycmd = ("echo \"Working on dimension name:" + str(dimensionname) + " uuuid:" + str(dimensionuuid) + "\" >> /home/support/api-config-backup/all-dimensions-all-possitions.json") 
+                    #print("Debug: Command is:" + mycmd )
+                    os.system(mycmd)
+                    mycmd = ("curl -k --silent -X GET 'https://" + cluster_fqdn + "/dimension/" + str(dimensionuuid) + "/positions?&attributes=(*)&api_key=" + API_Key + "' | json_pp >> /home/support/api-config-backup/all-dimensions-all-possitions.json")
+                    #print("Debug: Command is:" + mycmd )
+                    os.system(mycmd)
+                print("\nDone")
+            else:
+                print ("skipping this step as you did not enter yes")
+            print("-------------------------------------------------")
             print ("Step 99)tar'ing up the api dumps into one big tar file")
             print("-------------------------------------------------")
             mycmd = ("tar czvf /home/support/api-config-backup.tar.gz /home/support/api-config-backup/*")
