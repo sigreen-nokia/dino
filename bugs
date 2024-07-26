@@ -1,0 +1,17 @@
+from mac:
+
+Enter your choice: 11
+Flip all policies to use flow rather than spm (config-sync use case)
+Traceback (most recent call last):
+  File "/Users/sigreen/git/dino/dino.py", line 3609, in <module>
+    topmenu() 
+    ^^^^^^^^^
+  File "/Users/sigreen/git/dino/dino.py", line 169, in topmenu
+    submenu219() 
+    ^^^^^^^^^^^^
+  File "/Users/sigreen/git/dino/dino.py", line 1154, in submenu219
+    policylist = requests.get(url, verify=False).json()
+                 ^^^^^^^^^^^^
+AttributeError: module 'requests' has no attribute 'get'
+
+

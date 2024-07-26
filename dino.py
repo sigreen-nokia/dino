@@ -486,9 +486,11 @@ def submenu218():
             2.Dump all DCU's network configuration to all DCU's to a tar file 
             3.Collect the config via api for Analytics, make one large tar file on master
             4.Clean up old tar files
-            5.Generate a config_sync backup even without config sync enabled
+            5.Generate a config_sync backup, without enabling config sync
             6.Unencrypt a config_sync backup so you can look at its contents
-            7.Return""")
+            7.Add a cron to once a week sync the master postgress backups to worker01
+            8.Remove the cron to once a week sync the master postgress backups to worker01
+            9.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -773,7 +775,7 @@ def submenu218():
             os.system("clear")
             submenu218() 
         elif ch == 5:
-            print ("Generate a config_sync backup even without config sync enabled. For a rainy day")
+            print ("Generate a config_sync backup, without enabling config sync. Usefull for a rainy day")
             print ("#***You should to enable a blackout on slack before you start, leave it for an hour or two afterwards")
             print ("#***Make it clear that your are squirreling away a backup for a rainy day")
             print ("#***Otherwise should it fail its checks, ops will get a ping and wonder whats going on")
@@ -818,6 +820,30 @@ def submenu218():
             os.system("clear")
             submenu218() 
         elif ch == 7:
+            print ("Add a cron to once a week sync the master postgress backups to worker01")
+            mycmd = ("sudo printf '#!/bin/sh -e\n#customer requirement: Sync the postgress backup files to worker01, once once a week\n/usr/sbin/runuser -l support -c \"/usr/bin/rsync /pipedream/backup/*.sql.gz worker01:/pipedream/backup/\"\n' | sudo tee /etc/cron.weekly/postgress-remote-backup")
+            #print("Debug: Command is:" + mycmd )
+            os.system(mycmd)
+            mycmd = ("sudo chmod a+x /etc/cron.weekly/postgress-remote-backup")
+            #print("Debug: Command is:" + mycmd )
+            os.system(mycmd)
+            print ("All done.")
+            print ("The cron file has been created here /etc/cron.weekly/postgress-remote-backup")
+            print (".sql.gz files in /pipedream/backups/ will be synced to the same place on worker01 weekly")
+            input("Press enter to continue")
+            os.system("clear")
+            submenu218() 
+        elif ch == 8:
+            print ("Remove the cron to once a week sync the master postgress backups to worker01")
+            mycmd = ("sudo rm /etc/cron.weekly/postgress-remote-backup")
+            #print("Debug: Command is:" + mycmd )
+            os.system(mycmd)
+            print ("All done.")
+            print ("The cron file /etc/cron.weekly/postgress-remote-backup has been remove")
+            input("Press enter to continue")
+            os.system("clear")
+            submenu218() 
+        elif ch == 9:
             topmenu()
         else:
             print("Invalid entry")
