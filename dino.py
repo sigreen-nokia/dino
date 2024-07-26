@@ -821,7 +821,7 @@ def submenu218():
             submenu218() 
         elif ch == 7:
             print ("Add a cron to once a week sync the master postgress backups to worker01")
-            mycmd = ("sudo printf '#!/bin/sh -e\n#customer requirement: Sync the postgress backup files to worker01, once once a week\n/usr/sbin/runuser -l support -c \"/usr/bin/rsync /pipedream/backup/*.sql.gz worker01:/pipedream/backup/\"\n' | sudo tee /etc/cron.weekly/postgress-remote-backup")
+            mycmd = ("sudo printf '#!/bin/sh -e\n#customer requirement: Sync the postgress backup files to worker01, once a week\n/usr/sbin/runuser -l support -c \"ssh worker01 rm -f /pipedream/backup-master/*.sql.gz\"\n/usr/sbin/runuser -l support -c \"/usr/bin/rsync /pipedream/backup/*.sql.gz worker01:/pipedream/backup-master/\"\n' | sudo tee /etc/cron.weekly/postgress-remote-backup")
             #print("Debug: Command is:" + mycmd )
             os.system(mycmd)
             mycmd = ("sudo chmod a+x /etc/cron.weekly/postgress-remote-backup")
@@ -829,7 +829,7 @@ def submenu218():
             os.system(mycmd)
             print ("All done.")
             print ("The cron file has been created here /etc/cron.weekly/postgress-remote-backup")
-            print (".sql.gz files in /pipedream/backups/ will be synced to the same place on worker01 weekly")
+            print ("*.sql.gz files in /pipedream/backup/ will be synced to /pipedream/backup-master/ on worker01 weekly")
             input("Press enter to continue")
             os.system("clear")
             submenu218() 
