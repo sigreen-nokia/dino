@@ -16,7 +16,7 @@ sudo salt-cp --chunked '*' /tmp/network-test-ip-addresses.json /tmp/tests/
 
 #ship jq up as its missing and these nodes are isolated. use scp as salt-cp is slow
 echo "shipping jq-linux64 to the nodes"
-for NODE in $(bin/jq-linux64 -r ". | keys" /tmp/tests/network-test-ip-addresses.json | grep "\"" | sed 's|[" ]||g'); 
+for NODE in $(./jq-linux64 -r ". | keys" /tmp/tests/network-test-ip-addresses.json | grep "\"" | sed 's|[" ]||g'); 
 do
         if [ "$DEBUG" = true ] ; then
                 echo "==================="
@@ -26,14 +26,14 @@ do
 	if [[ $NODE == *"-master" ]] ; then
 		NODE="master" 
 	fi
-	scp bin/jq-linux64  support@$NODE:/tmp/jq-linux64
+	scp ./jq-linux64  support@$NODE:/tmp/jq-linux64
 done
 sudo salt \* cmd.run "mv /tmp/jq-linux64 /usr/local/sbin/jq-linux64"
 sudo salt \* cmd.run "chmod a+x /usr/local/sbin/jq-linux64"
 
 #ship up the test scripts
 echo "shipping the test scripts to the nodes"
-sudo salt-cp --chunked '*' /home/support/mop-remove-vswitches/bin/test* /tmp/tests/
+sudo salt-cp --chunked '*' /home/support/dino/network-testing/test* /tmp/tests/
 
 #execute test1 on the master
 sudo salt "nokia-deepfield-master" cmd.run "/tmp/tests/test1.sh"
