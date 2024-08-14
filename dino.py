@@ -2875,11 +2875,12 @@ def submenu217():
             6.Example Case: Create a new custom ddos data view sliced on a custom protection group - A step by step using an example
             7.Create a new data view from a json file - A step by step
             8.Patch an existing data view retention - A step by step
-            9.Delete an existing data view
-            10.Log the current calculated disk space for each data view 
-            11.Configure a daily CRON job to log the current calculated disk space for each data view to /pipedream/log/
-            12.Remove the daily CRON job to log the current calculated disk space for each data view
-            13.Return""")
+            9.PUT (update) the fields of a dataview from a json file - A step by step
+            10.Delete an existing data view
+            11.Log the current calculated disk space for each data view 
+            12.Configure a daily CRON job to log the current calculated disk space for each data view to /pipedream/log/
+            13.Remove the daily CRON job to log the current calculated disk space for each data view
+            14.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -3253,6 +3254,77 @@ def submenu217():
             else:
                 print ("doing nothing. You can use the curl above to create the data view yourself")
         elif(ch == 9):
+            print("PUT (Update) an existing data views fields - A step by step")
+            url = 'https://' + cluster_fqdn + '/api/data_views/?attributes=*&api_key=' + API_Key
+            dataviewlist = requests.get(url, verify=False).json()
+            #for debug the two lines below prints the json
+            json_formatted_dataviewlist = json.dumps(dataviewlist, indent=2)
+            user_input = ''
+            input_message = "Select a data view:\n"
+            index = 0
+            for key in dataviewlist['data']:
+                index += 1
+                #print ("DEBUG: key:", key)
+                dataviewname = key['name']
+                dataviewuuid = key['uuid']
+                lastmodified = key['last_modified']
+                #print ("DEBUG: dataviewname:", dataviewname)
+                #print ("DEBUG: dataviewuuid:", dataviewuuid)
+                #print ("DEBUG: lastmodified:", lastmodified)
+                input_message += f'{index}) {dataviewname}\n'
+            input_message += 'You selected data view: '
+            #prompt for the data view by number x) 
+            user_input = input(input_message)
+            #now find the selected data view name and uuid for the selected number
+            index = 0
+            for key in dataviewlist['data']:
+                index += 1
+                if index == int(user_input):
+                    dataviewname = key['name']
+                    dataviewuuid = key['uuid']
+            print ("You selected data view name:", dataviewname)
+            #print ("DEBUG: lastmodified:", lastmodified)
+            print ("Dumping the current data view JSON for this view to file dataview_before_being_modified.json")
+            mycmd = ("curl -k --silent -X GET 'https://" + cluster_fqdn + "/api/data_views/" + dataviewuuid + "?api_key=" + API_Key + "' | json_pp | tee dataview_before_being_modified.json") 
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+            print ("Making a copy of file 'dataview_before_being_modified.json' to file 'dataview_after_being_modified.json'")
+            mycmd = ("cp dataview_before_being_modified.json dataview_after_being_modified.json")
+            os.system(mycmd)
+            print("##########################################################################")
+            print("Now in a different window go and modify the file 'dataview_after_being_modified.json'")
+            print("Add or delete or update the fields as you need to")
+            print("You will also have to change the json block \"timesteps\" : {")
+            print("Into a json block structured like this,..")
+            print("   \"timestep_retention_days\" : {")
+            print("       \"5min\" : x,")
+            print("       \"2hour\" : x,")
+            print("       \"week\" : x")
+            print("   },")
+            print("You will also need to add a comment block..something like")
+            print("\"comment\": \"Modifying fields as requested by customer\"")
+            print("Then hit enter to load the file and modify the dataview fields")
+            print("##########################################################################")
+            user_input = input("hit [enter] once you are ready:")
+            print("\n\nThe following command will update the dataview with your modified json file")
+            mycmd = ("curl --insecure -X PUT -H 'Content-Type: application/json' -d '@dataview_after_being_modified.json' https://" + cluster_fqdn + "/api/data_views/" + dataviewuuid + "?api_key=" + API_Key)
+            print("\nCommand is:" + mycmd )
+            user_input = input("\nInput yes and I will create the data view for you, any other key to do nothing at all:")
+            if user_input == 'yes':
+                print("\nRunning Command: " + mycmd )
+                os.system(mycmd)
+                print ("Dumping the dataview json again to file 'dataview_final_check.json'")
+                mycmd = ("curl -k --silent -X GET 'https://" + cluster_fqdn + "/api/data_views/" + dataviewuuid + "?api_key=" + API_Key + "' | json_pp | tee dataview_final_check.json") 
+                os.system(mycmd)
+                print ("As a final validation:")
+                print ("Running a diff of the dataview json now verses before the changes")
+                print ("Besides the changes you made, we only expect to see last_modified showing up in here")
+                mycmd = ("diff dataview_final_check.json dataview_before_being_modified.json") 
+                os.system(mycmd)
+                print("\nDone")
+            else:
+                print ("doing nothing. You can use the curl above to update the data view yourself")
+        elif(ch == 10):
             print ("Delete an existing data view")
             url = 'https://' + cluster_fqdn + '/api/data_views/?attributes=*&api_key=' + API_Key
             dataviewlist = requests.get(url, verify=False).json()
@@ -3290,13 +3362,13 @@ def submenu217():
                 print("\nDone")
             else:
                 print ("doing nothing. You can use the curl above to delete the data view yourself")
-        elif ch == 10:
+        elif ch == 11:
             print ("Logging the current calculated disk space for each data view")
             print ("Appending the output to files {} and {}".format(str(disk_space_filename_sorted),str(disk_space_filename)))
             mycmd = ("python3 log_dataview_size.py " + cluster_fqdn + " " + API_Key + " -log_dir .")
             print("Command is:" + mycmd )
             os.system(mycmd)
-        elif ch == 11:
+        elif ch == 12:
             print ("Install a daily cron on mast to log the current calculated disk space each data view to /pipedream/log/")
             input("\nPress enter to continue")
             mycmd = ("sudo cp log_dataview_size.py /usr/local/sbin/log_dataview_size.py")
@@ -3307,14 +3379,14 @@ def submenu217():
             print("Command is:" + mycmd )
             os.system(mycmd)
             print ("The cron will log dataview sizes once a day to /pipedream/log/{} and /pipedream/log/{}".format(str(disk_space_filename_sorted),str(disk_space_filename)))
-        elif ch == 12:
+        elif ch == 13:
             print ("Remove the daily cron on master to log the current calculated disk space each data view")
             input("\nPress enter to continue")
             mycmd = ("crontab -l 2>/dev/null | grep -v '/usr/local/sbin/log_dataview_size.py'  | crontab -")
             print("Command is:" + mycmd )
             os.system(mycmd)
             print ("The cron job has been removed")
-        elif ch == 13:
+        elif ch == 14:
             topmenu()
         else:
             print("Invalid entry")
