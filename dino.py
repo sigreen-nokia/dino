@@ -234,7 +234,7 @@ def submenu23():
             4.memory hogs 						#show the top processes consuming memory for all nodes 
             5.check the performance of dnsflowd on each worker 	        #100% indicated it is time to scale up
             6.check the performance of classifyd on each worker 	#100% indicated it is time to scale up
-            7.check the performance of collectord on each worker 	#100% indicated it is time to scale up
+            7.check the performance of collectd on each worker 	        #100% indicated it is time to scale up
             8.check the performance of normd on each worker 	        #100% indicated it is time to scale up
             9.cpu hogs 							#show the top processes consuming cpu for all nodes 
             10.show me the cpu details for each node 			#cpu details
@@ -271,7 +271,7 @@ def submenu23():
             print("Command is:" + mycmd )
             os.system(mycmd)
         elif ch == 7:
-            mycmd = "sudo salt \* cmd.run \"ps -eo %mem,%cpu,pid,ppid,cmd --sort=-%mem | cut -c -140 | grep collectord | grep -v grep \""
+            mycmd = "sudo salt \* cmd.run \"ps -eo %mem,%cpu,pid,ppid,cmd --sort=-%mem | cut -c -140 | grep collectd | grep -v grep \""
             print("Command is:" + mycmd )
             os.system(mycmd)
         elif ch == 8:
