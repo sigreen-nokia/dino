@@ -923,7 +923,9 @@ def submenu219():
             10.Dump the countermeasure dimension positions in JSON
             11.Flip all policies to use flow rather than spm (config-sync use case)
             12.Flip all policies to use spm rather than flow (config-sync use case)
-            13.Return""")
+            13.Dump all mitigation devices via the api
+            14.Dump all mitigation device groups via the api
+            15.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -1220,7 +1222,20 @@ def submenu219():
                 print("All Done")
                 print("Changes have been written to file policies-entities.json")
 
-        elif ch == 13:
+#here
+        elif(ch == 13):
+            print ("Dumping all mitigation devices via the api")
+            mycmd = ("curl --insecure -X GET https://" + cluster_fqdn + "/api/defender/mitigation/devices?api_key=" + API_Key + " | json_pp | tee mitigation-devices.json" )
+            print("\nCommand is:" + mycmd )
+            os.system(mycmd)
+            print ("The json has also been written to file ./mitigation-devices.json")
+        elif(ch == 14):
+            print ("Dumping all mitigation device groups via the api")
+            mycmd = ("curl --insecure -X GET https://" + cluster_fqdn + "/api/defender/mitigation/groups?api_key=" + API_Key + " | json_pp | tee mitigation-device-groups.json" )
+            print("\nCommand is:" + mycmd )
+            os.system(mycmd)
+            print ("The json has also been written to file ./mitigation-device-groups.json")
+        elif ch == 15:
             topmenu()
         else:
             print("Invalid entry")
