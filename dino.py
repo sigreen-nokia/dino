@@ -787,6 +787,12 @@ def submenu218():
             print ("cp /usr/local/sbin/config_sync.py ./custom_config_sync.py")
             print ("sed -i '/CONFIG_SYNC_ENABLED/d' ./custom_config_sync.py")
             print ("sed -i '/config sync not enabled/d' ./custom_config_sync.py")
+            print ("sed -i 's/stats.event/#stats.event/g' ./custom_config_sync.py")
+            print ("#patch out the slice.json restore code (used later for the recovery)")
+            print ("#as we do not want to replace slice.json with the backup")
+            print ("sed -i 's/_merge_slice_file(json.load.*/print(f\"Skipping the merge of the slice.json file\")/g' ./custom_config_sync.py")
+            print ("#patch to make sure we backup everything, avoids problems in HealthStatus*")
+            print ("sed -i '/pg_dump_cmd.extend/d' ./custom_config_sync.py")
             print ("./custom_config_sync.py -d")
             print ("#you can get the key for encryption/de-cryption with this command")
             print ("grep deployment_encryption_key /pipedream/cache/config/config_sync.json")
@@ -2406,7 +2412,8 @@ def submenu216():
             14.Debugging hints
             15.Procedure to change any fields in an existing router using the dimensions api
             16.Procedure to create a new router/dms from an existing router/dms using the  dimension/router api
-            17.Return""")
+            17.Dump the udms mdms configs using /api/devices/dms 
+            18.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -2933,6 +2940,14 @@ def submenu216():
             print ("")
             print ("")
         elif(ch == 17):
+            print("Dump the udms mdms configs using /api/devices/dms")
+            mycmd = ("curl --insecure -X GET 'https://" + cluster_fqdn + "/api/devices/dms?&attributes=(*)&api_key=" + API_Key + "' | json_pp | tee dmslist.json")
+            print("Command is:" + mycmd )
+            input("\nPress enter to run the command")
+            os.system(mycmd)
+            print("\n\nI've written the output to file dmslist.json for you")
+#here
+        elif(ch == 18):
             topmenu()
         else:
             print("Invalid entry")
