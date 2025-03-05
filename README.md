@@ -216,7 +216,11 @@ Run it and you will see a menu like this one..
             12.Set all interfaces 'active' true/false on all router (psql so must be on master)s
             13.Overwrite a specified routers interface name, intended for config rules (works but then gets reset to router name + ifname )
             14.Debugging hints
-            15.Return
+            15.Procedure to change any fields in an existing router using the dimensions api
+            16.Procedure to create a new router/dms from an existing router/dms using the  dimension/router api
+            17.Dump the udms mdms configs using /api/devices/dms 
+            18.Delete a router selected from a list of all routers
+            19.Return
 
 
 	-------------------------------------------------
