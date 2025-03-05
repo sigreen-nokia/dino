@@ -2413,7 +2413,8 @@ def submenu216():
             15.Procedure to change any fields in an existing router using the dimensions api
             16.Procedure to create a new router/dms from an existing router/dms using the  dimension/router api
             17.Dump the udms mdms configs using /api/devices/dms 
-            18.Return""")
+            18.Delete a router selected from a list of all routers
+            19.Return""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -2946,8 +2947,42 @@ def submenu216():
             input("\nPress enter to run the command")
             os.system(mycmd)
             print("\n\nI've written the output to file dmslist.json for you")
-#here
         elif(ch == 18):
+            print("Delete a router selected from a list of all routers")
+            url = 'https://' + cluster_fqdn + '/dimension/router/positions?attributes=*&api_key=' + API_Key
+            routerlist = requests.get(url, verify=False).json()
+            json_formatted_routerlist = json.dumps(routerlist, indent=2)
+            #for debug the line below prints the json
+            #print ("\nDebug routerlist: " , json_formatted_routerlist)
+            #build the text menu
+            user_input = ''
+            input_message = "Select a router:\n"
+            index = 0
+            for key in routerlist:
+                index += 1
+                routername = routerlist[key]['name']
+                input_message += f'{index}) {routername}\n'
+            input_message += 'You selected router: '
+            #prompt for the router by number x) 
+            user_input = input(input_message)
+            #now find the selected router name and position for the selected number
+            index = 0
+            for key in routerlist:
+                index += 1
+                if index == int(user_input):
+                    routername = routerlist[key]['name']
+                    routerposition = routerlist[key]['position_id']
+            print ("You selected Router name:", routername)
+            print ("That Router has position:", routerposition)
+            print ("The following command will delete the selected router")
+            mycmd = ("curl --insecure -X DELETE 'https://" + cluster_fqdn + "/api/router/" + str(routerposition) + "?api_key=" + API_Key + "'")
+            print("Command is:" + mycmd )
+            user_input = input("Input yes and I will delete the router for you, any other key to do nothing at all:")
+            if user_input == 'yes':
+                print("\nRunning Command: " + mycmd )
+                os.system(mycmd)
+                print("\n\nAll Done")
+        elif(ch == 19):
             topmenu()
         else:
             print("Invalid entry")
