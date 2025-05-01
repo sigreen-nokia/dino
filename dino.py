@@ -122,7 +122,8 @@ def topmenu():
             20.Dimensions
             21.Organizations and Users
             22.Boundaries
-            23.Exit""")
+            23.Data-Explore
+            24.Exit""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -174,6 +175,8 @@ def topmenu():
         elif ch == 22:
             submenu222() 
         elif ch == 23:
+            submenu223() 
+        elif ch == 24:
             print("Exiting application")
             exit()
         else:
@@ -2118,6 +2121,58 @@ def submenu222():
         input("\nPress enter to continue")
         os.system("clear")
         submenu221()
+
+def submenu223():
+    os.system("clear")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\n\t-------------------------------------------------")
+    # sets the text colour to green
+    os.system("tput setaf 2")
+    print("\tData-Explore")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\t-------------------------------------------------")
+    while True:
+        print("""
+            1.Data Explore Dump Defaults
+            2.Data Explore Change Defaults
+            3.Return""")
+        print("\n")
+        ch=int(input("Enter your choice: "))
+        if(ch == 1):
+            print("Dumping the current Data-Explore defaults for you and write to a file")
+            mycmd = ("curl --insecure -X GET 'https://" + cluster_fqdn + "/api/explorer/default/contexts?api_key=" + API_Key + "' | json_pp")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 2):
+            print("First let me grab the current Data-Explore defaults for you and write to a file")
+            mycmd = ("curl --insecure -X GET 'https://" + cluster_fqdn + "/api/explorer/default/contexts?api_key=" + API_Key + "' | json_pp | tee data-explore-defaults.json")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+            print("\n\nI've written the current data explore defaults to file data-explore-defaults.json for you")
+            print("Modify the files defaults as you wish")
+            print("Then run the following command to update the data explore default")
+            print("\nCommand is:curl --insecure -X PUT --header \"Content-Type: application/json\" -d '@data-explore-defaults.json' 'https://localhost/api/explorer/default/contexts?api_key=" + API_Key + "'")
+            print("\nNote: I had to add the following json block to fix an error Missing dnsfqdn contexts.....") 
+            print('      {')
+            print('        "boundaries" : [],')
+            print('        "context" : "dnsfqdn",')
+            print('        "measures" : [')
+            print('          "sum.num.queries",')
+            print('          "pctl95.num.queries"')
+            print('        ],')
+            print('        "perspective" : ""')
+            print('      },')
+        elif ch == 3:
+            topmenu()
+        else:
+            print("Invalid entry")
+        input("\nPress enter to continue")
+        os.system("clear")
+        submenu223()
+
+
 
 def submenu212():
     os.system("clear")
