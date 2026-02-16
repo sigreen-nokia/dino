@@ -1,5 +1,7 @@
 # importing the modules
-#To add missing modues: 
+#To add missing modues:
+#                       python3 -m pip install requests (macos)
+#                       or 
 #                       pip install [module name]: 
 #                       or 
 #                       pip3 install [module name]: 
@@ -20,6 +22,8 @@ try:
     import requests 
 except ImportError:
     print ("\nPlease Install python module requests using")
+    print ("       'python3 -m pip install requests'")
+    print ("       or")
     print ("       'pip install requests'")
     print ("       or")
     print ("       'pip3 install requests'")
@@ -123,7 +127,8 @@ def topmenu():
             21.Organizations and Users
             22.Boundaries
             23.Data-Explore
-            24.Exit""")
+            24.Subscriber Intelligence (SUBI)
+            25.Exit""")
         print("\n")
         ch=int(input("Enter your choice: "))
         if(ch == 1):
@@ -177,6 +182,8 @@ def topmenu():
         elif ch == 23:
             submenu223() 
         elif ch == 24:
+            submenu224() 
+        elif ch == 25:
             print("Exiting application")
             exit()
         else:
@@ -2187,6 +2194,65 @@ def submenu223():
         os.system("clear")
         submenu223()
 
+def submenu224():
+    os.system("clear")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\n\t-------------------------------------------------")
+    # sets the text colour to green
+    os.system("tput setaf 2")
+    print("\tData-Explore")
+    # sets the text color to magenta
+    os.system("tput setaf 6")
+    print("\t-------------------------------------------------")
+    while True:
+        print("""
+            1.Run a SUBI API query to dump the endpoint schema subscribers/{endpoint}
+            2.Run a SUBI API query to dump the connector info subscribers/connectors
+            3.Run a SUBI API query to dump one connectors details subscribers/connectors/{connector name}
+            4.Run a SUBI API query to dump one connectors dimensions subscribers/dimensions/{dimension name}
+            5.Run a SUBI API query to dump the ingest info subscribers/ingest/info  
+            6.Run a SUBI API query to dump the ingest match subscribers/ingest/match
+            7.Return""")
+        print("\n")
+        ch=int(input("Enter your choice: "))
+        if(ch == 1):
+            print("Running a SUBI API query to dump the endpoint schema subscribers/{endpoint}")
+            mycmd = ("curl --insecure -X GET 'https://" + cluster_fqdn + "/api/subscribers?api_key=" + API_Key + "' | json_pp")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 2):
+            print("Running a SUBI API query to dump the connector info subscribers/connectors")
+            mycmd = ("curl --insecure -X GET 'https://" + cluster_fqdn + "/api/explorer/subscribers/connectors?api_key=" + API_Key + "' | json_pp")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 3):
+            print("Running a SUBI API query to dump one connectors details subscribers/connectors/{connector name}")
+            mycmd = ("curl --insecure -X GET 'https://" + cluster_fqdn + "/api/explorer/subscribers/connectors/{connector name}?api_key=" + API_Key + "' | json_pp")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 4):
+            print("Running a SUBI API query to dump one connectors dimensions subscribers/dimensions/{dimension name}")
+            mycmd = ("curl --insecure -X GET 'https://" + cluster_fqdn + "/api/explorer/subscribers/dimensions/{dimension name}?api_key=" + API_Key + "' | json_pp")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 5):
+            print("Running a SUBI API query to dump the ingest info subscribers/ingest/info")
+            mycmd = ("curl --insecure -X GET 'https://" + cluster_fqdn + "/api/explorer/subscribers/ingest/info?api_key=" + API_Key + "' | json_pp")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif(ch == 6):
+            print("Running a SUBI API query to dump the ingest match subscribers/ingest/match")
+            mycmd = ("curl --insecure -X GET 'https://" + cluster_fqdn + "/api/explorer/subscribers/ingest/match?api_key=" + API_Key + "' | json_pp")
+            print("Command is:" + mycmd )
+            os.system(mycmd)
+        elif ch == 7:
+            topmenu()
+        else:
+            print("Invalid entry")
+        input("\nPress enter to continue")
+        os.system("clear")
+        submenu223()
 
 
 def submenu212():
