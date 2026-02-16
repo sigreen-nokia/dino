@@ -2201,7 +2201,7 @@ def submenu224():
     print("\n\t-------------------------------------------------")
     # sets the text colour to green
     os.system("tput setaf 2")
-    print("\tData-Explore")
+    print("\tSUBI")
     # sets the text color to magenta
     os.system("tput setaf 6")
     print("\t-------------------------------------------------")
@@ -2252,7 +2252,7 @@ def submenu224():
             print("Invalid entry")
         input("\nPress enter to continue")
         os.system("clear")
-        submenu223()
+        submenu224()
 
 
 def submenu212():
